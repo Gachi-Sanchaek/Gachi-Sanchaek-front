@@ -1,14 +1,18 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-html,
-body,
-#root {
-  height: 100%;
-  overflow: hidden;
-  padding: 0;
+@font-face {
+  font-family: Cafe24Ssurround;
+  src:
+    local('Cafe24Ssurround'),
+    url('/font/Cafe24Ssurround.woff') format('woff'),
+    url('/font/Cafe24Ssurround.woff2') format('woff2');
+  font-display: swap;
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
+@font-face {
+  font-family: PretendardVariable;
+  src:
+    local('PretendardVariable'),
+    url('/font/PretendardVariable.woff2') format('woff');
+  font-display: swap;
 }
