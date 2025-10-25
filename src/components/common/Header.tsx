@@ -6,9 +6,10 @@ interface HeaderProps {
   hasArrow?: boolean;
   title?: string;
   titleColor?: 'black' | 'white';
+  bgColor: 'transparent' | 'white';
 }
 
-const Header = ({ hasArrow = false, title, titleColor = 'white' }: HeaderProps) => {
+const Header = ({ hasArrow = false, title, titleColor = 'white', bgColor = 'transparent' }: HeaderProps) => {
   const navigate = useNavigate();
 
   const handleClickBack = () => {
@@ -16,7 +17,7 @@ const Header = ({ hasArrow = false, title, titleColor = 'white' }: HeaderProps) 
   };
 
   return (
-    <header className='fixed top-0 w-full max-w-[480px] bg-transparent z-50 py-2.5'>
+    <header className={`fixed top-0 w-full max-w-[480px] z-50 py-2.5 bg-${bgColor}`}>
       {hasArrow ? (
         <div className='flex items-center justify-center px-6'>
           <button type='button' className='absolute left-6 cursor-pointer' onClick={handleClickBack}>
