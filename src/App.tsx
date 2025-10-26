@@ -2,7 +2,6 @@ import { type RouteObject, createBrowserRouter, RouterProvider } from 'react-rou
 import PublicLayout from './layouts/public-layout';
 import ProtectedLayout from './layouts/protected-layout';
 import Home from './pages/Home';
-import ListPage from './pages/search-page/list-page';
 import MapPage from './pages/search-page/map-page';
 
 const publicRoutes: RouteObject[] = [
@@ -23,7 +22,6 @@ const protectedRoutes: RouteObject[] = [
     children: [
       { index: true, element: <Home /> },
       { path: 'search', element: <MapPage /> },
-      { path: 'lists', element: <ListPage /> },
     ],
   },
 ];
