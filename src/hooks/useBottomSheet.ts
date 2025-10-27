@@ -41,7 +41,7 @@ const useBottomSheet = () => {
         return true;
       }
 
-      // 바텀시크가 최대로 올라와 있는 상태가 아닐 경우
+      // 바텀시트가 최대로 올라와 있는 상태가 아닐 경우
       if (sheet.current!.getBoundingClientRect().y !== MIN_Y) {
         return true;
       }
@@ -74,7 +74,7 @@ const useBottomSheet = () => {
         pointerMove.prevPointY = pointerMove.prevPointY || pointerStart.pointY;
       }
 
-      // 초기 렌더링
+      // 초기 위치
       if (pointerMove.prevPointY === 0) {
         pointerMove.prevPointY = pointerStart.pointY;
       }
@@ -172,7 +172,7 @@ const useBottomSheet = () => {
     };
 
     const node = content.current;
-    node?.addEventListener('pointerdown', onContentPointerDown, true);
+    node?.addEventListener('pointerdown', onContentPointerDown);
     return () => node?.removeEventListener('pointerdown', onContentPointerDown, true);
   }, []);
 
