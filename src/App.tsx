@@ -1,19 +1,16 @@
-import {
-  type RouteObject,
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import LogIn from "./pages/LogIn";
-import Home from "./pages/Home";
-import PublicLayout from "./layouts/public-layout";
-import ProtectedLayout from "./layouts/protected-layout";
+import { type RouteObject, createBrowserRouter, RouterProvider } from 'react-router-dom';
+import LogIn from './pages/LogIn';
+import Home from './pages/Home';
+import PublicLayout from './layouts/public-layout';
+import ProtectedLayout from './layouts/protected-layout';
+import SearchPage from './pages/search-page';
 
 const publicRoutes: RouteObject[] = [
   {
-    path: "/",
+    path: '/',
     element: <PublicLayout />,
     children: [
-      { path: "login", element: <LogIn /> },
+      { path: 'login', element: <LogIn /> },
       //   {path:'register', element:<Register />}
     ],
   },
@@ -21,9 +18,12 @@ const publicRoutes: RouteObject[] = [
 
 const protectedRoutes: RouteObject[] = [
   {
-    path: "/",
+    path: '/',
     element: <ProtectedLayout />,
-    children: [{ index: true, element: <Home /> }],
+    children: [
+      { index: true, element: <Home /> },
+      { path: 'search', element: <SearchPage /> },
+    ],
   },
 ];
 
