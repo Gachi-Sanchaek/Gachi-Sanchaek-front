@@ -6,7 +6,7 @@ import ListCard from '../ListCard';
 const BottomSheetContent = () => {
   return (
     <div
-      className={`pb-5 overflow-scroll [&::-webkit-scrollbar]:hidden`}
+      className={`pb-5`}
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
