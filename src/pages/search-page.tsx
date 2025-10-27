@@ -1,6 +1,6 @@
 import BottomSheet from '../components/SearchPage/BottomSheet/BottomSheet';
 
-export default function MapPage() {
+export default function SearchPage() {
   return (
     // base layer
     // <div>

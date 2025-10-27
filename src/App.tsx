@@ -3,7 +3,7 @@ import LogIn from './pages/LogIn';
 import Home from './pages/Home';
 import PublicLayout from './layouts/public-layout';
 import ProtectedLayout from './layouts/protected-layout';
-import MapPage from './pages/search-page';
+import SearchPage from './pages/search-page';
 
 const publicRoutes: RouteObject[] = [
   {
@@ -22,7 +22,7 @@ const protectedRoutes: RouteObject[] = [
     element: <ProtectedLayout />,
     children: [
       { index: true, element: <Home /> },
-      { path: 'search', element: <MapPage /> },
+      { path: 'search', element: <SearchPage /> },
     ],
   },
 ];
