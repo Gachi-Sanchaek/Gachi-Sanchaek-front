@@ -16,7 +16,12 @@ const Background: React.FC<BackgroundProps> = ({
   const safeHeight = Math.max(0, Math.min(100, whiteBackgroundHeight));
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
+    <div
+      className="relative w-screen overflow-hidden"
+      style={{
+        height: "calc(100dvh - 40px)", // 40px = ProtectedLayout의 pt-10
+      }}
+    >
       <div
         className="absolute inset-0 z-0"
         style={{

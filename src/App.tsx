@@ -4,6 +4,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import LogIn from "./pages/LogIn";
+import Home from "./pages/Home";
 import PublicLayout from "./layouts/public-layout";
 import ProtectedLayout from "./layouts/protected-layout";
 
@@ -22,7 +23,7 @@ const protectedRoutes: RouteObject[] = [
   {
     path: "/",
     element: <ProtectedLayout />,
-    children: [],
+    children: [{ index: true, element: <Home /> }],
   },
 ];
 
