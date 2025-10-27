@@ -1,17 +1,18 @@
 import { type RouteObject, createBrowserRouter, RouterProvider } from 'react-router-dom';
+import LogIn from './pages/LogIn';
+import Home from './pages/Home';
 import PublicLayout from './layouts/public-layout';
 import ProtectedLayout from './layouts/protected-layout';
-import Home from './pages/Home';
 import MapPage from './pages/search-page';
 
 const publicRoutes: RouteObject[] = [
   {
     path: '/',
     element: <PublicLayout />,
-    // children:[
-    //   {path:'login', element:<Login />}
-    //   {path:'register', element:<Register />}
-    // ]
+    children: [
+      { path: 'login', element: <LogIn /> },
+      //   {path:'register', element:<Register />}
+    ],
   },
 ];
 
