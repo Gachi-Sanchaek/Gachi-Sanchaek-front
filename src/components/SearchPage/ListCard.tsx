@@ -9,7 +9,7 @@ interface ListCardProps {
 
 const ListCard = ({ location, address, phoneNum }: ListCardProps) => {
   return (
-    <div className='flex flex-col gap-0.5 px-6 py-3 border-b border-[#F5F5F5]'>
+    <div className='flex flex-col gap-0.5 px-6 py-3 border-b border-[#F5F5F5] select-none'>
       <p className='font-[PretendardVariable] font-semibold text-[14px]'>{location}</p>
       <div className='flex gap-1'>
         <img src={Location} alt='주소' />
