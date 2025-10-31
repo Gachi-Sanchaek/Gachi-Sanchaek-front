@@ -4,6 +4,7 @@ interface KakaoMapProps {
   initialLat?: number;
   initialLng?: number;
   initialLevel?: number; //지도 확대 레벨
+  // selectedCategory: '산책' | '동행 산책' | '유기견 산책' | '플로깅';
 }
 
 const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.80448486831264, initialLevel = 3 }: KakaoMapProps) => {
@@ -82,7 +83,7 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
     }
   }, [initialLat, initialLng, initialLevel]);
 
-  return <div ref={mapRef} className='w-full h-[100dvh]' />;
+  return <div ref={mapRef} className='w-full h-[calc(100dvh-48px)]' />;
 };
 
 export default KakaoMap;
