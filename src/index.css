@@ -1,18 +1,18 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @font-face {
   font-family: Cafe24Ssurround;
   src:
-    local('Cafe24Ssurround'),
-    url('/font/Cafe24Ssurround.woff') format('woff'),
-    url('/font/Cafe24Ssurround.woff2') format('woff2');
+    local("Cafe24Ssurround"),
+    url("/font/Cafe24Ssurround.woff") format("woff"),
+    url("/font/Cafe24Ssurround.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: PretendardVariable;
   src:
-    local('PretendardVariable'),
-    url('/font/PretendardVariable.woff2') format('woff');
+    local("PretendardVariable"),
+    url("/font/PretendardVariable.woff2") format("woff");
   font-display: swap;
 }

@@ -1,26 +1,42 @@
 interface BottomButtonProps {
-  buttons: { text: string; onClick: () => void; variant?: 'white' | 'green' }[];
+  buttons: {
+    text: string;
+    onClick: () => void;
+    variant?: "white" | "green";
+    disabled?: boolean;
+  }[];
 }
 
 const BottomButton = ({ buttons }: BottomButtonProps) => {
-  const getButtonStyle = (variant: string = 'white') => {
+  const getButtonStyle = (variant: string = "white", disabled?: boolean) => {
+    if (disabled) return "bg-[#F5F5F5] text-white cursor-not-allowed";
+
     switch (variant) {
-      case 'green':
-        return 'bg-[#5FD59B] text-white hover:brightness-98';
-      case 'white':
+      case "green":
+        return "bg-[#5FD59B] text-white hover:brightness-98";
+      case "white":
       default:
-        return 'bg-white text-[#5FD59B] border border-[#5FD59B] hover:bg-gray-100/50';
+        return "bg-white text-[#5FD59B] border border-[#5FD59B] hover:bg-gray-100/50";
     }
   };
 
   return (
-    <div className='flex px-6 pt-2 gap-2 justify-center'>
-      {buttons.length > 0 &&
-        buttons.map(({ text, onClick, variant }, idx) => (
-          <button type='button' key={idx} className={`w-full px-4 py-2 rounded-[10px] cursor-pointer font-[PretendardVariable] font-semibold text-base ${getButtonStyle(variant)}`} onClick={onClick}>
-            {text}
-          </button>
-        ))}
+    <div className="relative w-full">
+      <div className="absolute bottom-0 left-0 w-full h-[80px] bg-white shadow-[0_-2px_8px_rgba(0,0,0,0.08)]"></div>
+      <div className="relative flex items-center h-[77px] px-6 pb-5 gap-2 justify-center">
+        {buttons.length > 0 &&
+          buttons.map(({ text, onClick, variant, disabled }, idx) => (
+            <button
+              type="button"
+              key={idx}
+              onClick={onClick}
+              disabled={disabled}
+              className={`w-full px-4 py-3 rounded-[8px] cursor-pointer font-[PretendardVariable] font-semibold font-[16px] text-base ${getButtonStyle(variant, disabled)}`}
+            >
+              {text}
+            </button>
+          ))}
+      </div>
     </div>
   );
 };
