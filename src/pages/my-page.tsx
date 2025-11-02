@@ -239,7 +239,7 @@ export default function MyPage() {
               <div className="overflow-y-auto h-[calc(100%-40px)] pb-5">
                 <div className="flex flex-col gap-3">
                   {filteredPointHistory.map((p) => {
-                    const [year, month, day] = p.date.split("-");
+                    const [, month, day] = p.date.split("-");
                     const formattedDate = `${parseInt(month, 10)}.${parseInt(day, 10)}`;
 
                     return (
