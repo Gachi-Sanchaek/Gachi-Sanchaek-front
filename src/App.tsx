@@ -1,16 +1,26 @@
-import { type RouteObject, createBrowserRouter, RouterProvider } from 'react-router-dom';
-import LogIn from './pages/LogIn';
-import Home from './pages/Home';
-import PublicLayout from './layouts/public-layout';
-import ProtectedLayout from './layouts/protected-layout';
-import SearchPage from './pages/search-page';
+import {
+  type RouteObject,
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+import LogIn from "./pages/LogIn";
+import Home from "./pages/Home";
+import PublicLayout from "./layouts/public-layout";
+import ProtectedLayout from "./layouts/protected-layout";
+import SearchPage from "./pages/search-page";
+import SignUp from "./pages/SignUp";
+import { KAKAO_OAUTH } from "./utils/kakao-constants";
+import { KakaoOAuthHandler } from "./pages/KakaoOAuthHandler";
+import MyPage from "./pages/my-page";
 
 const publicRoutes: RouteObject[] = [
   {
-    path: '/',
+    path: "/",
     element: <PublicLayout />,
     children: [
-      { path: 'login', element: <LogIn /> },
+      { path: "login", element: <LogIn /> },
+      { path: "signup", element: <SignUp /> },
+      { path: KAKAO_OAUTH, element: <KakaoOAuthHandler /> },
       //   {path:'register', element:<Register />}
     ],
   },
@@ -18,11 +28,12 @@ const publicRoutes: RouteObject[] = [
 
 const protectedRoutes: RouteObject[] = [
   {
-    path: '/',
+    path: "/",
     element: <ProtectedLayout />,
     children: [
       { index: true, element: <Home /> },
-      { path: 'search', element: <SearchPage /> },
+      { path: "search", element: <SearchPage /> },
+      { path: "mypage", element: <MyPage /> },
     ],
   },
 ];

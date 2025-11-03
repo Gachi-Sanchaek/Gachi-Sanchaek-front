@@ -16,16 +16,17 @@ const KakaoIcon = () => (
 );
 
 const LogIn = () => {
-  const KAKAO_SERVER_REDIRECT_URI = import.meta.env
-    .VITE_KAKAO_SERVER_REDIRECT_URI;
+  const K_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
+  const K_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${K_REST_API_KEY}&redirect_uri=${K_REDIRECT_URI}`;
 
   const handleKakaoLogin = () => {
-    window.location.href = KAKAO_SERVER_REDIRECT_URI;
+    window.location.href = kakaoURL;
   };
 
   return (
     <div
-      className="relative w-screen h-screen overflow-hidden flex flex-col items-center justify-center"
+      className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center"
       style={{
         background: "linear-gradient(to bottom, #5FD59B, #FFEC8A)",
       }}
@@ -35,7 +36,7 @@ const LogIn = () => {
         <p className="font-[PretendardVariable] font-light text-[16px] text-[#FFFFFF]">
           걸음마다 쌓이는 가치
         </p>
-        <h1 className="font-[Cafe24Ssurround] font-bold text-[50px] text-white">
+        <h1 className="font-[Cafe24Ssurround] font-medium text-[50px] text-white">
           가치산책
         </h1>
         <button

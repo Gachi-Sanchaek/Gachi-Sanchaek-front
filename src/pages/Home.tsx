@@ -4,6 +4,7 @@ import walkBonggong from "../assets/bonggong_png/4_걷는봉공.png";
 import { userMock } from "../mocks/user";
 import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const STAMP_POINT = 500;
 
@@ -46,6 +47,14 @@ const Home = () => {
     progressPercentage += 1;
   }
   const bonggongPosition = getRoundedProgress(progressInSegment);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   return (
     <Background
