@@ -9,6 +9,7 @@ import PublicLayout from "./layouts/public-layout";
 import ProtectedLayout from "./layouts/protected-layout";
 import SearchPage from "./pages/search-page";
 import SignUp from "./pages/SignUp";
+import WalkStartPage from "./pages/walk-start-page";
 import WalkPage from "./pages/walk-page";
 import { KAKAO_OAUTH } from "./utils/kakao-constants";
 import { KakaoOAuthHandler } from "./pages/KakaoOAuthHandler";
@@ -21,6 +22,7 @@ const publicRoutes: RouteObject[] = [
       { path: "login", element: <LogIn /> },
       { path: "signup", element: <SignUp /> },
       { path: KAKAO_OAUTH, element: <KakaoOAuthHandler /> },
+      { path: "walk/start", element: <WalkStartPage /> },
       { path: "walk", element: <WalkPage /> },
       //   {path:'register', element:<Register />}
     ],
@@ -34,7 +36,6 @@ const protectedRoutes: RouteObject[] = [
     children: [
       { index: true, element: <Home /> },
       { path: "search", element: <SearchPage /> },
-      
     ],
   },
 ];
