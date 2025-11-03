@@ -1,8 +1,18 @@
+import { useState } from "react";
 import Header from "../components/common/Header";
 import BottomButton from "../components/common/BottomButton";
 import Category from "../components/SearchPage/Category/Category";
 import MapView from "../components/WalkPage/MapView";
 export default function WalkPage() {
+  const [time, setTime] = useState("");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    setTime(value);
+  };
+
+  const isDisabled = !time || Number(time) === 0;
+
   return (
     <div className="relative min-h-screen">
       <Header hasArrow title="유기견 산책" titleColor="black" bgColor="white" />
@@ -25,6 +35,8 @@ export default function WalkPage() {
               inputMode="numeric"
               pattern="[0-9]*"
               placeholder="시간입력"
+              value={time}
+              onChange={handleInputChange}
               className="w-[100px] h-12 px-4 border border-gray-200 rounded-lg text-center font-normal text-lg "
             ></input>
             <p className="font-semibold text-lg">분</p>
@@ -35,7 +47,12 @@ export default function WalkPage() {
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50">
         <BottomButton
           buttons={[
-            { text: "코스 추천 받기", variant: "green", onClick: () => {} },
+            {
+              text: "코스 추천 받기",
+              variant: "green",
+              onClick: () => {},
+              disabled: isDisabled,
+            },
           ]}
         />
       </div>
