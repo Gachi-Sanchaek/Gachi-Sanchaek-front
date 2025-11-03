@@ -1,13 +1,16 @@
 import Header from "../components/common/Header";
 import BottomButton from "../components/common/BottomButton";
 import Category from "../components/SearchPage/Category/Category";
-
+import MapView from "../components/WalkPage/MapView";
 export default function WalkPage() {
   return (
-    <div className="relative bg-gray-500 min-h-screen">
+    <div className="relative min-h-screen">
       <Header hasArrow title="유기견 산책" titleColor="black" bgColor="white" />
       <div className="pt-8">
         <Category />
+      </div>
+      <div className="w-full" style={{ height: 700 }}>
+        <MapView />
       </div>
 
       <div className="absolute bottom-0 w-full max-w-[480px] pb-4 z-40">
