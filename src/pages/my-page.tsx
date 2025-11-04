@@ -89,7 +89,7 @@ export default function MyPage() {
   return (
     <Background
       whiteBackgroundHeight={60}
-      whiteBgColor="#FAFAFA"
+      whiteBgColor="#FFFFFF"
       greenChildren={
         <div className="p-5 pt-2">
           <div className="flex items-center mt-4">
@@ -189,7 +189,7 @@ export default function MyPage() {
         <div className="w-full h-full">
           {activeTab === "points" ? (
             <div className="relative h-full">
-              <div className="sticky top-0 left-0 bg-[#FAFAFA] z-10 pt-2 pb-3 flex items-center">
+              <div className="sticky top-0 left-0 z-10 pt-2 pb-3 flex items-center">
                 <div
                   className="flex items-center gap-1 text-sm text-[#BDBDBD] cursor-pointer select-none"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -206,7 +206,7 @@ export default function MyPage() {
                 {dropdownOpen && (
                   <div className="absolute mt-2 bg-white border-none rounded-lg shadow-md w-32 z-20">
                     <div
-                      className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+                      className={`px-3 py-2 cursor-pointer ${
                         selectedMonth === "전체" ? "text-[#5FD59B]" : ""
                       }`}
                       onClick={() => {

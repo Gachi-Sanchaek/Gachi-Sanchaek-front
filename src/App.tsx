@@ -12,6 +12,7 @@ import SignUp from "./pages/SignUp";
 import { KAKAO_OAUTH } from "./utils/kakao-constants";
 import { KakaoOAuthHandler } from "./pages/KakaoOAuthHandler";
 import MyPage from "./pages/my-page";
+import RankingPage from "./pages/ranking-page";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -34,6 +35,7 @@ const protectedRoutes: RouteObject[] = [
       { index: true, element: <Home /> },
       { path: "search", element: <SearchPage /> },
       { path: "mypage", element: <MyPage /> },
+      { path: "ranking", element: <RankingPage /> },
     ],
   },
 ];
