@@ -90,10 +90,7 @@ const Home = () => {
             className="absolute left-0 w-full flex justify-center w-full px-4 mt-25 overflow-visible "
             style={{ bottom: "62vh" }}
           >
-            <div
-              className="w-full h-4 rounded-full"
-              style={{ backgroundColor: "#FFFFFF" }}
-            >
+            <div className="bg-[#FFFFFF] w-full h-4 rounded-full">
               <div
                 className="h-full rounded-full bg-yellow-400 transition-all duration-500"
                 style={{
@@ -115,7 +112,7 @@ const Home = () => {
             </div>
             <div className="absolute top-full w-full flex justify-between text-sm mt-2 px-4">
               <span></span>
-              <span className="text-right" style={{ color: "#FFFFFF" }}>
+              <span className="text-right text-[#FFFFFF]">
                 {nextPoints.toLocaleString()}P
               </span>
             </div>
@@ -142,10 +139,7 @@ const Home = () => {
       }
       whiteChildren={
         <div className="flex flex-col h-full gap-6">
-          <div
-            className="flex-[4] flex flex-col items-center justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)]"
-            style={{ backgroundColor: "#FFFFFF" }}
-          >
+          <div className="bg-[#FFFFFF] flex-[4] flex flex-col items-center justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)]">
             <div className="flex-1 flex items-center justify-center w-full mb-2">
               <img
                 src={walkingBonggong}
