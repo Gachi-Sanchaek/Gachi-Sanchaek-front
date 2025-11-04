@@ -7,7 +7,7 @@ const Category = () => {
   const { selectedCategory, setSelectedCategory } = useCategoryStore();
 
   return (
-    <div className='flex gap-3 pl-6 pt-6 fixed z-20'>
+    <div className='flex gap-3 pl-6 pt-6 fixed w-full z-20 overflow-x-auto [&::-webkit-scrollbar]:hidden'>
       {TagNames.map((name, index) => (
         <Tag key={index} TagName={name} selected={selectedCategory === name} onClick={() => setSelectedCategory(name)} />
       ))}

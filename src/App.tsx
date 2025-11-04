@@ -13,6 +13,7 @@ import WalkStartPage from "./pages/walk-start-page";
 import WalkPage from "./pages/walk-page";
 import { KAKAO_OAUTH } from "./utils/kakao-constants";
 import { KakaoOAuthHandler } from "./pages/KakaoOAuthHandler";
+import MyPage from "./pages/my-page";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -36,6 +37,7 @@ const protectedRoutes: RouteObject[] = [
     children: [
       { index: true, element: <Home /> },
       { path: "search", element: <SearchPage /> },
+      { path: "mypage", element: <MyPage /> },
     ],
   },
 ];
