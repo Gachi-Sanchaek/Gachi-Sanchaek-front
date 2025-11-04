@@ -1,43 +1,10 @@
 import { useRef, useState } from "react";
 import BottomButton from "../components/common/BottomButton";
 import RouteInfoCard from "../components/WalkRoutePage/RouteInfoCard";
-
-type Waypoint = { lat: number; lng: number };
-type Route = {
-  id: number; // 슬라이드 번호
-  description: string; // 카드 제목
-  waypoints: Waypoint[]; // 지도에서 사용
-  estimatedTime: number; // 분
-};
-
-// 백엔드 응답 예시
-const mockRoutes: Route[] = [
-  {
-    id: 1,
-    description: "프레쉬한 공기를 맡는 길",
-    waypoints: [
-      { lat: 37.566, lng: 126.978 },
-      { lat: 37.569, lng: 126.982 },
-      { lat: 37.566, lng: 126.978 },
-    ],
-    estimatedTime: 43,
-  },
-  {
-    id: 2,
-    description: "강변 산책 루트",
-    waypoints: [],
-    estimatedTime: 38,
-  },
-  {
-    id: 3,
-    description: "도심 힐링 코스",
-    waypoints: [],
-    estimatedTime: 45,
-  },
-];
+import { walkRoutes } from "../mocks/walkRoutes";
 
 export default function WalkRoutePage() {
-  const routes = mockRoutes; // 추후교체
+  const routes = walkRoutes; //api연결후교체
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
 
