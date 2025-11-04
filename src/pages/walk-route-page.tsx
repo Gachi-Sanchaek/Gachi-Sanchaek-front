@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import BottomButton from "../components/common/BottomButton";
 import RouteInfoCard from "../components/WalkRoutePage/RouteInfoCard";
 import { walkRoutes } from "../mocks/walkRoutes";
+import MapRoute from "../components/WalkRoutePage/MapRoute";
 
 export default function WalkRoutePage() {
   const routes = walkRoutes; //api연결후교체
@@ -27,6 +28,9 @@ export default function WalkRoutePage() {
   return (
     <>
       {/* 지도 자리 */}
+      <div className="pt-10">
+        <MapRoute waypoints={current.waypoints} height={620} />
+      </div>
 
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40">
         <div className="w-[393px] h-[238px] relative overflow-hidden rounded-tl-xl rounded-tr-xl bg-white mx-auto">
