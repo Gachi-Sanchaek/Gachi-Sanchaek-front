@@ -12,11 +12,12 @@ export type Route = {
 export const walkRoutes: Route[] = [
   {
     id: 1,
-    description: "프레쉬한 공기를 맡는 길",
+    description: "가톨릭대 정문 앞 30분 산책 코스",
     waypoints: [
-      { lat: 37.566, lng: 126.978 },
-      { lat: 37.569, lng: 126.982 },
-      { lat: 37.566, lng: 126.978 },
+      { lat: 37.4845, lng: 126.8018 }, // 가톨릭대 정문
+      { lat: 37.4868, lng: 126.8049 }, // 부천둘레길 입구 근처
+      { lat: 37.4882, lng: 126.8072 }, // 부천시립상동도서관 뒤편 산책로
+      { lat: 37.4845, lng: 126.8018 }, // 돌아오는 길
     ],
     estimatedTime: 43,
   },
@@ -32,11 +33,12 @@ export const walkRoutes: Route[] = [
   },
   {
     id: 3,
-    description: "도심 힐링 코스",
+    description: "부산 광안리 해변 산책 코스",
     waypoints: [
-      { lat: 37.564, lng: 126.975 },
-      { lat: 37.568, lng: 126.983 },
-      { lat: 37.564, lng: 126.975 },
+      { lat: 35.1532, lng: 129.1187 }, // 광안리 해수욕장 입구
+      { lat: 35.1551, lng: 129.1209 }, // 광안대교 전망 포인트
+      { lat: 35.1564, lng: 129.1178 }, // 해변 산책로 끝지점
+      { lat: 35.1532, lng: 129.1187 }, // 되돌아오는 길
     ],
     estimatedTime: 45,
   },
