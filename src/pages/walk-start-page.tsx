@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import Header from "../components/common/Header";
 import BottomButton from "../components/common/BottomButton";
 import Category from "../components/SearchPage/Category/Category";
 import MapView from "../components/WalkPage/MapView";
@@ -7,12 +6,10 @@ export default function WalkStartPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="relative min-h-screen">
-      <Header hasArrow title="유기견 산책" titleColor="black" bgColor="white" />
-      <div className="pt-8">
-        <Category />
-      </div>
-      <div className="w-full" style={{ height: 810 }}>
+    <>
+      <Category />
+
+      <div className="w-full" style={{ height: "calc(100vh - 124px)" }}>
         <MapView />
       </div>
 
@@ -28,6 +25,6 @@ export default function WalkStartPage() {
           ]}
         />
       </div>
-    </div>
+    </>
   );
 }
