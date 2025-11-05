@@ -83,10 +83,7 @@ const SignUp = () => {
         </div>
       </header>
       <div className="pt-16 px-6 flex flex-col pb-20">
-        <label
-          className="flex items-center gap-2 pt-4 font-[PretendardVariable] font-medium"
-          style={{ fontSize: "16px" }}
-        >
+        <label className="flex items-center gap-2 pt-4 font-[PretendardVariable] font-medium text-[16px]">
           닉네임
           <div
             className={`w-4 h-4 rounded-full flex items-center justify-center border-2 transition-colors ${
@@ -106,7 +103,7 @@ const SignUp = () => {
             placeholder="닉네임을 입력하세요"
             value={nickname}
             onChange={(e) => handleNicknameChange(e.target.value)}
-            className={`flex-1 px-5 py-3 rounded-lg font-[PretendardVariable] font-medium border ${
+            className={`flex-1 px-3 py-3 rounded-lg font-[PretendardVariable] font-medium text-[16px] border ${
               nicknameChecked && isNicknameValid
                 ? "border-[#5FD59B]"
                 : "border-[#F5F5F5]"
@@ -123,20 +120,17 @@ const SignUp = () => {
           </button>
         </div>
         {nicknameChecked && isNicknameValid && (
-          <p className="text-[#5FD59B]" style={{ fontSize: "12px" }}>
+          <p className="text-[#5FD59B] text-[13px]">
             사용 가능한 닉네임입니다.
           </p>
         )}
         {nicknameChecked && !isNicknameValid && (
-          <p className="text-red-500" style={{ fontSize: "12px" }}>
+          <p className="text-red-500 text-[13px]">
             사용 불가능한 닉네임입니다.
           </p>
         )}
 
-        <label
-          className="flex items-center gap-2 pt-10 font-[PretendardVariable] font-medium pt-8"
-          style={{ fontSize: "16px" }}
-        >
+        <label className="flex items-center gap-2 pt-10 font-[PretendardVariable] font-medium text-[16px] pt-8">
           성별
           <div
             className={`w-4 h-4 rounded-full flex items-center justify-center border-2 transition-colors ${
@@ -152,12 +146,11 @@ const SignUp = () => {
           <button
             type="button"
             onClick={() => setGender("MALE")}
-            className={`flex-1 py-3 rounded-lg font-[PretendardVariable] font-medium transition-colors ${
+            className={`flex-1 py-3 rounded-lg font-[PretendardVariable] font-medium text-[16px] transition-colors ${
               gender === "MALE"
                 ? "bg-[#5FD59B] text-white"
                 : "bg-[#F5F5F5] text-black"
             }`}
-            style={{ fontSize: "16px" }}
           >
             남성
             {gender === "MALE"}
@@ -165,12 +158,11 @@ const SignUp = () => {
           <button
             type="button"
             onClick={() => setGender("FEMALE")}
-            className={`flex-1 py-3 rounded-lg font-[PretendardVariable] font-medium transition-colors ${
+            className={`flex-1 py-3 rounded-lg font-[PretendardVariable] font-medium text-[16px] transition-colors ${
               gender === "FEMALE"
                 ? "bg-[#5FD59B] text-white"
                 : "bg-[#F5F5F5] text-black"
             }`}
-            style={{ fontSize: "16px" }}
           >
             여성
             {gender === "FEMALE"}
