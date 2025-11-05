@@ -44,6 +44,14 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
   const getCurrentWeek = (baseDate: Dayjs = dayjs()) => {
     const date = baseDate;
     let targetMonth = date.month();
@@ -104,7 +112,7 @@ const Home = () => {
         const data = response.data?.data;
         console.log(response.data);
 
-        if (userProfile) {
+        if (data) {
           setUserProfile(data);
         } else {
           console.error("사용자 데이터가 없습니다.");
@@ -144,16 +152,7 @@ const Home = () => {
   if (error) return <p>{error}</p>;
   if (!userProfile) return <p>사용자 정보가 없습니다.</p>;
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
-
   const currentPoints = userProfile?.totalPoints;
-  //const currentPoints = userMock.points;
 
   const currentStampCount = Math.floor(currentPoints / STAMP_POINT);
   const startPoints = currentStampCount * STAMP_POINT;
@@ -200,7 +199,7 @@ const Home = () => {
           <div className="flex items-center mt-4">
             <div className="bg-[#FFFFFF] w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
               <img
-                src={userProfile.profileImageUrl}
+                src={`${import.meta.env.VITE_BONGGONG_URL}${userProfile.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />

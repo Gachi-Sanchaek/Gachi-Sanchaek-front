@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { axiosInstance } from "../apis/axios";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -17,11 +17,11 @@ const SignUp = () => {
     if (!nickname.trim()) return;
 
     try {
-      const response = await axios.get("/api/v1/users/check-nickname", {
+      const response = await axiosInstance.get("/api/v1/users/check-nickname", {
         params: { nickname },
       });
-
-      const available = response.data?.data?.available ?? false;
+      console.log("닉네임 중복 응답:", response.data);
+      const available = response.data?.data?.isAvailable ?? false;
       setIsNicknameValid(available);
     } catch (error) {
       console.error("닉네임 중복 검사 실패:", error);
@@ -44,7 +44,7 @@ const SignUp = () => {
     if (!isButtonEnabled) return;
 
     try {
-      const response = await axios.post("/api/v1/users", {
+      const response = await axiosInstance.post("/api/v1/users", {
         gender,
         nickname,
       });
