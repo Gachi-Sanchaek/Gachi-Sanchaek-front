@@ -3,18 +3,19 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import LogIn from "./pages/LogIn";
-import Home from "./pages/Home";
+import LogIn from "./pages/login-page";
+import Home from "./pages/home-page";
 import PublicLayout from "./layouts/public-layout";
 import ProtectedLayout from "./layouts/protected-layout";
 import SearchPage from "./pages/search-page";
-import SignUp from "./pages/SignUp";
+import SignUp from "./pages/signup-page";
 import WalkStartPage from "./pages/walk-start-page";
 import WalkPage from "./pages/walk-page";
 import WalkRoutePage from "./pages/walk-route-page";
 import { KAKAO_OAUTH } from "./utils/kakao-constants";
-import { KakaoOAuthHandler } from "./pages/KakaoOAuthHandler";
+import { KakaoOAuthHandler } from "./pages/kakao-oauth-handler";
 import MyPage from "./pages/my-page";
+import RankingPage from "./pages/ranking-page";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -41,6 +42,7 @@ const protectedRoutes: RouteObject[] = [
       { path: "walk/start", element: <WalkStartPage /> },
       { path: "walk", element: <WalkPage /> },
       { path: "walk/route", element: <WalkRoutePage /> },
+      { path: "ranking", element: <RankingPage /> },
     ],
   },
 ];
