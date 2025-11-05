@@ -63,20 +63,14 @@ const Home = () => {
       greenChildren={
         <div className="p-5 pt-2">
           <div className="flex items-center mt-4">
-            <div
-              className="w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]"
-              style={{ backgroundColor: "#FFFFFF" }}
-            >
+            <div className="bg-[#FFFFFF] w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
               <img
                 src={userMock.profileImage}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
             </div>
-            <h2
-              className="ml-2 font-[PretendardVariable]"
-              style={{ color: "#FFFFFF", fontSize: "24px" }}
-            >
+            <h2 className="ml-2 font-[PretendardVariable] text-[24px] text-[#FFFFFF]">
               {userMock.nickname}님
             </h2>
             <ChevronRight
@@ -86,26 +80,20 @@ const Home = () => {
             />
           </div>
 
-          <div
-            className="absolute left-0 w-full flex justify-center w-full px-4 mt-25 overflow-visible "
-            style={{ bottom: "62vh" }}
-          >
+          <div className="absolute left-0 bottom-[62vh] w-full flex justify-center w-full px-4 mt-25 overflow-visible">
             <div className="bg-[#FFFFFF] w-full h-4 rounded-full">
               <div
-                className="h-full rounded-full bg-yellow-400 transition-all duration-500"
+                className="bg-[#FFEC8A] h-full rounded-full transition-all duration-500"
                 style={{
                   width: `${progressPercentage}%`,
-                  backgroundColor: "#FFEC8A",
                 }}
               />
               {[6.5, 23.9, 41.3, 58.7, 76.1].map((point, index) => (
                 <div
                   key={index}
-                  className="absolute top-1/2 w-2.5 h-2.5 rounded-full border-white bg-[#FFFFFF]"
+                  className="bg-[#FFFFFF] absolute top-1/2 w-2.5 h-2.5 rounded-full border-white -translate-x-1/2 -translate-y-1/2 z-20"
                   style={{
                     left: `${point}%`,
-                    transform: "translate(-50%, -50%)",
-                    zIndex: 20,
                   }}
                 />
               ))}
@@ -118,10 +106,9 @@ const Home = () => {
             </div>
 
             <div
-              className="absolute top-1/2 transition-all z-20"
+              className="absolute top-1/2 transition-all -translate-y-4/5 z-20"
               style={{
                 left: `calc(${bonggongPosition}% - 40px)`,
-                transform: `translate(0, -80%)`,
               }}
             >
               <img
@@ -148,24 +135,15 @@ const Home = () => {
               />
             </div>
 
-            <button
-              className="w-full text-white py-2 rounded-lg font-[PretendardVariable] text-sm font-medium"
-              style={{ backgroundColor: "#5FD59B" }}
-            >
+            <button className="bg-[#5FD59B] w-full text-white py-2 rounded-lg font-[PretendardVariable] text-sm font-medium">
               산책 시작하기
             </button>
           </div>
 
           <div className="flex-[3] flex gap-4">
-            <div
-              className="flex-1 flex flex-col justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)] mx-auto"
-              style={{ backgroundColor: "#FFFFFF" }}
-            >
+            <div className="bg-[#FFFFFF] flex-1 flex flex-col justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)] mx-auto">
               <div className="flex items-center">
-                <p
-                  className="font-[PretendardVariable] text-[16px]"
-                  style={{ color: "#BDBDBD" }}
-                >
+                <p className="font-[PretendardVariable] text-[16px] text-[#BDBDBD]">
                   나의 포인트
                 </p>
                 <ChevronRight
@@ -178,15 +156,9 @@ const Home = () => {
                 {userMock.points.toLocaleString()}P
               </p>
             </div>
-            <div
-              className="flex-1 flex flex-col justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)] mx-auto"
-              style={{ backgroundColor: "#FFFFFF" }}
-            >
+            <div className="bg-[#FFFFFF] flex-1 flex flex-col justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)] mx-auto">
               <div className="flex items-center">
-                <p
-                  className="font-[PretendardVariable] text-[16px]"
-                  style={{ color: "#BDBDBD" }}
-                >
+                <p className="font-[PretendardVariable] text-[16px] text-[#BDBDBD]">
                   나의 순위
                 </p>
                 <ChevronRight
