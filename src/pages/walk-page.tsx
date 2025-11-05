@@ -15,7 +15,7 @@ export default function WalkPage() {
   return (
     <>
       <Category />
-      <div className="w-full" style={{ height: "calc(100vh - 48px - 238px)" }}>
+      <div className="w-full" style={{ height: "calc(100vh - 48px - 230px)" }}>
         <MapView />
       </div>
 

@@ -6,7 +6,7 @@ type LatLng = { lat: number; lng: number };
 
 interface MapRouteProps {
   waypoints: LatLng[]; //백엔드에서 받은 경유지
-  height?: number; // 지도 높이
+  height?: string | number; // 지도 높이
 }
 
 function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
