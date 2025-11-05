@@ -11,9 +11,9 @@ interface MapRouteProps {
 
 function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null); //지도객체 저장
-  const lineRef = useRef<any>(null); //그려진 폴리라인 객체 저장
-  const markerRef = useRef<any>(null);
+  const mapRef = useRef<kakao.maps.Map | null>(null); //지도객체 저장
+  const lineRef = useRef<kakao.maps.Polyline | null>(null); //그려진 폴리라인 객체 저장
+  const markerRef = useRef<kakao.maps.Marker | null>(null);
 
   //현재위치 받아오기
   const getCurrentLatLng = (): Promise<{ lat: number; lng: number }> =>
@@ -34,9 +34,9 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
 
   //지도 초기화
   useEffect(() => {
-    const { kakao } = window as any;
-    if (!kakao || !mapEl.current) return;
+    if (typeof kakao === "undefined" || !mapEl.current) return;
 
+    const container = mapEl.current as HTMLDivElement;
     kakao.maps.load(async () => {
       const cur = await getCurrentLatLng();
 
@@ -45,7 +45,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
         waypoints?.[0]?.lng || cur.lng
       );
 
-      const map = new kakao.maps.Map(mapEl.current, {
+      const map = new kakao.maps.Map(container, {
         center,
         level: 5,
       });
@@ -53,7 +53,9 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
 
       const imageSrc = CurrentMarker;
       const imageSize = new kakao.maps.Size(54, 54);
-      const imageOption = { offset: new kakao.maps.Point(27, 27) }; // 중심 기준
+      const imageOption: kakao.maps.MarkerImageOptions = {
+        offset: new kakao.maps.Point(27, 27),
+      };
       const markerImage = new kakao.maps.MarkerImage(
         imageSrc,
         imageSize,
@@ -65,13 +67,12 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
         position: markerPosition,
         image: markerImage,
       });
-      markerRef.current.setMap(map);
+      markerRef.current?.setMap(map);
     });
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   //경로 그리기
   useEffect(() => {
-    const { kakao } = window as any;
     const map = mapRef.current;
     if (!map || !waypoints || waypoints.length < 2) return;
 
@@ -115,10 +116,10 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
       const route = res.data?.routes?.[0];
       if (!route) throw new Error("NO_ROUTE");
 
-      const path: any[] = [];
-      route.sections?.forEach((sec: any) => {
-        sec.roads?.forEach((r: any) => {
-          const v = r.vertexes as number[];
+      const path: kakao.maps.LatLng[] = [];
+      route.sections?.forEach((sec: { roads?: { vertexes: number[] }[] }) => {
+        sec.roads?.forEach((r: { vertexes: number[] }) => {
+          const v = r.vertexes;
           for (let i = 0; i < v.length; i += 2) {
             const lng = v[i];
             const lat = v[i + 1];
@@ -131,8 +132,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
       return path;
     };
 
-    const draw = (path: any[]) => {
-      const { kakao } = window as any;
+    const draw = (path: kakao.maps.LatLng[]) => {
       lineRef.current = new kakao.maps.Polyline({
         path,
         strokeWeight: 6,
@@ -140,7 +140,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
         strokeOpacity: 0.9,
         strokeStyle: "solid",
       });
-      lineRef.current.setMap(map);
+      lineRef.current?.setMap(map);
 
       //전체확인용 지도 영역 맞추기
       const bounds = new kakao.maps.LatLngBounds();
