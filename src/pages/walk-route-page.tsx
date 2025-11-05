@@ -28,9 +28,8 @@ export default function WalkRoutePage() {
   return (
     <>
       {/* 지도 자리 */}
-      <div className="pt-10">
-        <MapRoute waypoints={current.waypoints} height={620} />
-      </div>
+
+      <MapRoute waypoints={current.waypoints} height={580} />
 
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40">
         <div className="w-[393px] h-[238px] relative overflow-hidden rounded-tl-xl rounded-tr-xl bg-white mx-auto">

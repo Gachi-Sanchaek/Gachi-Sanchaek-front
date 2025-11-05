@@ -1,39 +1,71 @@
 import { useEffect, useRef } from "react";
 import axios from "axios";
+import CurrentMarker from "/src/assets/current-marker.svg";
 
 type LatLng = { lat: number; lng: number };
 
 interface MapRouteProps {
   waypoints: LatLng[]; //백엔드에서 받은 경유지
-  priority?: "TIME" | "DISTANCE"; // 기본 TIME 거리는임시
   height?: number; // 지도 높이
 }
 
-function MapRoute({
-  waypoints,
-  priority = "TIME",
-  height = 400,
-}: MapRouteProps) {
+function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null);
-  const lineRef = useRef<any>(null);
+  const mapRef = useRef<any>(null); //지도객체 저장
+  const lineRef = useRef<any>(null); //그려진 폴리라인 객체 저장
+  const markerRef = useRef<any>(null);
+
+  //현재위치 받아오기
+  const getCurrentLatLng = (): Promise<{ lat: number; lng: number }> =>
+    new Promise((resolve) => {
+      if (!navigator?.geolocation) {
+        return resolve({ lat: 37.4863, lng: 126.825 }); //가톨릭대 정문
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          resolve({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        () => resolve({ lat: 37.4863, lng: 126.825 }) // 권한 거부/오류
+      );
+    });
 
   //지도 초기화
   useEffect(() => {
     const { kakao } = window as any;
     if (!kakao || !mapEl.current) return;
 
-    kakao.maps.load(() => {
-      // 초기 중심 -> 첫 웨이포인트가 있으면 그쪽 없으면 현재위치로 수정하기
-      const center = waypoints?.length
-        ? new kakao.maps.LatLng(waypoints[0].lat, waypoints[0].lng)
-        : //지금은 시청
-          new kakao.maps.LatLng(37.5665, 126.978);
+    kakao.maps.load(async () => {
+      const cur = await getCurrentLatLng();
 
-      mapRef.current = new kakao.maps.Map(mapEl.current, {
+      const center = new kakao.maps.LatLng(
+        waypoints?.[0]?.lat || cur.lat,
+        waypoints?.[0]?.lng || cur.lng
+      );
+
+      const map = new kakao.maps.Map(mapEl.current, {
         center,
         level: 5,
       });
+      mapRef.current = map;
+
+      const imageSrc = CurrentMarker;
+      const imageSize = new kakao.maps.Size(54, 54);
+      const imageOption = { offset: new kakao.maps.Point(27, 27) }; // 중심 기준
+      const markerImage = new kakao.maps.MarkerImage(
+        imageSrc,
+        imageSize,
+        imageOption
+      );
+      const markerPosition = new kakao.maps.LatLng(cur.lat, cur.lng);
+
+      markerRef.current = new kakao.maps.Marker({
+        position: markerPosition,
+        image: markerImage,
+      });
+      markerRef.current.setMap(map);
     });
   }, []);
 
@@ -53,20 +85,20 @@ function MapRoute({
       | string
       | undefined;
 
-    //카카오모빌리티 다중 경유지 길찾기 호출
+    //다중 경유지 길찾기 호출
     const fetchRoute = async () => {
       if (!REST_KEY) throw new Error("NO_REST_KEY");
 
       const start = waypoints[0];
       const dest = waypoints[waypoints.length - 1];
-      const mids = waypoints.slice(1, -1);
+      const mids = waypoints.slice(1, -1); //가운데 점들 경유지
 
-      // API x=lng, y=lat
+      //x=lng y=lat
       const body = {
         origin: { x: start.lng, y: start.lat },
         destination: { x: dest.lng, y: dest.lat },
         waypoints: mids.map((p) => ({ x: p.lng, y: p.lat })),
-        priority, // "TIME" | "DISTANCE"
+        priority: "TIME",
       };
 
       const res = await axios.post(
@@ -110,10 +142,10 @@ function MapRoute({
       });
       lineRef.current.setMap(map);
 
-      //전체확인 영역 맞추기
+      //전체확인용 지도 영역 맞추기
       const bounds = new kakao.maps.LatLngBounds();
       path.forEach((p) => bounds.extend(p));
-      map.setBounds(bounds, 24, 24, 24, 24);
+      map.setBounds(bounds, 24, 24, 24, 24); //상하좌우 여백
     };
 
     (async () => {
@@ -121,16 +153,16 @@ function MapRoute({
         const roadPath = await fetchRoute();
         draw(roadPath);
       } catch (e) {
-        console.warn("[KakaoMobility] 실패 → 직선 폴백", e);
+        console.warn("KakaoMobility 실패 → 직선 폴백", e);
 
-        //안되면 단순 웨이포인트 연결(임시)
+        //연결실패시 단순 웨이포인트 연결(임시)
         const straight = waypoints.map(
           (p) => new kakao.maps.LatLng(p.lat, p.lng)
         );
         draw(straight);
       }
     })();
-  }, [waypoints, priority]);
+  }, [waypoints]);
 
   return <div ref={mapEl} className="w-full" style={{ height }} />;
 }
