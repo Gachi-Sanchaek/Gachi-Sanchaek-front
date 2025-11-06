@@ -1,6 +1,12 @@
 import { useEffect, useRef } from "react";
 import axios from "axios";
-import CurrentMarker from "/src/assets/current-marker.svg";
+
+import {
+  createCurrentMarker,
+  updateCurrentMarker,
+  removeCurrentMarker,
+  type CurrentMarkerHandle,
+} from "../../utils/map/current-marker";
 
 type LatLng = { lat: number; lng: number };
 
@@ -13,7 +19,9 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<kakao.maps.Map | null>(null); //지도객체 저장
   const lineRef = useRef<kakao.maps.Polyline | null>(null); //그려진 폴리라인 객체 저장
-  const markerRef = useRef<kakao.maps.Marker | null>(null);
+
+  const currentRef = useRef<CurrentMarkerHandle | null>(null);
+  const watchIdRef = useRef<number | null>(null); //헤드위치 갱신
 
   //현재위치 받아오기
   const getCurrentLatLng = (): Promise<{ lat: number; lng: number }> =>
@@ -51,24 +59,44 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
       });
       mapRef.current = map;
 
-      const imageSrc = CurrentMarker;
-      const imageSize = new kakao.maps.Size(54, 54);
-      const imageOption: kakao.maps.MarkerImageOptions = {
-        offset: new kakao.maps.Point(27, 27),
-      };
-      const markerImage = new kakao.maps.MarkerImage(
-        imageSrc,
-        imageSize,
-        imageOption
-      );
-      const markerPosition = new kakao.maps.LatLng(cur.lat, cur.lng);
+      //CustomOverlay 생성
+      const pos = new kakao.maps.LatLng(cur.lat, cur.lng);
+      currentRef.current = createCurrentMarker(map, pos, { heading: 0 });
 
-      markerRef.current = new kakao.maps.Marker({
-        position: markerPosition,
-        image: markerImage,
-      });
-      markerRef.current?.setMap(map);
+      //실시간 위치, 방향 반영 헤드조절
+      if (navigator.geolocation) {
+        watchIdRef.current = navigator.geolocation.watchPosition(
+          (p) => {
+            const latlng = new kakao.maps.LatLng(
+              p.coords.latitude,
+              p.coords.longitude
+            );
+            const hd =
+              typeof p.coords.heading === "number"
+                ? p.coords.heading
+                : undefined;
+            if (currentRef.current) {
+              updateCurrentMarker(currentRef.current, latlng, hd);
+            }
+          },
+          (err) => {
+            console.warn("watchPosition error", err);
+          },
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+        );
+      }
     });
+
+    //언마운트 정리
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+      if (currentRef.current) {
+        removeCurrentMarker(currentRef.current);
+        currentRef.current = null;
+      }
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   //경로 그리기
