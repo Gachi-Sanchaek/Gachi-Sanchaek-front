@@ -1,11 +1,9 @@
 import Background from "../components/Background";
 import walkingBonggong from "../assets/images/gachi_sanchaek_bonggong.svg";
 import walkBonggong from "../assets/bonggong_png/4_걷는봉공.png";
-import { userMock } from "../mocks/user";
 import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { axiosInstance } from "../apis/axios";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -103,8 +101,6 @@ const Home = () => {
     };
   };
 
-  const [weekInfo, setWeekInfo] = useState(getCurrentWeek());
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -132,14 +128,16 @@ const Home = () => {
     const fetchRanking = async () => {
       try {
         const { year, month, week } = getCurrentWeek();
+        console.log(year, month, week);
         const formattedDate = `${year}${String(month).padStart(2, "0")}${week}`;
-        const response = await axios.get(
-          `/api/v1/ranking/my-ranking?date=${formattedDate}`
-        );
+        const response = await axiosInstance.get(`/api/v1/ranking/my-ranking`, {
+          params: { date: formattedDate },
+        });
 
         if (response.data.status === 200) {
           setUserRanking(response.data.data);
         }
+        console.log(response.data.ranking);
       } catch (error) {
         console.error("내 랭킹 조회 실패: ", error);
       }
@@ -199,7 +197,7 @@ const Home = () => {
           <div className="flex items-center mt-4">
             <div className="bg-[#FFFFFF] w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
               <img
-                src={`${import.meta.env.VITE_BONGGONG_URL}${userProfile.profileImageUrl}`}
+                src={`${import.meta.env.VITE_API_URL}${userProfile.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
@@ -302,7 +300,7 @@ const Home = () => {
                 />
               </div>
               <p className="font-[PretendardVariable] text-[18px] font-semibold">
-                {userMock.ranking}위
+                {userRanking?.ranking}위
               </p>
             </div>
           </div>
