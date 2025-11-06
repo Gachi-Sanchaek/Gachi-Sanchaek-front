@@ -16,6 +16,7 @@ import { KAKAO_OAUTH } from "./utils/kakao-constants";
 import { KakaoOAuthHandler } from "./pages/kakao-oauth-handler";
 import MyPage from "./pages/my-page";
 import RankingPage from "./pages/ranking-page";
+import WalkingPage from "./pages/walking-page";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -42,6 +43,7 @@ const protectedRoutes: RouteObject[] = [
       { path: "walk/start", element: <WalkStartPage /> },
       { path: "walk", element: <WalkPage /> },
       { path: "walk/route", element: <WalkRoutePage /> },
+      { path: "walking", element: <WalkingPage /> },
       { path: "ranking", element: <RankingPage /> },
     ],
   },
