@@ -18,7 +18,7 @@ const KakaoIcon = () => (
 const LogIn = () => {
   const K_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
   const K_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
-  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${K_REST_API_KEY}&redirect_uri=${K_REDIRECT_URI}`;
+  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${K_REST_API_KEY}&redirect_uri=${K_REDIRECT_URI}&prompt=login`;
 
   const handleKakaoLogin = () => {
     window.location.href = kakaoURL;

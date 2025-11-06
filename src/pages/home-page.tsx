@@ -1,16 +1,156 @@
 import Background from "../components/Background";
 import walkingBonggong from "../assets/images/gachi_sanchaek_bonggong.svg";
 import walkBonggong from "../assets/bonggong_png/4_걷는봉공.png";
-import { userMock } from "../mocks/user";
 import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { axiosInstance } from "../apis/axios";
+import dayjs, { Dayjs } from "dayjs";
 
 const STAMP_POINT = 500;
 
+interface UserProfile {
+  profileImageUrl: string;
+  nickname: string;
+  email: string;
+  createdAt: string;
+  totalPoints: number;
+  walkingCount: number;
+  role: string;
+}
+
+interface UserRanking {
+  nickname: string;
+  point: number;
+  profileImageUrl: string;
+  ranking: number;
+}
+
+function getWeekOfMonth(date: Dayjs): number {
+  const startOfMonth = date.startOf("month");
+  const startDay = startOfMonth.day(); // 0=일요일, 1=월요일 ...
+  const offset = startDay === 0 ? 6 : startDay - 1; // 월요일 기준 정렬
+  const dayOfMonth = date.date();
+
+  return Math.ceil((dayOfMonth + offset) / 7);
+}
+
 const Home = () => {
   const navigate = useNavigate();
-  const currentPoints = userMock.points;
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userRanking, setUserRanking] = useState<UserRanking | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+  const getCurrentWeek = (baseDate: Dayjs = dayjs()) => {
+    const date = baseDate;
+    let targetMonth = date.month();
+    const targetDate = date.date();
+    const startWeekDay = date.startOf("month").day();
+    const originalWeek = Math.ceil((targetDate + startWeekDay - 1) / 7);
+    let weekCorrection = 0;
+
+    if (startWeekDay >= 1 && startWeekDay <= 4) {
+      if (originalWeek === 5) {
+        const endWeekDay = date.endOf("month").day();
+        if (endWeekDay >= 1 && endWeekDay <= 3) {
+          targetMonth = date.add(1, "month").month();
+          weekCorrection = -4;
+        }
+      }
+    } else if (startWeekDay === 0) {
+      if (originalWeek === 0) {
+        const lastDateOfPreviousMonth = date
+          .subtract(1, "month")
+          .endOf("month");
+        const weekNum = getWeekOfMonth(lastDateOfPreviousMonth);
+        targetMonth = lastDateOfPreviousMonth.month();
+        weekCorrection = weekNum;
+      } else if (originalWeek === 5) {
+        targetMonth = date.add(1, "month").month();
+        weekCorrection = -4;
+      }
+    } else {
+      if (originalWeek === 1) {
+        const lastDateOfPreviousMonth = date
+          .subtract(1, "month")
+          .endOf("month");
+        const weekNum = getWeekOfMonth(lastDateOfPreviousMonth);
+        targetMonth = lastDateOfPreviousMonth.month();
+        weekCorrection = weekNum - originalWeek;
+      } else if (originalWeek === 6) {
+        targetMonth = date.add(1, "month").month();
+        weekCorrection = -5;
+      } else {
+        weekCorrection = -1;
+      }
+    }
+    return {
+      year: date.year(),
+      month: targetMonth + 1,
+      week: originalWeek + weekCorrection,
+      date: date,
+    };
+  };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axiosInstance.get("/api/v1/users/me");
+        const data = response.data?.data;
+        console.log(response.data);
+
+        if (data) {
+          setUserProfile(data);
+        } else {
+          console.error("사용자 데이터가 없습니다.");
+          setUserProfile(null);
+        }
+      } catch (error) {
+        setError("사용자 정보를 불러오지 못했습니다.");
+        console.error("사용자 정보 불러오기 실패: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    const fetchRanking = async () => {
+      try {
+        const { year, month, week } = getCurrentWeek();
+        console.log(year, month, week);
+        const formattedDate = `${year}${String(month).padStart(2, "0")}${week}`;
+        const response = await axiosInstance.get(`/api/v1/ranking/my-ranking`, {
+          params: { date: formattedDate },
+        });
+
+        if (response.data.status === 200) {
+          setUserRanking(response.data.data);
+        }
+        console.log(response.data.ranking);
+      } catch (error) {
+        console.error("내 랭킹 조회 실패: ", error);
+      }
+    };
+
+    fetchRanking();
+  }, []);
+
+  if (loading) return <p>로딩중...</p>;
+  if (error) return <p>{error}</p>;
+  if (!userProfile) return <p>사용자 정보가 없습니다.</p>;
+
+  const currentPoints = userProfile?.totalPoints;
 
   const currentStampCount = Math.floor(currentPoints / STAMP_POINT);
   const startPoints = currentStampCount * STAMP_POINT;
@@ -48,14 +188,6 @@ const Home = () => {
   }
   const bonggongPosition = getRoundedProgress(progressInSegment);
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
-
   return (
     <Background
       whiteBackgroundHeight={55}
@@ -65,13 +197,13 @@ const Home = () => {
           <div className="flex items-center mt-4">
             <div className="bg-[#FFFFFF] w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
               <img
-                src={userMock.profileImage}
+                src={`${import.meta.env.VITE_API_URL}${userProfile.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
             </div>
             <h2 className="ml-2 font-[PretendardVariable] text-[24px] text-[#FFFFFF]">
-              {userMock.nickname}님
+              {userProfile.nickname}님
             </h2>
             <ChevronRight
               size={30}
@@ -153,7 +285,7 @@ const Home = () => {
                 />
               </div>
               <p className="font-[PretendardVariable] text-[18px] font-semibold">
-                {userMock.points.toLocaleString()}P
+                {userProfile.totalPoints.toLocaleString()}P
               </p>
             </div>
             <div className="bg-[#FFFFFF] flex-1 flex flex-col justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)] mx-auto">
@@ -168,7 +300,7 @@ const Home = () => {
                 />
               </div>
               <p className="font-[PretendardVariable] text-[18px] font-semibold">
-                {userMock.ranking}위
+                {userRanking?.ranking}위
               </p>
             </div>
           </div>
