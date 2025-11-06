@@ -3,23 +3,42 @@ import vector from "../assets/vector.svg";
 import coin from "../assets/coin.svg";
 import polygon from "../assets/polygon.svg";
 import lock from "../assets/lock.svg";
-import { userProfile } from "../mocks/userProfile";
 import { useEffect, useState } from "react";
 import { bonggongList } from "../mocks/bonggongList";
 import { pointHistory } from "../mocks/pointHistory";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
-// import axios from "axios";
+import { axiosInstance } from "../apis/axios";
+
+interface UserProfile {
+  profileImageUrl: string;
+  nickname: string;
+  email: string;
+  createdAt: string;
+  totalPoints: number;
+  walkingCount: number;
+  role: string;
+}
+
+interface Stamp {
+  id: number;
+  name: string;
+  imageUrl: string;
+  price: number;
+  isActive: boolean;
+}
 
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState<"points" | "stamps">("points");
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [selectedBonggong, setSelectedBonggong] = useState<number | null>(null);
-  const [representBonggong, setRepresentBonggong] = useState<string>(
-    userProfile.profileImageUrl
-  );
+  const [representBonggong, setRepresentBonggong] = useState<string>("");
+  const [stamps, setStamps] = useState<Stamp[]>([]);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>("전체");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const sortedPointHistory = [...pointHistory].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -43,12 +62,63 @@ export default function MyPage() {
           return formatted === selectedMonth;
         });
 
-  /*
-  const handleChangeBonggong = async () => {
-    if (selectedBonggong === null) return;
+  useEffect(() => {
+    if (userProfile) {
+      setRepresentBonggong(userProfile.profileImageUrl);
+    }
+  }, [userProfile]);
 
-    const selected = bonggongList.find((b) => b.id === selectedBonggong);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axiosInstance.get("/api/v1/users/me");
+        const data = response.data?.data;
+        console.log(response.data);
+
+        if (data) {
+          setUserProfile(data);
+        } else {
+          console.error("사용자 데이터가 없습니다.");
+          setUserProfile(null);
+        }
+      } catch (error) {
+        setError("사용자 정보를 불러오지 못했습니다.");
+        console.error("사용자 정보 불러오기 실패: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    const fetchStamps = async () => {
+      try {
+        const response = await axiosInstance.get("/api/v1/stamps");
+
+        if (response.data.status === 200 && Array.isArray(response.data.data)) {
+          setStamps(response.data.data);
+        } else {
+          console.error("스탬프 에러 응답: ", response.data);
+        }
+      } catch (error) {
+        console.error("스탬프 데이터 호출 실패: ", error);
+      } finally {
+      }
+    };
+    fetchStamps();
+  }, []);
+
+  const handleChangeBonggong = async () => {
+    if (selectedBonggong === null || !userProfile) return;
+
+    const selected = stamps.find((b) => b.id === selectedBonggong);
     if (!selected) return;
+
+    if (!userProfile) {
+      alert("유저 정보를 불러오지 못했습니다.");
+      return;
+    }
 
     const updatedData = {
       nickname: userProfile.nickname,
@@ -56,18 +126,22 @@ export default function MyPage() {
     };
 
     try {
-      const response = await axios.put("/api/v1/users", updatedData, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axiosInstance.patch(
+        "/api/v1/users/me",
+        updatedData
+      );
 
+      console.log("프로필 수정 성공:", response.data);
       setRepresentBonggong(selected.imageUrl);
+      setUserProfile({ ...userProfile, profileImageUrl: selected.imageUrl });
       setSelectedBonggong(null);
     } catch (error) {
       console.error("대표 봉공 변경 실패: ", error);
       alert("봉공이 변경 중 오류가 발생했습니다.");
     }
   };
-  */
+
+  /*
   const handleChangeBonggong = () => {
     if (selectedBonggong !== null) {
       const selected = bonggongList.find((b) => b.id === selectedBonggong);
@@ -77,6 +151,7 @@ export default function MyPage() {
       }
     }
   };
+*/
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -98,7 +173,7 @@ export default function MyPage() {
               style={{ backgroundColor: "#FFFFFF" }}
             >
               <img
-                src={representBonggong}
+                src={`${import.meta.env.VITE_API_URL}${userProfile?.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
@@ -107,7 +182,7 @@ export default function MyPage() {
               className="ml-2 font-[PretendardVariable]"
               style={{ color: "#FFFFFF", fontSize: "24px" }}
             >
-              {userProfile.nickname}님
+              {userProfile?.nickname}님
             </h2>
           </div>
 
@@ -115,7 +190,7 @@ export default function MyPage() {
             <div className="flex items-center rounded-lg bg-black/10 p-2">
               <img src={vector} alt="발바닥 아이콘" className="w-5 h-5" />
               <span className="ml-2 font-[PretendardVariable] text-base">
-                {userProfile.walkingCount}번
+                {userProfile?.walkingCount}번
               </span>
             </div>
             <span className="ml-1 font-[PretendardVariable] text-base">
@@ -127,7 +202,7 @@ export default function MyPage() {
             <div className="flex items-center rounded-lg bg-black/10 p-2">
               <img src={coin} alt="동전 아이콘" className="w-4.5 h-4.5" />
               <span className="ml-2 font-[PretendardVariable] text-base">
-                {userProfile.totalPoints.toLocaleString()}포인트
+                {userProfile?.totalPoints.toLocaleString()}포인트
               </span>
             </div>
             <span className="ml-1 font-[PretendardVariable] text-base">
@@ -272,7 +347,7 @@ export default function MyPage() {
           ) : (
             <div className="overflow-y-auto h-[calc(100%-40px)]">
               <div className="grid grid-cols-3 gap-3 p-2">
-                {bonggongList.map((b) => {
+                {stamps.map((b) => {
                   const isSelected = selectedBonggong === b.id;
                   const isRepresentative = representBonggong === b.imageUrl;
                   return (
@@ -290,7 +365,7 @@ export default function MyPage() {
                       }}
                     >
                       <img
-                        src={b.imageUrl}
+                        src={`${import.meta.env.VITE_API_URL}${b.imageUrl}`}
                         alt={b.name}
                         className={`w-28 h-28 object-contain rounded-lg ${
                           b.isActive ? "" : "filter grayscale"
