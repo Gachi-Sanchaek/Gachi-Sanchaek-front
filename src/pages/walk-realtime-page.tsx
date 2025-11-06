@@ -1,5 +1,5 @@
 import MapView from "../components/WalkPage/MapView";
-export default function WalkingPage() {
+export default function WalkRealtimePage() {
   return (
     <>
       <div className="w-full" style={{ height: "calc(100vh - 48px - 230px)" }}>
