@@ -49,7 +49,7 @@ const KakaoOAuthHandler = () => {
         navigate("/login", { replace: true });
       }
     },
-    [navigate, setAccessToken]
+    [navigate, setAccessToken, [K_API_URL], [code]]
   );
 
   useEffect(() => {

@@ -103,6 +103,7 @@ export default function MyPage() {
       } catch (error) {
         console.error("스탬프 데이터 호출 실패: ", error);
       } finally {
+        setLoading(false);
       }
     };
     fetchStamps();
