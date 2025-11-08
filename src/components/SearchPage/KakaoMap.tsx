@@ -1,41 +1,26 @@
-import { useEffect, useRef } from 'react';
-// import WelfareCenter from '/assets/welfare-center-pin.png';
-// import AnimalShelter from '/assets/animal-shelter-pin.png';
+import { useEffect, useRef, useState } from 'react';
 // import { createRoot } from 'react-dom/client';
-// import LocationInfoCard from './LocationInfoCard';
+import type { Place } from '../../types/place';
+import { getNearbyPlaces } from '../../apis/place';
+import { markerType } from '../../utils/markerType';
+import { keywordType } from '../../utils/placeKeywordType';
 
 interface KakaoMapProps {
   initialLat?: number;
   initialLng?: number;
   initialLevel?: number; //지도 확대 레벨
   selectedCategory: string;
+  setShowBottomSheet: React.Dispatch<React.SetStateAction<boolean>>;
+  setPlaces: React.Dispatch<React.SetStateAction<Place[]>>;
+  setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
+  mapRefExternal: React.RefObject<kakao.maps.Map | null>;
+  markersRefExternal: React.RefObject<kakao.maps.Marker[] | null>;
 }
 
-// 마커 타입 반환
-// const markerType = (category: string) => {
-//   switch (category) {
-//     case '동행 산책':
-//       return WelfareCenter;
-//     case '유기견 산책':
-//       return AnimalShelter;
-//     default:
-//       return undefined;
-//   }
-// };
-
-const KakaoMap = ({
-  initialLat = 37.485993139336074,
-  initialLng = 126.80448486831264,
-  initialLevel = 3,
-  // selectedCategory
-}: KakaoMapProps) => {
+const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.80448486831264, initialLevel = 3, selectedCategory, setShowBottomSheet, setPlaces, setSelectedPlace, mapRefExternal, markersRefExternal }: KakaoMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
-
-  // 내 위치 마커
-  // let myLocationMarker: kakao.maps.Marker | null = null;
-
-  // 팝업카드
-  // let activeOverlay: kakao.maps.CustomOverlay | null = null;
+  const markersRef = useRef<kakao.maps.Marker[]>([]);
+  const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     const loadMap = async () => {
@@ -47,6 +32,10 @@ const KakaoMap = ({
         center: new kakao.maps.LatLng(initialLat, initialLng),
         level: initialLevel,
       });
+
+      if (mapRefExternal) mapRefExternal.current = map;
+
+      markersRef.current = [];
 
       // 내위치 마커 생성
       const createMyLocationMarker = (lat: number, lng: number) => {
@@ -77,11 +66,13 @@ const KakaoMap = ({
           (pos) => {
             createMyLocationMarker(pos.coords.latitude, pos.coords.longitude);
             map.setCenter(new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+            setMyLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
           },
           // 허용 안할 시, 초기값으로 위치 설정
           () => {
             createMyLocationMarker(initialLat, initialLng);
             map.setCenter(new kakao.maps.LatLng(initialLat, initialLng));
+            setMyLocation({ lat: initialLat, lng: initialLng });
           }
         );
       }
@@ -89,70 +80,62 @@ const KakaoMap = ({
       else {
         createMyLocationMarker(initialLat, initialLng);
         map.setCenter(new kakao.maps.LatLng(initialLat, initialLng));
+        setMyLocation({ lat: initialLat, lng: initialLng });
       }
 
-      // 일반 마커 생성
-      // const createMarker = (lat: number, lng: number, imageUrl?: string, size: number = 20, isMyLocation: boolean = false) => {
-      //   const markerImage = imageUrl ? new kakao.maps.MarkerImage(imageUrl, new kakao.maps.Size(size, size)) : undefined;
-
-      //   const marker = new kakao.maps.Marker({
-      //     position: new kakao.maps.LatLng(lat, lng),
-      //     image: markerImage,
-      //   });
-
-      //   marker.setMap(map);
-
-      //   if (isMyLocation) {
-      //     if (myLocationMarker) myLocationMarker.setMap(null);
-      //     myLocationMarker = marker;
-      //   }
-      // };
-
       // 기관 마커 생성
-      //   const createSpotMarker = (spot) => {
-      //     const type = markerType(selectedCategory);
-      //     const marker = new kakao.maps.Marker({
-      //       position: new kakao.maps.LatLng(spot.lat, spot.lng),
-      //       image: type,
-      //     });
+      const createPlaceMarker = (place: Place) => {
+        const type = markerType(selectedCategory);
+        // 기본 마커
+        const normalMarker = type ? new kakao.maps.MarkerImage(type, new kakao.maps.Size(40, 40)) : undefined;
+        // 선택한 마커
+        const selectedMarker = type ? new kakao.maps.MarkerImage(type, new kakao.maps.Size(50, 50)) : undefined;
 
-      //     marker.setMap(map);
+        const marker = new kakao.maps.Marker({
+          position: new kakao.maps.LatLng(place.latitude, place.longitude),
+          image: normalMarker,
+        });
 
-      // 마커 클릭 시 오버레이 생성
-      //     kakao.maps.event.addListener(marker, 'click', () => {
-      //       if (activeOverlay) activeOverlay.setMap(null);
+        marker.setMap(map);
 
-      //       const container = document.createElement('div');
-      //       const root = createRoot(container);
+        // 마커를 배열에 저장
+        markersRef.current.push(marker);
 
-      //       const overlay = new kakao.maps.CustomOverlay({
-      //         content: container,
-      //         position: new kakao.maps.LatLng(spot.lat, spot.lng),
-      //         yAnchor: 1,
-      //       });
+        if (markersRefExternal) {
+          markersRefExternal.current = markersRef.current;
+        }
 
-      //       root.render(<LocationInfoCard location={} />);
+        // 마커 클릭 시 오버레이 생성
+        kakao.maps.event.addListener(marker, 'click', () => {
+          markersRef.current.forEach((m) => m.setImage(normalMarker || ''));
+          marker.setImage(selectedMarker || ''); // 선택한 마커의 크기 확대
+          map.panTo(marker.getPosition()); // 마커 위치로 이동
 
-      //       overlay.setMap(map);
-      //       activeOverlay = overlay;
-      //     });
-      //   };
+          setSelectedPlace(place);
+          setShowBottomSheet(false);
+        });
 
-      // 내 위치 중심 이동 및 마커 표시
-      // const handleLocation = (lat: number, lng: number) => {
-      //   createMarker(lat, lng, type(selectedCategory), 40, true);
-      //   map.setCenter(new kakao.maps.LatLng(lat, lng));
-      // };
+        return marker;
+      };
 
-      // 실제 내 위치 기반 지도 중심 재설정
-      // if (navigator.geolocation) {
-      //   navigator.geolocation.getCurrentPosition(
-      //     (pos) => handleLocation(pos.coords.latitude, pos.coords.longitude),
-      //     () => handleLocation(initialLat, initialLng)
-      //   );
-      // } else {
-      //   handleLocation(initialLat, initialLng);
-      // }
+      const isValidCategory = selectedCategory === '동행 산책' || selectedCategory === '유기견 산책';
+      const params = {
+        lat: myLocation?.lat || initialLat,
+        lng: myLocation?.lng || initialLng,
+        radius: 5000,
+        keyword: keywordType(selectedCategory),
+      };
+
+      if (isValidCategory) {
+        try {
+          const data = await getNearbyPlaces(params);
+          console.log('근처 기관 데이터:', data);
+          setPlaces(data?.result || []);
+          data?.result.forEach(createPlaceMarker);
+        } catch (e) {
+          console.error('getNearbyPlaces api error', e);
+        }
+      }
     };
 
     // 이미 로드된 경우
@@ -168,9 +151,13 @@ const KakaoMap = ({
 
       script.onload = () => window.kakao.maps.load(loadMap);
     }
-  }, [initialLat, initialLng, initialLevel]);
+  }, [initialLat, initialLng, initialLevel, selectedCategory, myLocation?.lat, myLocation?.lng, setPlaces, setSelectedPlace, setShowBottomSheet, mapRefExternal]);
 
-  return <div ref={mapRef} className='w-full h-[calc(100dvh-48px)]' />;
+  return (
+    <div className='relative w-full h-[calc(100dvh-48px)]'>
+      <div ref={mapRef} className='w-full h-full' />
+    </div>
+  );
 };
 
 export default KakaoMap;
