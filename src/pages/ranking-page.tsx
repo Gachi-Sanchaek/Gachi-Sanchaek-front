@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import Background from "../components/Background";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { myRanking } from "../mocks/myRanking";
 import { tenRanking } from "../mocks/tenRanking";
 import dayjs, { Dayjs } from "dayjs";
+import { axiosInstance } from "../apis/axios";
 
 function getWeekOfMonth(date: Dayjs): number {
   const startOfMonth = date.startOf("month");
@@ -14,7 +14,18 @@ function getWeekOfMonth(date: Dayjs): number {
   return Math.ceil((dayOfMonth + offset) / 7);
 }
 
+interface MyRanking {
+  nickname: string;
+  point: number;
+  profileImageUrl: string;
+  ranking: number;
+}
+
 export default function RankingPage() {
+  const [myRanking, setMyRanking] = useState<MyRanking | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const getCurrentWeek = (baseDate: Dayjs = dayjs()) => {
     const date = baseDate;
     let targetMonth = date.month();
@@ -78,9 +89,15 @@ export default function RankingPage() {
   const handleNextWeek = () => {
     setWeekInfo((prev) => {
       const newDate = prev.date.add(7, "day");
+
+      if (newDate.isAfter(dayjs(), "week")) {
+        return prev;
+      }
       return getCurrentWeek(newDate);
     });
   };
+
+  const isNextDisabled = weekInfo.date.add(7, "day").isAfter(dayjs(), "week");
 
   const formattedWeek = () => {
     return `${weekInfo.year.toString().slice(2)}년 ${weekInfo.month}월 ${weekInfo.week}주`;
@@ -88,6 +105,37 @@ export default function RankingPage() {
 
   const top3 = [tenRanking[1], tenRanking[0], tenRanking[2]];
   const others = tenRanking.slice(3);
+
+  useEffect(() => {
+    const fetchMyRanking = async () => {
+      try {
+        const { year, month, week } = weekInfo;
+        const formattedDate = `${year}${month}${week}`;
+
+        const response = await axiosInstance.get(
+          "/api/v1/rankings/my-ranking",
+          {
+            params: { date: formattedDate },
+          }
+        );
+        const data = response.data?.data;
+        console.log(formattedDate, response.data);
+
+        if (data) {
+          setMyRanking(data);
+        } else {
+          console.error("사용자 데이터가 없습니다.");
+          setMyRanking(null);
+        }
+      } catch (error) {
+        setError("사용자 정보를 불러오지 못했습니다.");
+        console.error("사용자 정보 불러오기 실패: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMyRanking();
+  }, [weekInfo]);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -110,15 +158,26 @@ export default function RankingPage() {
             <span className="text-white text-[16px] mx-6">
               {formattedWeek()}
             </span>
-            <button onClick={handleNextWeek} className="p-2">
-              <ChevronRight className="text-white" size={24} />
+            <button
+              onClick={!isNextDisabled ? handleNextWeek : undefined}
+              className="p-2"
+              disabled={isNextDisabled}
+            >
+              <ChevronRight
+                className={
+                  isNextDisabled
+                    ? "text-white/50 cursor-not-allowed"
+                    : "text-white"
+                }
+                size={24}
+              />
             </button>
           </div>
 
           <div className="mt-2 w-full h-[70px] flex-shrink-0 bg-[#FFFFFF]/80 rounded-2xl flex items-center shadow-[0_0_5px_0_rgba(0,0,0,0.2)] px-4">
             <div className="relative w-[50px] h-[50px] bg-[#FFFFFF] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_3px_0_rgba(0,0,0,0.1)] mr-3">
               <img
-                src={myRanking.profileImageUrl}
+                src={`${import.meta.env.VITE_API_URL}${myRanking?.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
@@ -128,14 +187,14 @@ export default function RankingPage() {
             </div>
 
             <div className="flex flex-col justify-center flex-1 font-[PretendardVariable] font-medium">
-              <span className="text-[13px]">{myRanking.nickname}</span>
+              <span className="text-[13px]">{myRanking?.nickname}</span>
               <span className="text-[13px] text-[#BDBDBD]">
-                {myRanking.ranking.toLocaleString()}위
+                {myRanking?.ranking.toLocaleString()}위
               </span>
             </div>
             <div className="flex justify-end">
               <span className="bg-[#5FD59B] text-[#FFFFFF] text-[12px] px-3.5 py-0.5 rounded-full font-[PretendardVariable] font-light">
-                {myRanking.point.toLocaleString()}P
+                {myRanking?.point.toLocaleString()}P
               </span>
             </div>
           </div>
