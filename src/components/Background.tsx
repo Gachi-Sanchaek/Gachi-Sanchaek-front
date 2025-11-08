@@ -17,7 +17,7 @@ const Background: React.FC<BackgroundProps> = ({
 
   return (
     <div
-      className="relative w-screen overflow-hidden"
+      className="relative w-full h-screen overflow-hidden"
       style={{
         height: "calc(100dvh - 40px)", // 40px = ProtectedLayout의 pt-10
       }}

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { MAX_Y, MIN_Y } from '../constant/BottomSheet';
+import { MIN_Y, MAX_Y, SNAP_POINTS } from '../constant/BottomSheet';
 
-interface BottomSHeetMetrics {
+interface BottomSheetMetrics {
   pointerStart: {
     sheetY: number;
     pointY: number;
@@ -11,6 +11,7 @@ interface BottomSHeetMetrics {
     movingDirection: 'none' | 'up' | 'down';
   };
   isContentAreaTouched: boolean;
+  isDraggingSheet: boolean;
 }
 
 const useBottomSheet = () => {
@@ -18,8 +19,7 @@ const useBottomSheet = () => {
   const content = useRef<HTMLDivElement>(null);
   const isPointerDownRef = useRef(false);
 
-  // 초기화
-  const metrics = useRef<BottomSHeetMetrics>({
+  const metrics = useRef<BottomSheetMetrics>({
     pointerStart: {
       sheetY: 0,
       pointY: 0,
@@ -29,113 +29,138 @@ const useBottomSheet = () => {
       movingDirection: 'none',
     },
     isContentAreaTouched: false,
+    isDraggingSheet: false,
   });
 
   useEffect(() => {
-    // 바텀시트가 움직을 수 있는지 확인
-    const canMoveBottomSheet = () => {
-      const { pointerMove, isContentAreaTouched } = metrics.current;
+    if (!sheet.current) return;
 
-      // 바텀시트 컨텐츠가 아닌 영역을 터치했을 경우
+    // 초기 위치 설정 (중간 스냅 포인트)
+    const initialY = SNAP_POINTS.HALF;
+    const initialHeight = window.innerHeight - initialY;
+    sheet.current.style.top = `${initialY}px`;
+    sheet.current.style.height = `${initialHeight}px`;
+    sheet.current.style.transition = 'top 0.3s ease-out, height 0.3s ease-out';
+
+    // 바텀시트가 움직일 수 있는지 확인
+    const canMoveBottomSheet = () => {
+      const { pointerMove, isContentAreaTouched, isDraggingSheet } = metrics.current;
+
+      // 이미 바텀시트를 드래그 중인 경우
+      if (isDraggingSheet) {
+        return true;
+      }
+
+      // 바텀시트 컨텐츠가 아닌 영역(헤더)을 터치했을 경우
       if (!isContentAreaTouched) {
         return true;
       }
 
-      // 바텀시트가 최대로 올라와 있는 상태가 아닐 경우
-      if (sheet.current!.getBoundingClientRect().y !== MIN_Y) {
+      if (!content.current || !sheet.current) return false;
+
+      const currentSheetY = sheet.current.getBoundingClientRect().y;
+
+      // 바텀시트가 최대로 올라와 있지 않은 경우
+      if (Math.abs(currentSheetY - MIN_Y) > 5) {
         return true;
       }
 
-      // 더 이상 불러올 컨텐츠 내용이 없을 경우(컨텐츠의 최상단)
-      if (pointerMove.movingDirection === 'down') {
-        return content.current!.scrollTop <= 0;
+      // 컨텐츠를 아래로 스크롤할 때, 스크롤이 최상단에 있는 경우
+      if (pointerMove.movingDirection === 'down' && content.current.scrollTop <= 0) {
+        return true;
       }
 
-      // 위 조건에 만족하지 않는 경우 바텀시트 이동 불가
       return false;
     };
 
-    //  드래그 시작
+    // 가장 가까운 스냅 포인트 찾기
+    const findNearestSnapPoint = (currentY: number): number => {
+      const snapValues = Object.values(SNAP_POINTS);
+      return snapValues.reduce((prev, curr) => (Math.abs(curr - currentY) < Math.abs(prev - currentY) ? curr : prev)); // 현재 y값에서 더 가까운 값을 선택
+    };
+
+    // 드래그 시작
     const handlePointerDown = (e: PointerEvent) => {
       isPointerDownRef.current = true;
       const { pointerStart } = metrics.current;
-      pointerStart.sheetY = sheet.current!.getBoundingClientRect().y; // 바텀시트의 최상단 높이의 y값
-      pointerStart.pointY = e.clientY; // 처음 터치한 y값
+
+      if (sheet.current) {
+        pointerStart.sheetY = sheet.current.getBoundingClientRect().y;
+        pointerStart.pointY = e.clientY;
+
+        // transition 제거 (드래그 중에는 부드럽게 따라다니도록)
+        sheet.current.style.transition = 'none';
+      }
     };
 
     // 드래그
     const handlePointerMove = (e: PointerEvent) => {
-      if (!isPointerDownRef.current) return;
+      if (!isPointerDownRef.current || !sheet.current) return;
+
       const { pointerStart, pointerMove } = metrics.current;
-      const currentPointer = e.clientY; // 현재 터치하는 y값
+      const currentPointer = e.clientY;
 
-      // prevPointY값이 없으면 처음 터치한 y값 대입
-      if (pointerMove.prevPointY === undefined) {
-        pointerMove.prevPointY = pointerMove.prevPointY || pointerStart.pointY;
-      }
-
-      // 초기 위치
+      // 이동 방향 계산
       if (pointerMove.prevPointY === 0) {
         pointerMove.prevPointY = pointerStart.pointY;
       }
 
-      // 현재 y값이 처음 터치한 y값보다 크면 down(아래로 이동)
       if (pointerMove.prevPointY < currentPointer) {
         pointerMove.movingDirection = 'down';
-      }
-
-      // 현재 y값이 처음 터치한 y값보다 작으면 up(위로 이동)
-      if (pointerMove.prevPointY > currentPointer) {
+      } else if (pointerMove.prevPointY > currentPointer) {
         pointerMove.movingDirection = 'up';
       }
 
-      // 바텀 시트를 움직일 수 있는 경우, 이동 값만큼 계산
+      pointerMove.prevPointY = currentPointer;
+
+      // 바텀시트를 움직일 수 있는지 확인
       if (canMoveBottomSheet()) {
+        metrics.current.isDraggingSheet = true;
         e.preventDefault();
 
-        // 이동 후 바텀 시트의 최상단 높이의 y값
-        // 시작할 때 sheetY값에서 이동해야 하는 만큼(pointerOffset) 계산
         const pointerOffset = currentPointer - pointerStart.pointY;
         let nextSheetY = pointerStart.sheetY + pointerOffset;
 
-        // 바텀 시트는 MIN_Y 이하, MAX_Y 이싱의 영역에 위치할 경우, 영역 제한
+        // 영역 제한
         if (nextSheetY <= MIN_Y) {
           nextSheetY = MIN_Y;
         }
-
         if (nextSheetY >= MAX_Y) {
           nextSheetY = MAX_Y;
         }
 
-        // y값 계산(닫힌 상태를 기준으로)
-        if (sheet.current) {
-          sheet.current.style.transform = `translateY(${nextSheetY - MIN_Y}px)`;
-        }
-      }
-      // 컨텐츠 스크롤 시, 바텀 시트가 스크롤되는 것을 방지
-      else {
-        document.body.style.overflowY = 'hidden';
+        // 바텀시트 위치 및 높이 업데이트
+        const sheetHeight = window.innerHeight - nextSheetY;
+        sheet.current.style.top = `${nextSheetY}px`;
+        sheet.current.style.height = `${sheetHeight}px`;
+      } else {
+        // 컨텐츠 스크롤 허용
+        metrics.current.isDraggingSheet = false;
       }
     };
 
     // 드래그 종료
     const handlePointerUp = () => {
+      if (!sheet.current) return;
+
       isPointerDownRef.current = false;
-      document.body.style.overflowY = 'auto';
-      // const { pointerMove } = metrics.current;
-      // const currentSheetY = sheet.current!.getBoundingClientRect().y;
+      const { isDraggingSheet } = metrics.current;
 
-      // if (currentSheetY !== MIN_Y) {
-      //   if (pointerMove.movingDirection === 'down') {
-      //     sheet.current!.style.setProperty('transform', 'translateY(0)');
-      //   }
+      // transition 복원
+      sheet.current.style.transition = 'top 0.3s ease-out, height 0.3s ease-out';
 
-      //   if (pointerMove.movingDirection === 'up') {
-      //     sheet.current!.style.setProperty('transform', `translateY(${MIN_Y - MAX_Y}px)`);
-      //   }
-      // }
+      // 바텀시트를 드래그했을 경우에만 스냅
+      if (isDraggingSheet) {
+        const currentSheetY = sheet.current.getBoundingClientRect().y;
+        const nearestSnapPoint = findNearestSnapPoint(currentSheetY);
 
-      // 초기화
+        // 가장 가까운 스냅 포인트로 이동
+        const sheetHeight = window.innerHeight - nearestSnapPoint;
+        sheet.current.style.top = `${nearestSnapPoint}px`;
+        sheet.current.style.height = `${sheetHeight}px`;
+      }
+
+      // 메트릭 초기화
       metrics.current = {
         pointerStart: {
           sheetY: 0,
@@ -146,34 +171,38 @@ const useBottomSheet = () => {
           movingDirection: 'none',
         },
         isContentAreaTouched: false,
+        isDraggingSheet: false,
       };
     };
 
     const sheetElement = sheet.current;
 
-    sheetElement?.addEventListener('pointerdown', handlePointerDown);
-    sheetElement?.addEventListener('pointermove', handlePointerMove);
-    sheetElement?.addEventListener('pointerup', handlePointerUp);
-    sheetElement?.addEventListener('pointerleave', handlePointerUp);
+    sheetElement.addEventListener('pointerdown', handlePointerDown);
+    sheetElement.addEventListener('pointermove', handlePointerMove);
+    sheetElement.addEventListener('pointerup', handlePointerUp);
+    sheetElement.addEventListener('pointerleave', handlePointerUp);
 
     return () => {
       if (!sheetElement) return;
-
-      sheetElement?.removeEventListener('pointerdown', handlePointerDown);
-      sheetElement?.removeEventListener('pointermove', handlePointerMove);
-      sheetElement?.removeEventListener('pointerup', handlePointerUp);
-      sheetElement?.removeEventListener('pointerleave', handlePointerUp);
+      sheetElement.removeEventListener('pointerdown', handlePointerDown);
+      sheetElement.removeEventListener('pointermove', handlePointerMove);
+      sheetElement.removeEventListener('pointerup', handlePointerUp);
+      sheetElement.removeEventListener('pointerleave', handlePointerUp);
     };
   }, []);
 
+  // 컨텐츠 영역을 터치했을 경우
   useEffect(() => {
-    const onContentPointerDown = () => {
-      metrics.current!.isContentAreaTouched = true;
+    const handleContentPointerDown = () => {
+      metrics.current.isContentAreaTouched = true;
     };
 
     const node = content.current;
-    node?.addEventListener('pointerdown', onContentPointerDown);
-    return () => node?.removeEventListener('pointerdown', onContentPointerDown, true);
+    node?.addEventListener('pointerdown', handleContentPointerDown);
+
+    return () => {
+      node?.removeEventListener('pointerdown', handleContentPointerDown);
+    };
   }, []);
 
   return { sheet, content };

@@ -1,16 +1,31 @@
-import { type RouteObject, createBrowserRouter, RouterProvider } from 'react-router-dom';
-import LogIn from './pages/LogIn';
-import Home from './pages/Home';
-import PublicLayout from './layouts/public-layout';
-import ProtectedLayout from './layouts/protected-layout';
-import SearchPage from './pages/search-page';
+import {
+  type RouteObject,
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+import LogIn from "./pages/login-page";
+import Home from "./pages/home-page";
+import PublicLayout from "./layouts/public-layout";
+import ProtectedLayout from "./layouts/protected-layout";
+import SearchPage from "./pages/search-page";
+import SignUp from "./pages/signup-page";
+import WalkStartPage from "./pages/walk-start-page";
+import WalkPage from "./pages/walk-page";
+import WalkRoutePage from "./pages/walk-route-page";
+import { KAKAO_OAUTH } from "./utils/kakao-constants";
+import { KakaoOAuthHandler } from "./pages/kakao-oauth-handler";
+import MyPage from "./pages/my-page";
+import RankingPage from "./pages/ranking-page";
 
 const publicRoutes: RouteObject[] = [
   {
-    path: '/',
+    path: "/",
     element: <PublicLayout />,
     children: [
-      { path: 'login', element: <LogIn /> },
+      { path: "login", element: <LogIn /> },
+      { path: "signup", element: <SignUp /> },
+      { path: KAKAO_OAUTH, element: <KakaoOAuthHandler /> },
+
       //   {path:'register', element:<Register />}
     ],
   },
@@ -18,11 +33,16 @@ const publicRoutes: RouteObject[] = [
 
 const protectedRoutes: RouteObject[] = [
   {
-    path: '/',
+    path: "/",
     element: <ProtectedLayout />,
     children: [
       { index: true, element: <Home /> },
-      { path: 'search', element: <SearchPage /> },
+      { path: "search", element: <SearchPage /> },
+      { path: "mypage", element: <MyPage /> },
+      { path: "walk/start", element: <WalkStartPage /> },
+      { path: "walk", element: <WalkPage /> },
+      { path: "walk/route", element: <WalkRoutePage /> },
+      { path: "ranking", element: <RankingPage /> },
     ],
   },
 ];

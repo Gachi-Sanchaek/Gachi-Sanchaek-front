@@ -1,22 +1,26 @@
-// import Category from '../../components/SearchPage/Category/Category';
-// import LocationInfoCard from '../../components/SearchPage/LocationInfoCard';
-import { locationList } from '../../../mocks/locationList';
+import type { Place } from '../../../types/place';
 import ListCard from '../ListCard';
+import NotFoundBongGong from '/src/assets/images/not_found_bonggong.png';
 
-const BottomSheetContent = () => {
+interface BottomSheetContentProps {
+  places: Place[];
+  setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
+  setShowBottomSheet: React.Dispatch<React.SetStateAction<boolean>>;
+  mapRef: React.RefObject<kakao.maps.Map | null>;
+  markersRef: React.RefObject<kakao.maps.Marker[] | null>;
+}
+
+const BottomSheetContent = ({ places, setSelectedPlace, setShowBottomSheet, mapRef, markersRef }: BottomSheetContentProps) => {
   return (
-    <div
-      className={`pb-5`}
-      style={{
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-      }}
-    >
-      {locationList.map((loc) => (
-        <ListCard key={loc.id} location={loc.name} address={loc.address} phoneNum={loc.phone} />
-      ))}
-
-      {/* <LocationInfoCard location='서울 동물복지지원센터 마포' /> */}
+    <div className='pb-3 px-3'>
+      {places.length > 0 ? (
+        places.map((p) => <ListCard key={p.kakaoId} place={p} setSelectedPlace={setSelectedPlace} setShowBottomSheet={setShowBottomSheet} mapRef={mapRef} markersRef={markersRef} />)
+      ) : (
+        <div className='flex flex-col justify-center items-center'>
+          <img src={NotFoundBongGong} alt='not_found_bonggong' className='w-25 h-25' />
+          <p className='font-[pretendardVariable] text-sm text-gray-400'>근처에 관련 기관이 없습니다.</p>
+        </div>
+      )}
     </div>
   );
 };
