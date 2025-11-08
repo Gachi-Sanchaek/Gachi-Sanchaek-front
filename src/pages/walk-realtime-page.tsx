@@ -1,9 +1,65 @@
-import MapView from "../components/WalkPage/MapView";
+import { useEffect, useRef, useState } from "react";
+import MapRealtime from "../components/WalkRealtime/MapRealtime";
+
 export default function WalkRealtimePage() {
+  const [tracking, setTracking] = useState(true);
+  const [elapsed, setElapsed] = useState(0);
+  const [distanceKm, setDistanceKm] = useState(0);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const pathRef = useRef<{ lat: number; lng: number }[]>([]);
+
+  //타이머
+  useEffect(() => {
+    if (!tracking) return;
+    const id = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [tracking]);
+
+  //거리
+  const handleStats = ({ distanceKm }: { distanceKm: number }) =>
+    setDistanceKm(distanceKm);
+
+  //누적 좌표
+  const handlePath = (p: { lat: number; lng: number }[]) => {
+    pathRef.current = p;
+  };
+
+  //시간 mm:ss
+  const fmt = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
+
+  //정지/재히작
+  const onPauseResume = () => setTracking((t) => !t);
+
+  //종료 버튼 모달 열기
+  const openFinish = () => setShowConfirm(true);
+  const closeFinish = () => setShowConfirm(false);
+
+  const confirmFinish = async () => {
+    setShowConfirm(false);
+    //종료 POST 연결 예정
+    //await endWalk({ runtime: fmt(elapsed), distance: distanceKm, path: pathRef.current });
+    alert("산책을 종료합니다.");
+    //이동처리 필요
+  };
+
+  const pauseIcon = tracking ? "/src/assets/stop.svg" : "/src/assets/play.svg";
+
   return (
     <>
+      {/* 지도 영역 */}
       <div className="w-full" style={{ height: "calc(100vh - 48px - 230px)" }}>
-        <MapView />
+        <MapRealtime
+          tracking={tracking}
+          onStatsChange={handleStats}
+          onPathUpdate={handlePath}
+          width="100%"
+          height="100%"
+        />
       </div>
 
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 ">
@@ -13,7 +69,7 @@ export default function WalkRealtimePage() {
           <div className="flex justify-center items-center gap-10">
             <div className="flex flex-col items-center gap-1">
               <p className="text-2xl font-semibold text-[#bdbdbd] font-[PretendardVariable]">
-                0.0
+                {distanceKm.toFixed(2)}
               </p>
               <p className="text-sm text-[#bdbdbd] font-[PretendardVariable]">
                 거리(km)
@@ -22,7 +78,7 @@ export default function WalkRealtimePage() {
 
             <div className="flex flex-col items-center gap-1">
               <p className="text-2xl font-semibold text-[#bdbdbd] font-[PretendardVariable]">
-                00:01
+                {fmt(elapsed)}
               </p>
               <p className="text-sm text-[#bdbdbd] font-[PretendardVariable]">
                 시간(분)
@@ -30,18 +86,20 @@ export default function WalkRealtimePage() {
             </div>
           </div>
 
-          {/* 중지, 종료 버튼 */}
+          {/* 중지/재시작/종료 버튼 */}
           <div className="mt-6 flex justify-center items-center gap-9">
             <button
               type="button"
-              className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_0_10px_rgba(0,0,0,0.15)] place-items-center"
+              onClick={onPauseResume}
+              className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_0_10px_rgba(0,0,0,0.15)] place-items-center grid"
             >
-              <img src="/src/assets/stop.svg" alt="중지" className="w-9 h-9" />
+              <img src={pauseIcon} alt="중지/재개" className="w-9 h-9" />
             </button>
 
             <button
               type="button"
-              className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_0_10px_rgba(0,0,0,0.15)] place-items-center"
+              onClick={openFinish}
+              className="w-[60px] h-[60px] rounded-full bg-white shadow-[0_0_10px_rgba(0,0,0,0.15)] place-items-center grid"
             >
               <img
                 src="/src/assets/finish.svg"
@@ -52,6 +110,31 @@ export default function WalkRealtimePage() {
           </div>
         </div>
       </div>
+
+      {/* 종료 확인 모달 수정예정 */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40">
+          <div className="w-[320px] rounded-xl bg-white p-5">
+            <p className="text-base mb-4">정말 종료할까요?</p>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeFinish}
+                className="px-3 py-2 rounded-md bg-neutral-100"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={confirmFinish}
+                className="px-3 py-2 rounded-md bg-[#5FD59B] text-white"
+              >
+                종료
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
