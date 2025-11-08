@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import MapRealtime from "../components/WalkRealtime/MapRealtime";
+import Modal from "../components/common/Modal"; 
 
 export default function WalkRealtimePage() {
   const [tracking, setTracking] = useState(true);
@@ -113,27 +114,21 @@ export default function WalkRealtimePage() {
 
       {/* 종료 확인 모달 수정예정 */}
       {showConfirm && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40">
-          <div className="w-[320px] rounded-xl bg-white p-5">
-            <p className="text-base mb-4">정말 종료할까요?</p>
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={closeFinish}
-                className="px-3 py-2 rounded-md bg-neutral-100"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={confirmFinish}
-                className="px-3 py-2 rounded-md bg-[#5FD59B] text-white"
-              >
-                종료
-              </button>
-            </div>
-          </div>
-        </div>
+        <Modal
+          title="산책을 마치겠습니까?"
+          buttons={[
+            {
+              text: "아니오",
+              onClick: closeFinish,
+              variant: "gray", // 회색 버튼
+            },
+            {
+              text: "예",
+              onClick: confirmFinish,
+              variant: "green", // 초록 버튼
+            },
+          ]}
+        />
       )}
     </>
   );
