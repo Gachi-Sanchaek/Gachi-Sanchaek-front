@@ -4,7 +4,6 @@ import coin from "../assets/coin.svg";
 import polygon from "../assets/polygon.svg";
 import lock from "../assets/lock.svg";
 import { useEffect, useState } from "react";
-import { bonggongList } from "../mocks/bonggongList";
 import { pointHistory } from "../mocks/pointHistory";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
@@ -141,18 +140,6 @@ export default function MyPage() {
     }
   };
 
-  /*
-  const handleChangeBonggong = () => {
-    if (selectedBonggong !== null) {
-      const selected = bonggongList.find((b) => b.id === selectedBonggong);
-      if (selected) {
-        setRepresentBonggong(selected.imageUrl);
-        setSelectedBonggong(null);
-      }
-    }
-  };
-*/
-
   useEffect(() => {
     document.body.style.overflow = "hidden";
 
@@ -160,6 +147,10 @@ export default function MyPage() {
       document.body.style.overflow = "auto";
     };
   }, []);
+
+  if (loading) return <p>로딩중...</p>;
+  if (error) return <p>{error}</p>;
+  if (!userProfile) return <p>사용자 정보가 없습니다.</p>;
 
   return (
     <Background
