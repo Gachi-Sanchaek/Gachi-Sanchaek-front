@@ -17,7 +17,7 @@ export default function MapView() {
 
     kakao.maps.load(() => {
       // 기본 중심으로맵 생성
-      const defaultCenter = new kakao.maps.LatLng(37.5665, 126.978);
+      const defaultCenter = new kakao.maps.LatLng(37.4863, 126.825);
       const map = new kakao.maps.Map(mapRef.current!, {
         center: defaultCenter,
         level: 5,
