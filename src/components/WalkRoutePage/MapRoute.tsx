@@ -21,7 +21,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
   const lineRef = useRef<kakao.maps.Polyline | null>(null); //그려진 폴리라인 객체 저장
 
   const currentRef = useRef<CurrentMarkerHandle | null>(null);
-  const watchIdRef = useRef<number | null>(null); //헤드위치 갱신
+  const watchIdRef = useRef<number | null>(null); //위치만 갱신
 
   //현재위치 받아오기
   const getCurrentLatLng = (): Promise<{ lat: number; lng: number }> =>
@@ -49,21 +49,16 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
       const cur = await getCurrentLatLng();
 
       const center = new kakao.maps.LatLng(
-        waypoints?.[0]?.lat || cur.lat,
-        waypoints?.[0]?.lng || cur.lng
+        waypoints?.[0]?.lat ?? cur.lat,
+        waypoints?.[0]?.lng ?? cur.lng
       );
 
-      const map = new kakao.maps.Map(container, {
-        center,
-        level: 5,
-      });
+      const map = new kakao.maps.Map(container, { center, level: 5 });
       mapRef.current = map;
 
-      //CustomOverlay 생성
       const pos = new kakao.maps.LatLng(cur.lat, cur.lng);
-      currentRef.current = createCurrentMarker(map, pos, { heading: 0 });
+      currentRef.current = createCurrentMarker(map, pos);
 
-      //실시간 위치, 방향 반영 헤드조절
       if (navigator.geolocation) {
         watchIdRef.current = navigator.geolocation.watchPosition(
           (p) => {
@@ -71,12 +66,8 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
               p.coords.latitude,
               p.coords.longitude
             );
-            const hd =
-              typeof p.coords.heading === "number"
-                ? p.coords.heading
-                : undefined;
             if (currentRef.current) {
-              updateCurrentMarker(currentRef.current, latlng, hd);
+              updateCurrentMarker(currentRef.current, latlng);
             }
           },
           (err) => {
