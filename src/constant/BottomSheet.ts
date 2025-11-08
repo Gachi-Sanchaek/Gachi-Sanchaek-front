@@ -1,4 +1,4 @@
-export const MIN_Y = 60; // 바텀시트가 최대로 높이 올라갔을 때의 y 값
+export const MIN_Y = 120; // 바텀시트가 최대로 높이 올라갔을 때의 y 값
 export const MAX_Y = window.innerHeight - 60; // 바텀시트가 최소로 내려갔을 때의 y 값
 
 // 스냅 포인트들

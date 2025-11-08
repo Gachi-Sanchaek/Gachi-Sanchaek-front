@@ -17,6 +17,4 @@ export type PlaceMarkerRequest = {
   keyword: string;
 };
 
-export type PlaceMarkerResponse = CommonResponse<{
-  places: Place[];
-}>;
+export type PlaceMarkerResponse = CommonResponse<Place[]>;
