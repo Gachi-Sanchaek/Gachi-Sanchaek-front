@@ -130,9 +130,12 @@ const Home = () => {
         const { year, month, week } = getCurrentWeek();
         console.log(year, month, week);
         const formattedDate = `${year}${String(month).padStart(2, "0")}${week}`;
-        const response = await axiosInstance.get(`/api/v1/ranking/my-ranking`, {
-          params: { date: formattedDate },
-        });
+        const response = await axiosInstance.get(
+          `/api/v1/rankings/my-ranking`,
+          {
+            params: { date: formattedDate },
+          }
+        );
 
         if (response.data.status === 200) {
           setUserRanking(response.data.data);
