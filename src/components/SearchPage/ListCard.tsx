@@ -8,8 +8,8 @@ interface ListCardProps {
   place: Place;
   setSelectedPlace?: React.Dispatch<React.SetStateAction<Place | null>>;
   setShowBottomSheet?: React.Dispatch<React.SetStateAction<boolean>>;
-  mapRef: React.RefObject<kakao.maps.Map | null>;
-  markersRef: React.RefObject<kakao.maps.Marker[] | null>;
+  mapRef?: React.RefObject<kakao.maps.Map | null>;
+  markersRef?: React.RefObject<kakao.maps.Marker[] | null>;
 }
 
 const ListCard = ({ place, setSelectedPlace, setShowBottomSheet, mapRef, markersRef }: ListCardProps) => {
@@ -20,14 +20,14 @@ const ListCard = ({ place, setSelectedPlace, setShowBottomSheet, mapRef, markers
     setShowBottomSheet?.(false);
 
     // 리스트 카드 클릭 시 해당 위치를 지도 중심으로 이동
-    if (mapRef.current) {
+    if (mapRef?.current) {
       const { kakao } = window;
       const position = new kakao.maps.LatLng(place.latitude, place.longitude);
       mapRef.current.panTo(position);
     }
 
     // 리스트 카드 클릭 시 마커핀 이미지 크기 변경
-    if (markersRef.current && markersRef.current.length) {
+    if (markersRef?.current && markersRef?.current.length) {
       const { kakao } = window;
       const type = markerType(selectedCategory);
       const normalMarker = type ? new kakao.maps.MarkerImage(type, new kakao.maps.Size(40, 40)) : undefined;
