@@ -145,6 +145,9 @@ export default function RankingPage() {
     };
   }, []);
 
+  if (loading) return <p>로딩중...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
     <Background
       whiteBackgroundHeight={45}
