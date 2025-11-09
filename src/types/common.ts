@@ -4,3 +4,9 @@ export type CommonResponse<T> = {
   message: string;
   result: T;
 };
+
+export type CommonAuthResponse<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+};
