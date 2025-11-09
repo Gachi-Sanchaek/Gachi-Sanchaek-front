@@ -21,7 +21,7 @@ const Modal = ({ title, buttons = [] }: ModalProps) => {
   };
   return (
     <div role='dialog' aria-modal='true' className='fixed inset-0 flex items-center justify-center bg-black/40 z-[1000] p-10'>
-      <div className='w-full max-w-[480px] px-8 py-6 bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.25)] flex flex-col gap-6'>
+      <div className='w-full max-w-[400px] px-8 py-6 bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.25)] flex flex-col gap-6'>
         <div className='w-full flex flex-col items-center gap-5 text-center'>
           <h2 className='text-black text-base font-normal select-none font-["PretendardVariable"] break-keep'>{title}</h2>
 
