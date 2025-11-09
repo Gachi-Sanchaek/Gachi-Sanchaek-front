@@ -1,6 +1,6 @@
 import { useState } from "react";
 import BottomButton from "../components/common/BottomButton";
-import Category from "../components/SearchPage/Category/Category";
+/* import Category from "../components/SearchPage/Category/Category"; */
 import MapView from "../components/WalkPage/MapView";
 export default function WalkPage() {
   const [time, setTime] = useState("");
@@ -14,7 +14,7 @@ export default function WalkPage() {
 
   return (
     <>
-      <Category />
+      {/* <Category /> */}
       <div className="w-full" style={{ height: "calc(100vh - 48px - 230px)" }}>
         <MapView />
       </div>
