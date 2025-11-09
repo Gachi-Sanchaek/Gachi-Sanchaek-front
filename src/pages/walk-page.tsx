@@ -26,7 +26,7 @@ export default function WalkPage() {
       const data = await postWalkTime(minutes);
       console.log("백엔드 응답:", data);
       navigate("/walk/route");
-    } catch (error) {
+    } catch {
       console.log("시간 전송 실패");
     }
   };
