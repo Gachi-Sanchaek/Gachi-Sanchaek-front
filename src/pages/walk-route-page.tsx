@@ -1,13 +1,18 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BottomButton from "../components/common/BottomButton";
 import RouteInfoCard from "../components/WalkRoutePage/RouteInfoCard";
 import { walkRoutes } from "../mocks/walkRoutes";
 import MapRoute from "../components/WalkRoutePage/MapRoute";
+import { WalkStateStore } from "../store/WalkStateStore";
 
 export default function WalkRoutePage() {
+  const navigate = useNavigate();  
   const routes = walkRoutes; //api연결후교체
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
+
+  const { setWalkState } = WalkStateStore();
 
   const count = routes.length;
   const current = routes[index];
@@ -23,6 +28,11 @@ export default function WalkRoutePage() {
     if (delta > 50) setIndex((i) => (i - 1 + count) % count);
     else if (delta < -50) setIndex((i) => (i + 1) % count);
     touchX.current = null;
+  };
+
+  const handleStart = () => {
+    setWalkState("walk");
+    navigate("/walk/realtime");
   };
 
   return (
@@ -68,9 +78,7 @@ export default function WalkRoutePage() {
                 {
                   text: "산책 시작",
                   variant: "green",
-                  onClick: () => {
-                    console.log("산책 시작 버튼 클릭");
-                  },
+                  onClick: handleStart,
                 },
               ]}
             />
