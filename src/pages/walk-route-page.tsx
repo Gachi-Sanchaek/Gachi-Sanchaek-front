@@ -33,9 +33,9 @@ export default function WalkRoutePage() {
       />
 
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40">
-        <div className="w-[393px] h-[238px] relative overflow-hidden rounded-tl-xl rounded-tr-xl bg-white mx-auto">
+        <div className="w-full h-[238px] relative overflow-hidden rounded-tl-xl rounded-t-xl bg-white mx-auto">
           <div
-            className="flex flex-col items-center w-[393px] absolute top-6 gap-3"
+            className="flex flex-col items-center w-full absolute top-6 gap-3"
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >

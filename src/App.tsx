@@ -12,6 +12,7 @@ import { KakaoOAuthHandler } from './pages/kakao-oauth-handler';
 import MyPage from './pages/my-page';
 import RankingPage from './pages/ranking-page';
 import QRAuthPage from './pages/qr-auth-page';
+import WalkRealtimePage from './pages/walk-realtime-page';
 
 const publicRoutes: RouteObject[] = [
   {
@@ -38,6 +39,7 @@ const protectedRoutes: RouteObject[] = [
       { path: 'walk', element: <WalkPage /> },
       { path: 'walk/route', element: <WalkRoutePage /> },
       { path: 'ranking', element: <RankingPage /> },
+      { path: 'walk/realtime', element: <WalkRealtimePage /> },
       { path: 'qr-auth', element: <QRAuthPage /> },
     ],
   },
