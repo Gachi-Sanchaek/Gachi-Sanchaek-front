@@ -64,8 +64,8 @@ export default function WalkRealtimePage() {
       </div>
 
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 ">
-        <div className="w-[393px] h-[238px] relative overflow-hidden rounded-tr-xl bg-white mx-auto"></div>
-        <div className="w-[393px] absolute left-1/2 -translate-x-1/2 top-6 px-6">
+        <div className="w-full h-[238px] relative overflow-hidden rounded-t-xl bg-white mx-auto"></div>
+        <div className="w-full absolute left-1/2 -translate-x-1/2 top-6 px-6">
           {/* 거리,시간 */}
           <div className="flex justify-center items-center gap-10">
             <div className="flex flex-col items-center gap-1">
@@ -120,12 +120,12 @@ export default function WalkRealtimePage() {
             {
               text: "아니오",
               onClick: closeFinish,
-              variant: "gray", // 회색 버튼
+              variant: "gray",
             },
             {
               text: "예",
               onClick: confirmFinish,
-              variant: "green", // 초록 버튼
+              variant: "green",
             },
           ]}
         />
