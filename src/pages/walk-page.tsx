@@ -20,8 +20,8 @@ export default function WalkPage() {
       </div>
 
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 ">
-        <div className="w-[393px] h-[238px] relative overflow-hidden rounded-tr-xl bg-white mx-auto font-[PretendardVariable]">
-          <div className="flex flex-col w-[393px] absolute p-6 gap-2">
+        <div className="w-full h-[238px] relative overflow-hidden rounded-t-xl bg-white mx-auto font-[PretendardVariable]">
+          <div className="flex flex-col w-full absolute p-6 gap-2">
             <p className="font-semibold text-lg">얼마나 걸으실 건가요?</p>
             <p className="font-normal text-sm text-[#bdbdbd]">
               추천 코스는 입력한 시간과 ±10분 정도 차이날 수 있어요.
