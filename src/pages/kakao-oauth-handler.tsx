@@ -9,12 +9,13 @@ const KakaoOAuthHandler = () => {
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const searchParams = new URLSearchParams(window.location.search);
   const code = searchParams.get("code");
+  const K_API_URL = import.meta.env.VITE_API_URL;
 
   const sendAuthCodeToServer = useCallback(
     async (code: string) => {
       try {
         const response = await axios.get(
-          `http://13.124.32.133:8080/api/v1/auth/kakao/login?code=${code}`,
+          `${K_API_URL}/api/v1/auth/kakao/login?code=${code}`,
 
           {
             withCredentials: true, // 리프레시 토큰 받는 용도(브라우저가 자동으로 쿠키를 첨부해서 서버로 보내줌)
@@ -48,7 +49,7 @@ const KakaoOAuthHandler = () => {
         navigate("/login", { replace: true });
       }
     },
-    [navigate, setAccessToken]
+    [navigate, setAccessToken, [K_API_URL], [code]]
   );
 
   useEffect(() => {
