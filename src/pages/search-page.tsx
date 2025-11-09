@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import BottomSheet from '../components/SearchPage/BottomSheet/BottomSheet';
 import Category from '../components/SearchPage/Category/Category';
 import KakaoMap from '../components/SearchPage/KakaoMap';
-import { useCategoryStore } from '../store/useCategoryStore';
+import { CategoryStore } from '../store/CategoryStore';
 import type { Place } from '../types/place';
 import LocationInfoCard from '../components/SearchPage/LocationInfoCard';
 import BottomButton from '../components/common/BottomButton';
@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function SearchPage() {
   const navigate = useNavigate();
-  const { selectedCategory } = useCategoryStore();
+  const { selectedCategory } = CategoryStore();
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [places, setPlaces] = useState<Place[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);

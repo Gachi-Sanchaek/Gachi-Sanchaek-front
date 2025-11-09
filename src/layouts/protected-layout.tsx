@@ -1,13 +1,13 @@
 import { matchPath, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
-import { useCategoryStore } from '../store/useCategoryStore';
+import { CategoryStore } from '../store/CategoryStore';
 import { useEffect } from 'react';
 
 const ProtectedLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const token = localStorage.getItem('accessToken');
-  const { selectedCategory } = useCategoryStore();
+  const { selectedCategory } = CategoryStore();
 
   const isHome = !!matchPath('/', location.pathname);
   const isMyPage = !!matchPath('/mypage', location.pathname);
