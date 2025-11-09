@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import type { Place } from '../../types/place';
 import BottomButton from '../common/BottomButton';
 import ListCard from './ListCard';
@@ -10,9 +11,15 @@ interface LocationInfoCardProps {
 }
 
 const LocationInfoCard = ({ place, setSelectedPlace, setShowBottomSheet }: LocationInfoCardProps) => {
+  const navigate = useNavigate();
+
   const handleClose = () => {
     setSelectedPlace(null);
     setShowBottomSheet(true);
+  };
+
+  const handleRouteRecommend = () => {
+    navigate('/walk');
   };
 
   return (
@@ -26,7 +33,7 @@ const LocationInfoCard = ({ place, setSelectedPlace, setShowBottomSheet }: Locat
       <div className='pt-3'>
         <BottomButton
           buttons={[
-            { text: '코스 추천 받기', variant: 'white', onClick: () => console.log('코스 추천 받기') },
+            { text: '코스 추천 받기', variant: 'white', onClick: handleRouteRecommend },
             { text: '바로 산책 시작', variant: 'green', onClick: () => console.log('바로 산책 시작') },
           ]}
         />

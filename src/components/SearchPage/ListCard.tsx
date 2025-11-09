@@ -1,4 +1,4 @@
-import { useCategoryStore } from '../../store/useCategoryStore';
+import { CategoryStore } from '../../store/CategoryStore';
 import type { Place } from '../../types/place';
 import { markerType } from '../../utils/markerType';
 import Location from '/src/assets/location.svg';
@@ -13,7 +13,7 @@ interface ListCardProps {
 }
 
 const ListCard = ({ place, setSelectedPlace, setShowBottomSheet, mapRef, markersRef }: ListCardProps) => {
-  const { selectedCategory } = useCategoryStore();
+  const { selectedCategory } = CategoryStore();
 
   const handleClickCard = () => {
     setSelectedPlace?.(place);
