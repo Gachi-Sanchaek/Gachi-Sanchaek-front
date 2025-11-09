@@ -44,6 +44,7 @@ export default function WalkRoutePage() {
               {routes.map((_, i) => (
                 <div
                   key={i}
+                  onClick={() => setIndex(i)}
                   className={`w-2 h-2 rounded-full ${
                     i === index ? "bg-[#5fd59b]" : "bg-neutral-200"
                   }`}
