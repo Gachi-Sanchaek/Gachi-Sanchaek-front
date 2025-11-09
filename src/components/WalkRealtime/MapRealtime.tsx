@@ -5,6 +5,12 @@ import {
   removeCurrentMarker,
 } from "../../utils/map/current-marker";
 
+declare global {
+  interface Window {
+    kakao: typeof kakao;
+  }
+}
+
 type MapRealtimeProps = {
   tracking: boolean;
   onStatsChange?: (s: { distanceKm: number }) => void;
@@ -33,7 +39,7 @@ function MapRealtime({
   useEffect(() => {
     if (!el.current || mapRef.current) return;
 
-    const { kakao } = window as any;
+    const { kakao } = window;
     if (!kakao || !kakao.maps) return;
 
     kakao.maps.load(() => {
@@ -70,7 +76,7 @@ function MapRealtime({
 
   //실시간 위치추적
   useEffect(() => {
-    const { kakao } = window as any;
+    const { kakao } = window;
     if (!kakao || !kakao.maps) return;
     if (!mapRef.current) return;
 
