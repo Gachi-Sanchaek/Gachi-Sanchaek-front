@@ -1,10 +1,10 @@
 import Tag from './Tag';
-import { useCategoryStore } from '../../../store/useCategoryStore';
+import { CategoryStore } from '../../../store/CategoryStore';
 
 const TagNames = ['산책', '동행 산책', '유기견 산책', '플로깅'];
 
 const Category = () => {
-  const { selectedCategory, setSelectedCategory } = useCategoryStore();
+  const { selectedCategory, setSelectedCategory } = CategoryStore();
 
   return (
     <div className='max-w-[480px] flex gap-3 pl-6 pt-6 fixed w-full z-20 overflow-x-auto [&::-webkit-scrollbar]:hidden'>

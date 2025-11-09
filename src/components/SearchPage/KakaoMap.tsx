@@ -151,7 +151,7 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
 
       script.onload = () => window.kakao.maps.load(loadMap);
     }
-  }, [initialLat, initialLng, initialLevel, selectedCategory, myLocation?.lat, myLocation?.lng, setPlaces, setSelectedPlace, setShowBottomSheet, mapRefExternal]);
+  }, [initialLat, initialLng, initialLevel, selectedCategory, myLocation?.lat, myLocation?.lng, setPlaces, setSelectedPlace, setShowBottomSheet, mapRefExternal, markersRefExternal]);
 
   return (
     <div className='relative w-full h-[calc(100dvh-48px)]'>
