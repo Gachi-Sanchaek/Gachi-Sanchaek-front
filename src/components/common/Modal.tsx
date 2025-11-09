@@ -5,7 +5,7 @@ type ModalButton = {
 };
 
 interface ModalProps {
-  title: string;
+  title: React.ReactNode;
   buttons?: ModalButton[];
 }
 
