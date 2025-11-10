@@ -53,7 +53,7 @@ function QRAuthPage() {
 
   return (
     <div className='relative h-screen flex flex-col items-center justify-center bg-black'>
-      <button type='button' className='absolute top-10 right-6' onClick={() => setshowCloseModal(true)}>
+      <button type='button' className='absolute top-10 right-6 cursor-pointer p-1' onClick={() => setshowCloseModal(true)}>
         <img src={Close} alt='close' />
       </button>
       <QrScannner setResult={setResult} />
