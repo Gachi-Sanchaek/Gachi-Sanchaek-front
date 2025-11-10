@@ -1,8 +1,8 @@
 import { useState } from "react";
 import BottomButton from "../components/common/BottomButton";
 import MapView from "../components/WalkPage/MapView";
-import { postWalkTime } from "../apis/walk-time";
 import { useNavigate } from "react-router-dom"; 
+import { getRecommendedRoutes } from "../apis/routes";
 
 export default function WalkPage() {
   const [time, setTime] = useState("");
@@ -20,14 +20,33 @@ export default function WalkPage() {
 
   const isDisabled = !time || Number(time) === 0;
 
+  //mapview에서 현재위치 받아오는것으로 수정 예정
+  const getCurrent = (): Promise<{ lat: number; lng: number }> =>
+    new Promise((resolve) => {
+      if (!navigator?.geolocation)
+        return resolve({ lat: 37.4863, lng: 126.825 });
+      navigator.geolocation.getCurrentPosition(
+        (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+        () => resolve({ lat: 37.4863, lng: 126.825 }) //기본값
+      );
+    });
+
   const handleRecommendClick = async () => {
     try {
       const minutes = Number(time);
-      const data = await postWalkTime(minutes);
+
+      const cur = await getCurrent();//현재위치
+
+      const data = await getRecommendedRoutes({
+        minutes,
+        currentLat: cur.lat,
+        currentLng: cur.lng,
+        //orgId 선택된 기관?
+      });
       console.log("백엔드 응답:", data);
-      navigate("/walk/route");
-    } catch {
-      console.log("시간 전송 실패");
+      navigate("/walk/route", { state: { recommend: data } });
+    } catch (e) {
+      console.log("추천 코스 조회 실패", e);
     }
   };
 
