@@ -5,7 +5,7 @@ export type CommonResponse<T> = {
   result: T;
 };
 
-export type CommonAuthResponse<T> = {
+export type CommonWalkResponse<T> = {
   success: boolean;
   message: string;
   data: T;
