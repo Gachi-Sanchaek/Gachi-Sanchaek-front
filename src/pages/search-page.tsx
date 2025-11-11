@@ -7,6 +7,8 @@ import type { Place } from '../types/place';
 import LocationInfoCard from '../components/SearchPage/LocationInfoCard';
 import BottomButton from '../components/common/BottomButton';
 import { useNavigate } from 'react-router-dom';
+import { postWalkStart } from '../apis/walk';
+import { walkType } from '../utils/walkType';
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -29,14 +31,37 @@ export default function SearchPage() {
     }
   }, [isAllowedCategory]);
 
+  const handleWalkStart = async () => {
+    try {
+      const data = await postWalkStart({
+        recommendationId: null,
+        walkType: walkType(selectedCategory),
+      });
+
+      if (data.status === 200) {
+        localStorage.setItem('walkId', data.data.walkId.toString());
+
+        if (selectedCategory === '산책' || selectedCategory === '플로깅') {
+          navigate('/walk/realtime');
+        } else if (selectedCategory === '동행 산책' || selectedCategory === '유기견 산책') {
+          navigate('/qr-auth');
+        }
+      } else {
+        alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+      }
+    } catch (e) {
+      console.error('Walk Start Error on Normal Or Plogging', e);
+      alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+    }
+  };
+
   return (
     <div>
-      {/* base layer */}
       <div>
         <Category />
         <KakaoMap selectedCategory={selectedCategory} setShowBottomSheet={setShowBottomSheet} setPlaces={setPlaces} setSelectedPlace={setSelectedPlace} mapRefExternal={mapRef} markersRefExternal={markersRef} />
       </div>
-      {selectedPlace && !showBottomSheet && !isAllowedCategory && <LocationInfoCard place={selectedPlace} setSelectedPlace={setSelectedPlace} setShowBottomSheet={setShowBottomSheet} />}
+      {selectedPlace && !showBottomSheet && !isAllowedCategory && <LocationInfoCard place={selectedPlace} setSelectedPlace={setSelectedPlace} setShowBottomSheet={setShowBottomSheet} onClick={handleWalkStart} />}
       {showBottomSheet && <BottomSheet places={places} setSelectedPlace={setSelectedPlace} setShowBottomSheet={setShowBottomSheet} mapRef={mapRef} markersRef={markersRef} />}
       {!showBottomSheet && !selectedPlace && isAllowedCategory && (
         <div className='fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50'>
@@ -47,7 +72,7 @@ export default function SearchPage() {
                 variant: 'white',
                 onClick: () => navigate('/walk'),
               },
-              { text: '바로 산책 시작', variant: 'green', onClick: () => {} },
+              { text: '바로 산책 시작', variant: 'green', onClick: handleWalkStart },
             ]}
           />
         </div>

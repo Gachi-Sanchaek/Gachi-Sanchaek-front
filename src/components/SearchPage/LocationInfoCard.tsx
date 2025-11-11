@@ -8,9 +8,10 @@ interface LocationInfoCardProps {
   place: Place;
   setSelectedPlace: React.Dispatch<React.SetStateAction<Place | null>>;
   setShowBottomSheet: React.Dispatch<React.SetStateAction<boolean>>;
+  onClick: () => void;
 }
 
-const LocationInfoCard = ({ place, setSelectedPlace, setShowBottomSheet }: LocationInfoCardProps) => {
+const LocationInfoCard = ({ place, setSelectedPlace, setShowBottomSheet, onClick }: LocationInfoCardProps) => {
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -34,7 +35,7 @@ const LocationInfoCard = ({ place, setSelectedPlace, setShowBottomSheet }: Locat
         <BottomButton
           buttons={[
             { text: '코스 추천 받기', variant: 'white', onClick: handleRouteRecommend },
-            { text: '바로 산책 시작', variant: 'green', onClick: () => console.log('바로 산책 시작') },
+            { text: '바로 산책 시작', variant: 'green', onClick: onClick },
           ]}
         />
       </div>
