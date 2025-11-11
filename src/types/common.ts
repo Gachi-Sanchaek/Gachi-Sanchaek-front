@@ -6,7 +6,7 @@ export type CommonResponse<T> = {
 };
 
 export type CommonWalkResponse<T> = {
-  success: boolean;
+  status: number;
   message: string;
   data: T;
 };

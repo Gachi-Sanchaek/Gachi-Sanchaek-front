@@ -86,7 +86,7 @@ export default function PloggingAuthPage() {
         image: capturedFile,
       });
 
-      if (data.success) {
+      if (data.status === 200) {
         // 종료 api 연결 후 종료 페이지로 이동
       } else {
         // 에러처리
