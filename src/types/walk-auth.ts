@@ -9,3 +9,13 @@ export type QrAuth = {
 };
 
 export type QrAuthResponse = CommonWalkResponse<QrAuth>;
+
+export type PloggingAuthRequest = {
+  walkId: string;
+  image: File;
+};
+
+export type PloggingAuthResponse = CommonWalkResponse<{
+  walkId: number;
+  status: string;
+}>;
