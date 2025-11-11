@@ -13,6 +13,7 @@ import MyPage from './pages/my-page';
 import RankingPage from './pages/ranking-page';
 import QRAuthPage from './pages/qr-auth-page';
 import WalkRealtimePage from './pages/walk-realtime-page';
+import PloggingAuthPage from './pages/plogging-auth-page';
 
 const publicRoutes: RouteObject[] = [
   {
@@ -22,8 +23,6 @@ const publicRoutes: RouteObject[] = [
       { path: 'login', element: <LogIn /> },
       { path: 'signup', element: <SignUp /> },
       { path: KAKAO_OAUTH, element: <KakaoOAuthHandler /> },
-
-      //   {path:'register', element:<Register />}
     ],
   },
 ];
@@ -41,6 +40,7 @@ const protectedRoutes: RouteObject[] = [
       { path: 'ranking', element: <RankingPage /> },
       { path: 'walk/realtime', element: <WalkRealtimePage /> },
       { path: 'qr-auth', element: <QRAuthPage /> },
+      { path: 'plogging-auth', element: <PloggingAuthPage /> },
     ],
   },
 ];
