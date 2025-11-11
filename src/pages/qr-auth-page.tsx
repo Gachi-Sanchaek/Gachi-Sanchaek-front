@@ -70,6 +70,7 @@ function QRAuthPage() {
 
         if (data.status === 200) {
           // 완료페이지로 이동
+          localStorage.removeItem('walkId');
           navigate('/', {
             state: { ...data.data },
           });
