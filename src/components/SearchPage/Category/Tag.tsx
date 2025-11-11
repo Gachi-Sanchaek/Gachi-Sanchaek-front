@@ -1,5 +1,5 @@
 interface TagProps {
-  TagName: string;
+  TagName: '산책' | '동행 산책' | '유기견 산책' | '플로깅';
   onClick: () => void;
   selected: boolean;
 }
