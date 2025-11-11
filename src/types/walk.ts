@@ -1,9 +1,8 @@
 import type { CommonWalkResponse } from './common';
 
 export type WalkStartRequest = {
-  recommendationId: number;
-  walkType: string;
-  desiredTime: number;
+  recommendationId: number | null;
+  walkType: 'NORMAL' | 'PLOGGING' | 'DOG' | 'SENIOR';
 };
 
 export type WalkStartData = {
@@ -17,11 +16,20 @@ export type WalkStartData = {
 
 export type WalkStartResponse = CommonWalkResponse<WalkStartData>;
 
-export type WalkFinishData = {
+export type WalkFinishRequest = {
   walkId: number;
   totalDistance: number;
-  totalMin: number;
+  totalMinutes: number;
+};
+
+export type WalkFinishData = {
+  walkId: number;
+  status: string;
+  nickname: string;
+  totalDistance: number;
+  totalMinutes: number;
   pointsEarned: number;
+  walkingCount: number;
   message: string;
 };
 
