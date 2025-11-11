@@ -13,6 +13,7 @@ const ProtectedLayout = () => {
   const isMyPage = !!matchPath('/mypage', location.pathname);
   const isRanking = !!matchPath('/ranking', location.pathname);
   const isQRAuthPage = !!matchPath('/qr-auth', location.pathname);
+  const isPloggingAuthPage = !!matchPath('/plogging-auth', location.pathname);
 
   useEffect(() => {
     if (!token) {
@@ -23,8 +24,8 @@ const ProtectedLayout = () => {
   return (
     <div className='flex justify-center min-h-screen bg-gray-100'>
       <div className={`w-full max-w-[480px] min-h-screen ${isHome || isMyPage || isRanking ? 'bg-gradient-to-b from-[#5FD59B] to-[#FFEC8A]' : 'bg-white'}`}>
-        {!isQRAuthPage && <Header hasArrow={!isHome} title={isMyPage ? '마이 페이지' : isRanking ? '랭킹' : selectedCategory} titleColor={isMyPage || isRanking ? 'white' : 'black'} bgColor={isHome || isMyPage || isRanking ? 'transparent' : 'white'} />}
-        <div className={`${isQRAuthPage ? '' : 'pt-12'}`}>
+        {!isQRAuthPage && !isPloggingAuthPage && <Header hasArrow={!isHome} title={isMyPage ? '마이 페이지' : isRanking ? '랭킹' : selectedCategory} titleColor={isMyPage || isRanking ? 'white' : 'black'} bgColor={isHome || isMyPage || isRanking ? 'transparent' : 'white'} />}
+        <div className={`${isQRAuthPage || isPloggingAuthPage ? '' : 'pt-12'}`}>
           <Outlet />
         </div>
       </div>

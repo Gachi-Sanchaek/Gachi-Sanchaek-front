@@ -1,4 +1,4 @@
-import type { CommonAuthResponse } from './common';
+import type { CommonWalkResponse } from './common';
 
 export type QrAuth = {
   walkId: number;
@@ -8,4 +8,14 @@ export type QrAuth = {
   startTime: Date;
 };
 
-export type QrAuthResponse = CommonAuthResponse<QrAuth>;
+export type QrAuthResponse = CommonWalkResponse<QrAuth>;
+
+export type PloggingAuthRequest = {
+  walkId: string;
+  image: File;
+};
+
+export type PloggingAuthResponse = CommonWalkResponse<{
+  walkId: number;
+  status: string;
+}>;
