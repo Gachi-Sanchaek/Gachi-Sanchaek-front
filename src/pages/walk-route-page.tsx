@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import BottomButton from "../components/common/BottomButton";
 import RouteInfoCard from "../components/WalkRoutePage/RouteInfoCard";
 import MapRoute from "../components/WalkRoutePage/MapRoute";
-import { WalkStateStore } from "../store/WalkStateStore";
 import type { RecommendResponse } from "../apis/routes";
 
 export default function WalkRoutePage() {
@@ -15,7 +14,6 @@ export default function WalkRoutePage() {
   const routes = recommend?.routes ?? [];
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
-  const { setWalkState } = WalkStateStore();
 
   useEffect(() => {
     //경로 없을 시 입력 페이지 복귀
@@ -43,7 +41,6 @@ export default function WalkRoutePage() {
   };
 
   const handleStart = () => {
-    setWalkState("walk");
     navigate("/walk/realtime");
   };
 
