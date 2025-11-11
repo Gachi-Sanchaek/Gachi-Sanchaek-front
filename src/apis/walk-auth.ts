@@ -1,8 +1,8 @@
 import type { PloggingAuthRequest, PloggingAuthResponse, QrAuthRequest, QrAuthResponse } from '../types/walk-auth';
 import { axiosInstance } from './axios';
 
-export const postQrAuth = async (params: QrAuthRequest): Promise<QrAuthResponse> => {
-  const { data } = await axiosInstance.post(`/api/v1/walk/qr`, params);
+export const postQrAuth = async (body: QrAuthRequest): Promise<QrAuthResponse> => {
+  const { data } = await axiosInstance.post(`/api/v1/walk/qr`, body);
 
   return data;
 };

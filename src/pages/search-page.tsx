@@ -9,6 +9,8 @@ import BottomButton from '../components/common/BottomButton';
 import { useNavigate } from 'react-router-dom';
 import { postWalkStart } from '../apis/walk';
 import { walkType } from '../utils/walkType';
+import { postPlaceStore } from '../apis/place';
+import { keywordType } from '../utils/placeKeywordType';
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -50,8 +52,31 @@ export default function SearchPage() {
         alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
       }
     } catch (e) {
-      console.error('Walk Start Error', e);
       alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+      console.error('Walk Start Error', e);
+    }
+  };
+
+  const handleStorePlace = async () => {
+    if (selectedPlace) {
+      try {
+        const data = await postPlaceStore(selectedPlace, keywordType(selectedCategory));
+
+        if (data.isSuccess) {
+          navigate('/walk', {
+            state: {
+              orgId: data.result.id,
+            },
+          });
+        } else {
+          alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+        }
+      } catch (e) {
+        alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+        console.error('place store error', e);
+      }
+    } else {
+      console.error('place not selected');
     }
   };
 
@@ -61,7 +86,7 @@ export default function SearchPage() {
         <Category />
         <KakaoMap selectedCategory={selectedCategory} setShowBottomSheet={setShowBottomSheet} setPlaces={setPlaces} setSelectedPlace={setSelectedPlace} mapRefExternal={mapRef} markersRefExternal={markersRef} />
       </div>
-      {selectedPlace && !showBottomSheet && !isAllowedCategory && <LocationInfoCard place={selectedPlace} setSelectedPlace={setSelectedPlace} setShowBottomSheet={setShowBottomSheet} onClick={handleWalkStart} />}
+      {selectedPlace && !showBottomSheet && !isAllowedCategory && <LocationInfoCard place={selectedPlace} setSelectedPlace={setSelectedPlace} setShowBottomSheet={setShowBottomSheet} onClickWalkStart={handleWalkStart} onClickRouteRecommend={handleStorePlace} />}
       {showBottomSheet && <BottomSheet places={places} setSelectedPlace={setSelectedPlace} setShowBottomSheet={setShowBottomSheet} mapRef={mapRef} markersRef={markersRef} />}
       {!showBottomSheet && !selectedPlace && isAllowedCategory && (
         <div className='fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50'>
