@@ -3,9 +3,11 @@ import BottomButton from "../components/common/BottomButton";
 import MapView from "../components/WalkPage/MapView";
 import { useNavigate } from "react-router-dom";
 import { getRecommendedRoutes } from "../apis/routes";
+import Loading from "../components/common/Loading";
 
 export default function WalkPage() {
   const [time, setTime] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,11 +34,11 @@ export default function WalkPage() {
     });
 
   const handleRecommendClick = async () => {
+    if (loading) return;
     try {
+      setLoading(true);
       const minutes = Number(time);
-
       const cur = await getCurrent(); //현재위치
-
       const data = await getRecommendedRoutes({
         minutes,
         currentLat: cur.lat,
@@ -47,6 +49,8 @@ export default function WalkPage() {
       navigate("/walk/route", { state: { recommend: data } });
     } catch (e) {
       console.log("추천 코스 조회 실패", e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,6 +95,7 @@ export default function WalkPage() {
           ]}
         />
       </div>
+      {loading && <Loading label="AI가 산책 경로를 생성하는 중입니다" />}
     </>
   );
 }
