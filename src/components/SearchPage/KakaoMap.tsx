@@ -123,7 +123,7 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
         lat: myLocation?.lat || initialLat,
         lng: myLocation?.lng || initialLng,
         radius: 5000,
-        keyword: keywordType(selectedCategory),
+        type: keywordType(selectedCategory),
       };
 
       if (isValidCategory) {

@@ -14,7 +14,7 @@ export type PlaceMarkerRequest = {
   lat: number;
   lng: number;
   radius: number;
-  keyword: string;
+  type: string;
 };
 
 export type PlaceMarkerResponse = CommonResponse<Place[]>;
