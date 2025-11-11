@@ -50,7 +50,7 @@ export default function SearchPage() {
         alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
       }
     } catch (e) {
-      console.error('Walk Start Error on Normal Or Plogging', e);
+      console.error('Walk Start Error', e);
       alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
