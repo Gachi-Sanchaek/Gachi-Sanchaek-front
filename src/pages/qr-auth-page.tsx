@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import QrScannner from '../components/WalkAuth/QRScanner';
 import Close from '/src/assets/close-white.svg';
 import Modal from '../components/common/Modal';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { postQrAuth } from '../apis/walk-auth';
 import { patchWalkFinish } from '../apis/walk';
 
@@ -14,10 +14,12 @@ function QRAuthPage() {
   const navigate = useNavigate();
   const walkId = Number(localStorage.getItem('walkId'));
   const [isFirstAuth, setIsFirstAuth] = useState(true);
-  const loc = useLocation();
-  // 라우팅 상태로 전달받은 값 가져오기
-  const totalDistance = loc.state.totalDistance;
-  const totalMinutes = loc.state.totalMinutes;
+  // const loc = useLocation();
+  // // 라우팅 상태로 전달받은 값 가져오기
+  // const totalDistance = loc.state.totalDistance;
+  // const totalMinutes = loc.state.totalMinutes;
+  const totalDistance = 0;
+  const totalMinutes = 0;
 
   useEffect(() => {
     const fetchQrAuth = async () => {
