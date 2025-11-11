@@ -3,6 +3,7 @@ import Close from '/src/assets/close-white.svg';
 import Modal from '../components/common/Modal';
 import { useNavigate } from 'react-router-dom';
 import { postPloggingAuth } from '../apis/walk-auth';
+import { patchWalkFinish } from '../apis/walk';
 
 export default function PloggingAuthPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -12,7 +13,13 @@ export default function PloggingAuthPage() {
   const [showCloseModal, setshowCloseModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const navigate = useNavigate();
-  const walkId = ''; // walkId값 받아오기
+  const walkId = localStorage.getItem('walkId');
+  // const loc = useLocation();
+  // 라우팅 상태로 전달받은 값 가져오기
+  // const totalDistance = loc.state.totalDistance;
+  // const totalMinutes = loc.state.totalMinutes;
+  const totalDistance = 0;
+  const totalMinutes = 0;
 
   // 카메라 시작
   useEffect(() => {
@@ -64,7 +71,7 @@ export default function PloggingAuthPage() {
     // File 생성
     canvasRef.current.toBlob((blob) => {
       if (!blob) return;
-      const file = new File([blob], 'capture.jpg', { type: 'image/*' });
+      const file = new File([blob], 'capture.jpeg', { type: 'image/jpeg' });
       setCapturedFile(file);
 
       // 미리보기용 URL 생성
@@ -74,20 +81,43 @@ export default function PloggingAuthPage() {
       if (previewURL) {
         setShowSubmitModal(true);
       }
-    }, 'image/*');
+    }, 'image/jpeg');
   };
 
   const handleSubmit = async () => {
-    if (capturedFile) {
-      const data = await postPloggingAuth({
-        walkId, //wakId 값 받아오기
-        image: capturedFile,
-      });
+    if (capturedFile && walkId) {
+      try {
+        const data = await postPloggingAuth({
+          walkId,
+          image: capturedFile,
+        });
 
-      if (data.status === 200) {
-        // 종료 api 연결 후 종료 페이지로 이동
-      } else {
-        // 에러처리
+        if (data.status === 200) {
+          try {
+            const data = await patchWalkFinish({
+              walkId: Number(walkId),
+              totalDistance,
+              totalMinutes,
+            });
+
+            if (data.status === 200) {
+              localStorage.removeItem('walkId');
+              navigate('/', {
+                state: { ...data.data },
+              }); //종료페이지로 이동
+            } else {
+              alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+            }
+          } catch (e) {
+            alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+            console.error('plogging auth error', e);
+          }
+        } else {
+          alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+        }
+      } catch (e) {
+        alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+        console.error('plogging auth error', e);
       }
     }
   };
