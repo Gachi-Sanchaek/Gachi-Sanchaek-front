@@ -2,7 +2,7 @@ export type Waypoint = { lat: number; lng: number };
 
 // 백엔드 스키마와 동일
 export type Route = {
-  id: number; // 1,2,3 ... 슬라이드 번호 느낌
+  id: number; // 1,2,3슬라이드 번호 느낌
   description: string; // RouteInfoCard의 title
   waypoints: Waypoint[]; // 지도에서 사용(지금은 무시)
   estimatedTime: number; // 분 → RouteInfoCard의 minutes

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BottomButton from "../components/common/BottomButton";
 import MapView from "../components/WalkPage/MapView";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import { getRecommendedRoutes } from "../apis/routes";
 
 export default function WalkPage() {
@@ -11,7 +11,7 @@ export default function WalkPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
     //토스트로 수정하기
-    if (Number(value) > 300) { 
+    if (Number(value) > 300) {
       alert("최대 300분까지만 가능합니다!");
       return;
     }
@@ -35,7 +35,7 @@ export default function WalkPage() {
     try {
       const minutes = Number(time);
 
-      const cur = await getCurrent();//현재위치
+      const cur = await getCurrent(); //현재위치
 
       const data = await getRecommendedRoutes({
         minutes,
