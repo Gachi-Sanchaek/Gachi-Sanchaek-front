@@ -1,8 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BottomButton from "../components/common/BottomButton";
 import RouteInfoCard from "../components/WalkRoutePage/RouteInfoCard";
-import { walkRoutes } from "../mocks/walkRoutes";
 import MapRoute from "../components/WalkRoutePage/MapRoute";
 import { WalkStateStore } from "../store/WalkStateStore";
 import type { RecommendResponse } from "../apis/routes";
@@ -12,13 +11,20 @@ export default function WalkRoutePage() {
   const location = useLocation();
   const recommend = (location.state as { recommend?: RecommendResponse } | null)
     ?.recommend;
-
-  // 네비게이션 state가 있으면 API 응답 사용, 없으면 목데이터로 폴백
-  const routes = recommend?.routes?.length ? recommend.routes : walkRoutes;
+  //API응답만사용
+  const routes = recommend?.routes ?? [];
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
-
   const { setWalkState } = WalkStateStore();
+
+  useEffect(() => {
+    //경로 없을 시 입력 페이지 복귀
+    if (!routes.length) {
+      navigate("/walk", { replace: true });
+    }
+  }, [routes.length, navigate]);
+
+  if (!routes.length) return null; //데이터 없으면 렌더 X
 
   const count = routes.length;
   const current = routes[index];
