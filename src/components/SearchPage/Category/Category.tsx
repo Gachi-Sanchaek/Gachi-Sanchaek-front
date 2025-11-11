@@ -1,7 +1,9 @@
 import Tag from './Tag';
 import { CategoryStore } from '../../../store/CategoryStore';
 
-const TagNames = ['산책', '동행 산책', '유기견 산책', '플로깅'];
+type TagNameType = '산책' | '동행 산책' | '유기견 산책' | '플로깅';
+
+const TagNames: TagNameType[] = ['산책', '동행 산책', '유기견 산책', '플로깅'];
 
 const Category = () => {
   const { selectedCategory, setSelectedCategory } = CategoryStore();
