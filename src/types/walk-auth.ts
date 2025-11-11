@@ -20,5 +20,6 @@ export type PloggingAuthRequest = {
 
 export type PloggingAuthResponse = CommonWalkResponse<{
   walkId: number;
-  status: string;
+  verified: boolean;
+  message: string;
 }>;
