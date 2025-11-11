@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Close from '/src/assets/close-white.svg';
 import Modal from '../components/common/Modal';
-import { WalkStateStore } from '../store/WalkStateStore';
 import { useNavigate } from 'react-router-dom';
 import { postPloggingAuth } from '../apis/walk-auth';
 
@@ -12,7 +11,6 @@ export default function PloggingAuthPage() {
   const [capturedFile, setCapturedFile] = useState<File | null>(null);
   const [showCloseModal, setshowCloseModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const { setWalkState } = WalkStateStore();
   const navigate = useNavigate();
   const walkId = ''; // walkId값 받아오기
 
@@ -130,7 +128,6 @@ export default function PloggingAuthPage() {
               variant: 'green',
               text: '확인',
               onClick: () => {
-                setWalkState('stop');
                 navigate('/'); //완료페이지로 이동..?
               },
             },
