@@ -198,7 +198,7 @@ const Home = () => {
             <ChevronRight size={30} color='#FFFFFF' onClick={() => navigate('/mypage')} />
           </div>
 
-          <div className='absolute left-0 bottom-[62vh] w-full flex justify-center w-full px-4 mt-25 overflow-visible'>
+          <div className='absolute left-0 bottom-[62vh] flex justify-center w-full px-4 mt-25 overflow-visible'>
             <div className='bg-[#FFFFFF] w-full h-4 rounded-full'>
               <div
                 className='bg-[#FFEC8A] h-full rounded-full transition-all duration-500'
