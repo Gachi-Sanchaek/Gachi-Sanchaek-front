@@ -1,26 +1,34 @@
 import { useEffect, useState } from 'react';
 import QrScannner from '../components/WalkAuth/QRScanner';
 import Close from '/src/assets/close-white.svg';
-import { WalkStateStore } from '../store/WalkStateStore';
 import Modal from '../components/common/Modal';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { postQrAuth } from '../apis/walk-auth';
+import { patchWalkFinish } from '../apis/walk';
 
 function QRAuthPage() {
-  const [result, setResult] = useState('');
+  const [qrResult, setQrResult] = useState('');
   const [showCloseModal, setshowCloseModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const { walkState, setWalkState } = WalkStateStore();
   const navigate = useNavigate();
+  const walkId = Number(localStorage.getItem('walkId'));
+  const [isFirstAuth, setIsFirstAuth] = useState(true);
+  const loc = useLocation();
+  // 라우팅 상태로 전달받은 값 가져오기
+  const totalDistance = loc.state.totalDistance;
+  const totalMinutes = loc.state.totalMinutes;
 
   useEffect(() => {
     const fetchQrAuth = async () => {
       try {
-        const data = await postQrAuth(result);
+        const data = await postQrAuth({
+          walkId,
+          qrToken: qrResult,
+        });
         if (data.status === 200) {
+          setIsFirstAuth(data.data.message.includes('1'));
           setShowSuccessModal(true);
-          setWalkState('walk');
         } else {
           setShowErrorModal(true);
         }
@@ -30,24 +38,48 @@ function QRAuthPage() {
       }
     };
 
-    if (result) {
+    if (qrResult && walkId) {
       fetchQrAuth();
     }
-  }, [result, setWalkState]);
+  }, [qrResult, walkId]);
 
-  const handleConfirm = () => {
-    if (walkState === 'stop') {
+  const handleQuit = () => {
+    // 1회차 QR일 때
+    if (isFirstAuth) {
       navigate(-1);
-    } else if (walkState === 'walk') {
+    }
+    // 2회차 QR일 때
+    else {
       navigate('/'); // 완료페이지로 이동
     }
   };
 
-  const handleNavigateSuccess = () => {
-    if (walkState === 'stop') {
-      navigate('/'); // 완료페이지로 이동
-    } else if (walkState === 'walk') {
-      navigate('/'); //산책 추적 페이지로 이동
+  const handleNavigateSuccess = async () => {
+    // 1회차 QR일 때 -> /walk/realtime
+    if (isFirstAuth) {
+      navigate('/walk/realtime');
+    }
+    // 2회차 QR일 때 -> /walk/end api -> finish page routing
+    else {
+      try {
+        const data = await patchWalkFinish({
+          walkId,
+          totalDistance,
+          totalMinutes,
+        });
+
+        if (data.status === 200) {
+          // 완료페이지로 이동
+          navigate('/', {
+            state: { ...data.data },
+          });
+        } else {
+          alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+        }
+      } catch (e) {
+        console.error('walk finish error', e);
+        alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+      }
     }
   };
 
@@ -56,13 +88,13 @@ function QRAuthPage() {
       <button type='button' className='absolute top-10 right-6 cursor-pointer p-1' onClick={() => setshowCloseModal(true)}>
         <img src={Close} alt='close' />
       </button>
-      <QrScannner setResult={setResult} />
+      <QrScannner setResult={setQrResult} />
       <p className='text-white font-[pretendardVariable] text-base font-normal pt-6'>QR 코드를 사각형 안에 맞춰주세요.</p>
 
       {showCloseModal && (
         <Modal
           title={
-            walkState === 'stop' ? (
+            isFirstAuth ? (
               '산책 인증을 그만두시겠습니까?'
             ) : (
               <>
@@ -78,7 +110,7 @@ function QRAuthPage() {
                 setshowCloseModal(false);
               },
             },
-            { variant: 'green', text: '확인', onClick: () => handleConfirm() },
+            { variant: 'green', text: '확인', onClick: () => handleQuit() },
           ]}
         />
       )}
@@ -98,12 +130,7 @@ function QRAuthPage() {
 
       {showErrorModal && (
         <Modal
-          title={
-            <>
-              인증이 실패했습니다. <br />
-              다시 찍어주세요.
-            </>
-          }
+          title='인증을 실패했습니다...'
           buttons={[
             {
               variant: 'gray',

@@ -1,11 +1,14 @@
 import type { CommonWalkResponse } from './common';
 
-export type QrAuth = {
+export type QrAuthRequest = {
   walkId: number;
-  status: string;
-  walkType: string;
-  verificationMethod: string;
-  startTime: Date;
+  qrToken: string;
+};
+
+export type QrAuth = {
+  walkId?: number;
+  verified?: boolean;
+  message: string;
 };
 
 export type QrAuthResponse = CommonWalkResponse<QrAuth>;
