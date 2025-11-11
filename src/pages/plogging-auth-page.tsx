@@ -3,6 +3,7 @@ import Close from '/src/assets/close-white.svg';
 import Modal from '../components/common/Modal';
 import { WalkStateStore } from '../store/WalkStateStore';
 import { useNavigate } from 'react-router-dom';
+import { postPloggingAuth } from '../apis/walk-auth';
 
 export default function PloggingAuthPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -13,6 +14,7 @@ export default function PloggingAuthPage() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const { setWalkState } = WalkStateStore();
   const navigate = useNavigate();
+  const walkId = ''; // walkId값 받아오기
 
   // 카메라 시작
   useEffect(() => {
@@ -77,10 +79,23 @@ export default function PloggingAuthPage() {
     }, 'image/*');
   };
 
-  console.log(capturedFile, typeof capturedFile);
+  const handleSubmit = async () => {
+    if (capturedFile) {
+      const data = await postPloggingAuth({
+        walkId, //wakId 값 받아오기
+        image: capturedFile,
+      });
+
+      if (data.success) {
+        // 종료 api 연결 후 종료 페이지로 이동
+      } else {
+        // 에러처리
+      }
+    }
+  };
 
   return (
-    <div className='relative w-full h-full flex flex-col justify-center items-center gap-6 bg-black'>
+    <div className='relative w-full h-screen flex flex-col justify-center items-center gap-6 bg-black'>
       <button type='button' className='absolute top-10 right-6 cursor-pointer p-1' onClick={() => setshowCloseModal(true)}>
         <img src={Close} alt='close' />
       </button>
@@ -136,7 +151,7 @@ export default function PloggingAuthPage() {
             {
               variant: 'green',
               text: '제출하기',
-              onClick: () => console.log('api 연결'),
+              onClick: handleSubmit,
             },
           ]}
         />
