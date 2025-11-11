@@ -18,7 +18,7 @@ function QRAuthPage() {
     const fetchQrAuth = async () => {
       try {
         const data = await postQrAuth(result);
-        if (data.success) {
+        if (data.status === 200) {
           setShowSuccessModal(true);
           setWalkState('walk');
         } else {
