@@ -48,7 +48,7 @@ function MapRealtime({
       const fallback = new kakao.maps.LatLng(37.4863, 126.825); //가톨릭대
       const map = new kakao.maps.Map(el.current, {
         center: fallback,
-        level: 4,
+        level: 3,
       });
       mapRef.current = map;
 

@@ -20,7 +20,7 @@ export default function MapView() {
       const defaultCenter = new kakao.maps.LatLng(37.4863, 126.825);
       const map = new kakao.maps.Map(mapRef.current!, {
         center: defaultCenter,
-        level: 5,
+        level: 3,
       });
       //현재 위치 마커 맵에 올리기 + 위치 갱신
       const setAt = (lat: number, lng: number) => {
