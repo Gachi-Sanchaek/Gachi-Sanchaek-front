@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import MapRealtime from "../components/WalkRealtime/MapRealtime";
-import Modal from "../components/common/Modal"; 
+import Modal from "../components/common/Modal";
+import { useNavigate } from "react-router-dom";
+import { CategoryStore } from "../store/CategoryStore";
 
 export default function WalkRealtimePage() {
+  const navigate = useNavigate();
+  const { selectedCategory } = CategoryStore();
+  const isPlogging = selectedCategory === "플로깅";
+
   const [tracking, setTracking] = useState(true);
   const [elapsed, setElapsed] = useState(0);
   const [distanceKm, setDistanceKm] = useState(0);
@@ -33,8 +39,10 @@ export default function WalkRealtimePage() {
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   };
 
-  //정지/재히작
-  const onPauseResume = () => setTracking((t) => !t);
+  //정지/재시작
+  const onPauseResume = () => {
+    setTracking((t) => !t);
+  };
 
   //종료 버튼 모달 열기
   const openFinish = () => setShowConfirm(true);
@@ -44,8 +52,16 @@ export default function WalkRealtimePage() {
     setShowConfirm(false);
     //종료 POST 연결 예정
     //await endWalk({ runtime: fmt(elapsed), distance: distanceKm, path: pathRef.current });
-    alert("산책을 종료합니다.");
-    //이동처리 필요
+
+    setTracking(false); //로컬 추적 중단
+
+    if (isPlogging) {
+      //플로깅 AI 인증
+      navigate(""); //Ai인증 경로
+    } else {
+      //완료 페이지
+      navigate(""); //산책완료 페이지 경로
+    }
   };
 
   const pauseIcon = tracking ? "/src/assets/stop.svg" : "/src/assets/play.svg";

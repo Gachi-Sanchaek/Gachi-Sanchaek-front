@@ -1,13 +1,34 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import BottomButton from "../components/common/BottomButton";
 import RouteInfoCard from "../components/WalkRoutePage/RouteInfoCard";
-import { walkRoutes } from "../mocks/walkRoutes";
 import MapRoute from "../components/WalkRoutePage/MapRoute";
+import type { RecommendResponse } from "../apis/routes";
+import { startWalkAndSelect } from "../apis/route-select";
+import { CategoryStore } from "../store/CategoryStore";
+import { walkRoutes } from "../mocks/walkRoutes"; //목데이터 삭제예정
 
 export default function WalkRoutePage() {
-  const routes = walkRoutes; //api연결후교체
+  const navigate = useNavigate();
+  const location = useLocation();
+  const recommend = (location.state as { recommend?: RecommendResponse } | null)
+    ?.recommend;
+  //API응답만사용
+  //const routes = recommend?.routes ?? [];
+  const routes = recommend?.routes ?? walkRoutes; //목데이터로 확인후 삭제예정
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
+
+  const { selectedCategory } = CategoryStore();
+
+  useEffect(() => {
+    if (!routes.length) {
+      alert("추천 경로를 찾을 수 없습니다. 처음부터 다시 시도해주세요.");
+      navigate("/walk", { replace: true });
+    }
+  }, [routes.length, recommend, navigate]);
+
+  if (!routes.length) return null; //데이터 없으면 렌더 X
 
   const count = routes.length;
   const current = routes[index];
@@ -23,6 +44,40 @@ export default function WalkRoutePage() {
     if (delta > 50) setIndex((i) => (i - 1 + count) % count);
     else if (delta < -50) setIndex((i) => (i + 1) % count);
     touchX.current = null;
+  };
+
+  const handleStart = async () => {
+    try {
+      //임시값
+      const orgId = recommend?.orgId ?? null;
+      if (!recommend?.recommendationGroupId) {
+        alert("추천 정보가 없습니다. 처음부터 다시 시도해주세요.");
+        return;
+      }
+
+      const groupId = recommend.recommendationGroupId;
+
+      await startWalkAndSelect({
+        category: selectedCategory as
+          | "산책"
+          | "동행 산책"
+          | "유기견 산책"
+          | "플로깅",
+        orgId,
+        groupId,
+        selectedRoute: {
+          id: current.id,
+          description: current.description,
+          estimatedTime: current.estimatedTime,
+          waypoints: current.waypoints,
+        },
+      });
+      console.log("백엔드 응답 :"); //제거 예정
+      navigate("/walk/realtime");
+    } catch (error) {
+      console.error("산책 시작 실패:", error);
+      alert("산책 시작에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -44,6 +99,7 @@ export default function WalkRoutePage() {
               {routes.map((_, i) => (
                 <div
                   key={i}
+                  onClick={() => setIndex(i)}
                   className={`w-2 h-2 rounded-full ${
                     i === index ? "bg-[#5fd59b]" : "bg-neutral-200"
                   }`}
@@ -67,9 +123,7 @@ export default function WalkRoutePage() {
                 {
                   text: "산책 시작",
                   variant: "green",
-                  onClick: () => {
-                    console.log("산책 시작 버튼 클릭");
-                  },
+                  onClick: handleStart,
                 },
               ]}
             />
