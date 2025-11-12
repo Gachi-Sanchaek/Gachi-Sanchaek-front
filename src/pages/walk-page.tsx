@@ -47,6 +47,9 @@ export default function WalkPage() {
       });
       console.log("백엔드 응답:", data);
       navigate("/walk/route", { state: { recommend: data } });
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (e) {
       console.log("추천 코스 조회 실패", e);
     } finally {

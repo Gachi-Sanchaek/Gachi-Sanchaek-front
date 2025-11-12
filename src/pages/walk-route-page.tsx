@@ -6,7 +6,7 @@ import MapRoute from "../components/WalkRoutePage/MapRoute";
 import type { RecommendResponse } from "../apis/routes";
 import { startWalkAndSelect } from "../apis/route-select";
 import { CategoryStore } from "../store/CategoryStore";
-import { walkRoutes } from "../mocks/walkRoutes"; //목데이터 삭제예정
+//import { walkRoutes } from "../mocks/walkRoutes";
 
 export default function WalkRoutePage() {
   const navigate = useNavigate();
@@ -14,8 +14,8 @@ export default function WalkRoutePage() {
   const recommend = (location.state as { recommend?: RecommendResponse } | null)
     ?.recommend;
   //API응답만사용
-  //const routes = recommend?.routes ?? [];
-  const routes = recommend?.routes ?? walkRoutes; //목데이터로 확인후 삭제예정
+  const routes = recommend?.routes ?? [];
+  //const routes = recommend?.routes ?? walkRoutes; 목데이터
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
 
