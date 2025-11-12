@@ -11,7 +11,7 @@ import SearchPage from "./pages/search-page";
 import SignUp from "./pages/signup-page";
 import WalkPage from "./pages/walk-page";
 import WalkRoutePage from "./pages/walk-route-page";
-import { KAKAO_OAUTH } from "./utils/kakao-constants";
+import { KAKAO_OAUTH } from "./constant/kakao-constants";
 import { KakaoOAuthHandler } from "./pages/kakao-oauth-handler";
 import MyPage from "./pages/my-page";
 import RankingPage from "./pages/ranking-page";
