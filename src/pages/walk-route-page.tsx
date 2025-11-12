@@ -4,6 +4,9 @@ import BottomButton from "../components/common/BottomButton";
 import RouteInfoCard from "../components/WalkRoutePage/RouteInfoCard";
 import MapRoute from "../components/WalkRoutePage/MapRoute";
 import type { RecommendResponse } from "../apis/routes";
+import { startWalkAndSelect } from "../apis/route-select";
+import { CategoryStore } from "../store/CategoryStore";
+import { walkRoutes } from "../mocks/walkRoutes"; //목데이터 삭제예정
 
 export default function WalkRoutePage() {
   const navigate = useNavigate();
@@ -11,16 +14,19 @@ export default function WalkRoutePage() {
   const recommend = (location.state as { recommend?: RecommendResponse } | null)
     ?.recommend;
   //API응답만사용
-  const routes = recommend?.routes ?? [];
+  //const routes = recommend?.routes ?? [];
+  const routes = recommend?.routes ?? walkRoutes; //목데이터로 확인후 삭제예정
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
 
+  const { selectedCategory } = CategoryStore();
+
   useEffect(() => {
-    //경로 없을 시 입력 페이지 복귀
     if (!routes.length) {
+      alert("추천 경로를 찾을 수 없습니다. 처음부터 다시 시도해주세요.");
       navigate("/walk", { replace: true });
     }
-  }, [routes.length, navigate]);
+  }, [routes.length, recommend, navigate]);
 
   if (!routes.length) return null; //데이터 없으면 렌더 X
 
@@ -40,8 +46,38 @@ export default function WalkRoutePage() {
     touchX.current = null;
   };
 
-  const handleStart = () => {
-    navigate("/walk/realtime");
+  const handleStart = async () => {
+    try {
+      //임시값
+      const orgId = recommend?.orgId ?? null;
+      if (!recommend?.recommendationGroupId) {
+        alert("추천 정보가 없습니다. 처음부터 다시 시도해주세요.");
+        return;
+      }
+
+      const groupId = recommend.recommendationGroupId;
+
+      await startWalkAndSelect({
+        category: selectedCategory as
+          | "산책"
+          | "동행 산책"
+          | "유기견 산책"
+          | "플로깅",
+        orgId,
+        groupId,
+        selectedRoute: {
+          id: current.id,
+          description: current.description,
+          estimatedTime: current.estimatedTime,
+          waypoints: current.waypoints,
+        },
+      });
+      console.log("백엔드 응답 :"); //제거 예정
+      navigate("/walk/realtime");
+    } catch (error) {
+      console.error("산책 시작 실패:", error);
+      alert("산책 시작에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
   };
 
   return (

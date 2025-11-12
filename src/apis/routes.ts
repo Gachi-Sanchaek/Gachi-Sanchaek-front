@@ -1,3 +1,4 @@
+//api/v1/routes/recommend
 import { axiosInstance } from "./axios";
 type LatLng = { lat: number; lng: number };
 
@@ -20,12 +21,13 @@ export async function getRecommendedRoutes(params: {
   currentLng: number;
   orgId?: number;
 }) {
-  const { minutes, currentLat, currentLng, orgId } = params;
-
   const res = await axiosInstance.get("/api/v1/routes/recommend", {
-    params: { minutes, currentLat, currentLng, orgId },
+    params: {
+      orgId: params.orgId ?? null,
+      minutes: params.minutes,
+      currentLat: params.currentLat,
+      currentLng: params.currentLng,
+    },
   });
-
-  const data = res.data?.data as RecommendResponse;
-  return data;
+  return res.data?.data as RecommendResponse;
 }
