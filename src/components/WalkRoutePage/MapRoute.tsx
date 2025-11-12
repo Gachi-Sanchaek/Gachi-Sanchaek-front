@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
 import {
@@ -22,6 +22,8 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
 
   const currentRef = useRef<CurrentMarkerHandle | null>(null);
   const watchIdRef = useRef<number | null>(null); //위치만 갱신
+
+  const [tilesReady, setTilesReady] = useState(false); //지도타일로드
 
   //현재위치 받아오기
   const getCurrentLatLng = (): Promise<{ lat: number; lng: number }> =>
@@ -55,6 +57,13 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
 
       const map = new kakao.maps.Map(container, { center, level: 5 });
       mapRef.current = map;
+
+      //지도 타일로드 후 그리기
+      const onTilesLoaded = () => {
+        setTilesReady(true);
+        kakao.maps.event.removeListener(map, "tilesloaded", onTilesLoaded);
+      };
+      kakao.maps.event.addListener(map, "tilesloaded", onTilesLoaded);
 
       const pos = new kakao.maps.LatLng(cur.lat, cur.lng);
       currentRef.current = createCurrentMarker(map, pos);
@@ -181,7 +190,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
         draw(straight);
       }
     })();
-  }, [waypoints]);
+  }, [waypoints, tilesReady]);
 
   return <div ref={mapEl} className="w-full" style={{ height }} />;
 }

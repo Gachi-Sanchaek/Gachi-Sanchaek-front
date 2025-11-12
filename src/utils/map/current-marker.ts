@@ -17,8 +17,8 @@ export function createCurrentMarker(
   halo.style.position = "absolute";
   halo.style.left = "50%";
   halo.style.top = "50%";
-  halo.style.width = "36px";
-  halo.style.height = "36px";
+  halo.style.width = "32px";
+  halo.style.height = "32px";
   halo.style.borderRadius = "999px";
   halo.style.transform = "translate(-50%, -50%)";
   halo.style.background = "rgba(95, 213, 155, 0.25)";
@@ -29,8 +29,8 @@ export function createCurrentMarker(
   dot.style.position = "absolute";
   dot.style.left = "50%";
   dot.style.top = "50%";
-  dot.style.width = "14px";
-  dot.style.height = "14px";
+  dot.style.width = "18px";
+  dot.style.height = "18px";
   dot.style.borderRadius = "999px";
   dot.style.transform = "translate(-50%, -50%)";
   dot.style.background = "#5FD59B";
