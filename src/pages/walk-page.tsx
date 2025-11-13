@@ -10,7 +10,7 @@ export default function WalkPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const orgId = location.state.orgId;
+  const orgId = location.state?.orgId ?? null;
   console.log(orgId);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +46,7 @@ export default function WalkPage() {
         minutes,
         currentLat: cur.lat,
         currentLng: cur.lng,
-        orgId,
+        orgId: orgId ?? null,
       });
       console.log("백엔드 응답:", data);
       navigate("/walk/route", { state: { recommend: data } });
