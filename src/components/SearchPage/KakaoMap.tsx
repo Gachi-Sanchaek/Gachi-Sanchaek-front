@@ -130,8 +130,8 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
         try {
           const data = await getNearbyPlaces(params);
           console.log('근처 기관 데이터:', data);
-          setPlaces(data?.result || []);
-          data?.result.forEach(createPlaceMarker);
+          setPlaces(data?.data || []);
+          data?.data.forEach(createPlaceMarker);
         } catch (e) {
           console.error('getNearbyPlaces api error', e);
         }
