@@ -25,13 +25,21 @@ export default function SearchPage() {
   const isAllowedCategory = selectedCategory === '산책' || selectedCategory === '플로깅';
 
   useEffect(() => {
-    if (isAllowedCategory) {
+    // 카테고리가 바뀔 때마다 선택된 장소 초기화
+    setSelectedPlace(null);
+
+    // 카테고리에 따라 BottomSheet 제어
+    if (selectedCategory === '산책' || selectedCategory === '플로깅') {
+      // 일반 산책/플로깅은 BottomSheet 닫기
       setShowBottomSheet(false);
-      setSelectedPlace(null);
-    } else {
+    } else if (selectedCategory === '동행 산책' || selectedCategory === '유기견 산책') {
+      // 동행 산책/유기견 산책은 BottomSheet 열기
       setShowBottomSheet(true);
+    } else {
+      // 나머지는 기본적으로 BottomSheet 닫기
+      setShowBottomSheet(false);
     }
-  }, [isAllowedCategory]);
+  }, [selectedCategory]);
 
   const handleWalkStart = async () => {
     try {
@@ -58,14 +66,18 @@ export default function SearchPage() {
   };
 
   const handleStorePlace = async () => {
+    console.log(selectedPlace, keywordType(selectedCategory));
+
     if (selectedPlace) {
       try {
         const data = await postPlaceStore(selectedPlace, keywordType(selectedCategory));
 
-        if (data.isSuccess) {
+        console.log(data.data);
+
+        if (data.status === 200) {
           navigate('/walk', {
             state: {
-              orgId: data.result.id,
+              orgId: data.data.id,
             },
           });
         } else {
