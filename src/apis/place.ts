@@ -9,9 +9,11 @@ export const getNearbyPlaces = async (params: PlaceMarkerRequest): Promise<Place
   return data;
 };
 
-export const postPlaceStore = async (body: PlaceStoreRequest, keyword: string): Promise<PlaceStoreResponse> => {
+export const postPlaceStore = async (body: PlaceStoreRequest, type: string): Promise<PlaceStoreResponse> => {
   const { data } = await axiosInstance.post(`/api/v1/organizations/select`, body, {
-    params: keyword,
+    params: {
+      type,
+    },
   });
 
   return data;
