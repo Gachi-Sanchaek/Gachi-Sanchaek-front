@@ -15,9 +15,6 @@ export default function PloggingAuthPage() {
   const navigate = useNavigate();
   const walkId = localStorage.getItem('walkId');
   const loc = useLocation();
-  // 라우팅 상태로 전달받은 값 가져오기
-  const walkResult = loc.state.walkResult;
-  const { totalDistance, totalMinutes } = walkResult;
 
   // 카메라 시작
   useEffect(() => {
@@ -91,6 +88,10 @@ export default function PloggingAuthPage() {
         });
 
         if (data.status === 200) {
+          // 라우팅 상태로 전달받은 값 가져오기
+          const totalDistance = loc.state.totalDistance;
+          const totalMinutes = loc.state.totalMinutes;
+
           try {
             const data = await patchWalkFinish({
               walkId: Number(walkId),

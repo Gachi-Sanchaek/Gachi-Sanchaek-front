@@ -15,9 +15,6 @@ function QRAuthPage() {
   const walkId = Number(localStorage.getItem('walkId'));
   const [isFirstAuth, setIsFirstAuth] = useState(true);
   const loc = useLocation();
-  // // 라우팅 상태로 전달받은 값 가져오기
-  const walkResult = loc.state.walkResult;
-  const { totalDistance, totalMinutes } = walkResult;
 
   useEffect(() => {
     const fetchQrAuth = async () => {
@@ -61,6 +58,10 @@ function QRAuthPage() {
     }
     // 2회차 QR일 때 -> /walk/end api -> finish page routing
     else {
+      // 라우팅 상태로 전달받은 값 가져오기
+      const totalDistance = loc.state.totalDistance;
+      const totalMinutes = loc.state.totalMinutes;
+
       try {
         const data = await patchWalkFinish({
           walkId,
