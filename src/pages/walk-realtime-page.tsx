@@ -3,11 +3,12 @@ import MapRealtime from "../components/WalkRealtime/MapRealtime";
 import Modal from "../components/common/Modal";
 import { useNavigate } from "react-router-dom";
 import { CategoryStore } from "../store/CategoryStore";
+import { patchWalkFinish } from "../apis/walk";
 
 export default function WalkRealtimePage() {
   const navigate = useNavigate();
   const { selectedCategory } = CategoryStore();
-  const isPlogging = selectedCategory === "플로깅";
+  //const isPlogging = selectedCategory === "플로깅";
 
   const [tracking, setTracking] = useState(true);
   const [elapsed, setElapsed] = useState(0);
@@ -50,20 +51,51 @@ export default function WalkRealtimePage() {
 
   const confirmFinish = async () => {
     setShowConfirm(false);
-    //종료 POST 연결 예정
-    //await endWalk({ runtime: fmt(elapsed), distance: distanceKm, path: pathRef.current });
+    setTracking(false);
 
-    setTracking(false); //로컬 추적 중단
+    const walkId = Number(localStorage.getItem("walkId"));
+    if (!walkId) {
+      console.error("walkId가 없습니다");
+      return;
+    }
 
-    if (isPlogging) {
-      //플로깅 AI 인증
-      navigate(""); //Ai인증 경로
-    } else {
-      //완료 페이지
-      navigate(""); //산책완료 페이지 경로
+    //종료 API
+    const finishBody = {
+      walkId,
+      totalDistance: distanceKm,
+      totalMinutes: Math.floor(elapsed / 60),
+    };
+
+    try {
+      //종료API 호출
+      const res = await patchWalkFinish(finishBody);
+      const finishData = res.data; //응답 데이터
+
+      //카테고리별 이동 처리
+      if (selectedCategory === "산책") {
+        navigate("/end", { state: finishData });
+        return;
+      }
+
+      //인증 페이지 경로 매핑
+      const authRoutes: Record<string, string> = {
+        플로깅: "/walk/auth/plogging",
+        "유기견 산책": "/walk/auth/dog",
+        "동행 산책": "/walk/auth/companion",
+      };
+
+      const next = authRoutes[selectedCategory];
+      if (!next) {
+        console.error("해당 카테고리 인증 페이지 없음");
+        return;
+      }
+
+      //인증 페이지로 응답 전달
+      navigate(next, { state: finishData });
+    } catch (err) {
+      console.error("산책 종료 API 실패:", err);
     }
   };
-
   const pauseIcon = tracking ? "/src/assets/stop.svg" : "/src/assets/play.svg";
 
   return (
