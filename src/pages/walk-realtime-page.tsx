@@ -58,44 +58,52 @@ export default function WalkRealtimePage() {
       console.error("walkId가 없습니다");
       return;
     }
-
-    //종료 API
-    const finishBody = {
+    console.log("walkId:", walkId);
+    console.log("보내는 데이터:", {
       walkId,
-      totalDistance: distanceKm,
+      totalDistance: Number(distanceKm),
+      totalMinutes: Math.floor(elapsed / 60),
+    });
+
+    const walkResult = {
+      totalDistance: Number(distanceKm),
       totalMinutes: Math.floor(elapsed / 60),
     };
 
-    try {
-      //종료API 호출
-      const res = await patchWalkFinish(finishBody);
-      const finishData = res.data; //응답 데이터
+    if (selectedCategory === "산책") {
+      try {
+        const res = await patchWalkFinish({
+          walkId,
+          totalDistance: Number(distanceKm),
+          totalMinutes: Math.floor(elapsed / 60),
+        });
 
-      //카테고리별 이동 처리
-      if (selectedCategory === "산책") {
+        const finishData = res.data;
         navigate("/end", { state: finishData });
-        return;
+      } catch (err) {
+        console.error("산책 종료 API 실패:", err);
       }
-
-      //인증 페이지 경로 매핑
-      const authRoutes: Record<string, string> = {
-        플로깅: "/walk/auth/plogging",
-        "유기견 산책": "/walk/auth/dog",
-        "동행 산책": "/walk/auth/companion",
-      };
-
-      const next = authRoutes[selectedCategory];
-      if (!next) {
-        console.error("해당 카테고리 인증 페이지 없음");
-        return;
-      }
-
-      //인증 페이지로 응답 전달
-      navigate(next, { state: finishData });
-    } catch (err) {
-      console.error("산책 종료 API 실패:", err);
+      return;
     }
+
+    const authRoutes: Record<string, string> = {
+      플로깅: "/plogging-auth",
+      "유기견 산책": "/qr-auth",
+      "동행 산책": "/qr-auth",
+    };
+
+    const next = authRoutes[selectedCategory];
+
+    if (!next) {
+      console.error("해당 카테고리 인증 페이지 없음");
+      return;
+    }
+
+    navigate(next, {
+      state: walkResult, //거리,시간 전달
+    });
   };
+
   const pauseIcon = tracking ? "/src/assets/stop.svg" : "/src/assets/play.svg";
 
   return (
