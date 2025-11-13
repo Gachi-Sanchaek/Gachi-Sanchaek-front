@@ -15,6 +15,7 @@ const ProtectedLayout = () => {
   const isQRAuthPage = !!matchPath("/qr-auth", location.pathname);
   const isPloggingAuthPage = !!matchPath("/plogging-auth", location.pathname);
   const isRealtimePage = !!matchPath("/walk/realtime", location.pathname);
+  const isEndPage = !!matchPath("/end", location.pathname);
 
   useEffect(() => {
     if (!token) {
@@ -27,18 +28,23 @@ const ProtectedLayout = () => {
       <div
         className={`w-full max-w-[480px] min-h-screen ${isHome || isMyPage || isRanking ? "bg-gradient-to-b from-[#5FD59B] to-[#FFEC8A]" : "bg-white"}`}
       >
-        {!isQRAuthPage && !isPloggingAuthPage && !isRealtimePage && (
-          <Header
-            hasArrow={!isHome}
-            title={
-              isMyPage ? "마이 페이지" : isRanking ? "랭킹" : selectedCategory
-            }
-            titleColor={isMyPage || isRanking ? "white" : "black"}
-            bgColor={isHome || isMyPage || isRanking ? "transparent" : "white"}
-          />
-        )}
+        {!isQRAuthPage &&
+          !isPloggingAuthPage &&
+          !isRealtimePage &&
+          !isEndPage && (
+            <Header
+              hasArrow={!isHome}
+              title={
+                isMyPage ? "마이 페이지" : isRanking ? "랭킹" : selectedCategory
+              }
+              titleColor={isMyPage || isRanking ? "white" : "black"}
+              bgColor={
+                isHome || isMyPage || isRanking ? "transparent" : "white"
+              }
+            />
+          )}
         <div
-          className={`${isQRAuthPage || isPloggingAuthPage || isRealtimePage ? "" : "pt-12"}`}
+          className={`${isQRAuthPage || isPloggingAuthPage || isRealtimePage || isEndPage ? "" : "pt-12"}`}
         >
           <Outlet />
         </div>
