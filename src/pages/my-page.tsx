@@ -8,6 +8,8 @@ import { pointHistory } from "../mocks/pointHistory";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
 import { axiosInstance } from "../apis/axios";
+import type { PointLogItem } from "../types/point";
+import { getPointLog } from "../apis/point";
 
 interface UserProfile {
   profileImageUrl: string;
@@ -33,13 +35,14 @@ export default function MyPage() {
   const [selectedBonggong, setSelectedBonggong] = useState<number | null>(null);
   const [representBonggong, setRepresentBonggong] = useState<string>("");
   const [stamps, setStamps] = useState<Stamp[]>([]);
+  const [pointLogs, setPointLogs] = useState<PointLogItem[]>([]);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>("전체");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const sortedPointHistory = [...pointHistory].sort(
+  const sortedPointHistory = [...pointLogs].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
@@ -60,6 +63,18 @@ export default function MyPage() {
           const formatted = `${year.slice(2)}.${parseInt(month, 10)}`;
           return formatted === selectedMonth;
         });
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const logs = await getPointLog();
+        setPointLogs(logs);
+      } catch (err) {
+        console.error("포인트 로그 불러오기 실패", err);
+      }
+    };
+    fetchLogs();
+  }, []);
 
   useEffect(() => {
     if (userProfile) {
@@ -149,8 +164,18 @@ export default function MyPage() {
     };
   }, []);
 
-  if (loading) return <p>로딩중...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading)
+    return (
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
+        로딩중...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
+        {error}
+      </div>
+    );
   if (!userProfile) return <p>사용자 정보가 없습니다.</p>;
 
   return (
@@ -311,7 +336,7 @@ export default function MyPage() {
 
                     return (
                       <div
-                        key={p.id}
+                        key={p.date}
                         className="flex justify-between h-16 items-center font-[PretendardVariable]"
                       >
                         <span className="text-[#BDBDBD] text-[16px] w-15">
@@ -328,7 +353,7 @@ export default function MyPage() {
                           </span>
                         </div>
                         <span className="text-[#5FD59B] text-[16px] font-medium">
-                          {p.point}P
+                          {p.amount}P
                         </span>
                       </div>
                     );
