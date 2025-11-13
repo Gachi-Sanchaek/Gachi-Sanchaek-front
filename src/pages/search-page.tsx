@@ -7,7 +7,7 @@ import type { Place } from '../types/place';
 import LocationInfoCard from '../components/SearchPage/LocationInfoCard';
 import BottomButton from '../components/common/BottomButton';
 import { useNavigate } from 'react-router-dom';
-import { postWalkStart } from '../apis/walk';
+import { postWalkStart, postWalkStateChange } from '../apis/walk';
 import { walkType } from '../utils/walkType';
 import { postPlaceStore } from '../apis/place';
 import { keywordType } from '../utils/placeKeywordType';
@@ -52,7 +52,18 @@ export default function SearchPage() {
         localStorage.setItem('walkId', data.data.walkId.toString());
 
         if (selectedCategory === '산책' || selectedCategory === '플로깅') {
-          navigate('/walk/realtime');
+          try {
+            const res = await postWalkStateChange(data.data.walkId);
+
+            if (res.status === 200) {
+              navigate('/walk/realtime');
+            } else {
+              alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+            }
+          } catch (e) {
+            alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+            console.error('walk connect error', e);
+          }
         } else if (selectedCategory === '동행 산책' || selectedCategory === '유기견 산책') {
           navigate('/qr-auth');
         }
