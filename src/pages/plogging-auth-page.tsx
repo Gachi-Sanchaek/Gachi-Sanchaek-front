@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Close from '/src/assets/close-white.svg';
 import Modal from '../components/common/Modal';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { postPloggingAuth } from '../apis/walk-auth';
 import { patchWalkFinish } from '../apis/walk';
 
@@ -14,12 +14,10 @@ export default function PloggingAuthPage() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const navigate = useNavigate();
   const walkId = localStorage.getItem('walkId');
-  // const loc = useLocation();
+  const loc = useLocation();
   // 라우팅 상태로 전달받은 값 가져오기
-  // const totalDistance = loc.state.totalDistance;
-  // const totalMinutes = loc.state.totalMinutes;
-  const totalDistance = 0;
-  const totalMinutes = 0;
+  const walkResult = loc.state.walkResult;
+  const { totalDistance, totalMinutes } = walkResult;
 
   // 카메라 시작
   useEffect(() => {
@@ -102,7 +100,7 @@ export default function PloggingAuthPage() {
 
             if (data.status === 200) {
               localStorage.removeItem('walkId');
-              navigate('/', {
+              navigate('/end', {
                 state: { ...data.data },
               }); //종료페이지로 이동
             } else {
@@ -158,7 +156,7 @@ export default function PloggingAuthPage() {
               variant: 'green',
               text: '확인',
               onClick: () => {
-                navigate('/'); //완료페이지로 이동..?
+                navigate('/');
               },
             },
           ]}
