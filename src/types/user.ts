@@ -34,4 +34,4 @@ export type UserRankingItem = {
   ranking: number | string;
 };
 
-export type UserRankingResponse = UserRankingItem[] | null;
+export type UserRankingResponse = UserRankingItem | null;
