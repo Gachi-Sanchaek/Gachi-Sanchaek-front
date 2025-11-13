@@ -6,16 +6,14 @@ import MapRoute from "../components/WalkRoutePage/MapRoute";
 import type { RecommendResponse } from "../apis/routes";
 import { startWalkAndSelect } from "../apis/route-select";
 import { CategoryStore } from "../store/CategoryStore";
-//import { walkRoutes } from "../mocks/walkRoutes";
 
 export default function WalkRoutePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const recommend = (location.state as { recommend?: RecommendResponse } | null)
     ?.recommend;
-  //API응답만사용
+  //API응답사용
   const routes = recommend?.routes ?? [];
-  //const routes = recommend?.routes ?? walkRoutes; 목데이터
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
 
@@ -26,7 +24,7 @@ export default function WalkRoutePage() {
       alert("추천 경로를 찾을 수 없습니다. 처음부터 다시 시도해주세요.");
       navigate("/walk", { replace: true });
     }
-  }, [routes.length, recommend, navigate]);
+  }, [routes.length, navigate]);
 
   if (!routes.length) return null; //데이터 없으면 렌더 X
 
