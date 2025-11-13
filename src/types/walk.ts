@@ -34,3 +34,14 @@ export type WalkFinishData = {
 };
 
 export type WalkFinishReponse = CommonWalkResponse<WalkFinishData>;
+
+export type walkStateChange = {
+  walkId: number;
+  status: string;
+  walkType: string;
+  recommendationId: number | null;
+  verificationMethod: string;
+  startTime: Date;
+};
+
+export type walkStateChangeResponse = CommonWalkResponse<walkStateChange>;

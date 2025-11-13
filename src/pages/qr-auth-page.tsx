@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import QrScannner from '../components/WalkAuth/QRScanner';
 import Close from '/src/assets/close-white.svg';
 import Modal from '../components/common/Modal';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { postQrAuth } from '../apis/walk-auth';
 import { patchWalkFinish } from '../apis/walk';
 
@@ -14,12 +14,7 @@ function QRAuthPage() {
   const navigate = useNavigate();
   const walkId = Number(localStorage.getItem('walkId'));
   const [isFirstAuth, setIsFirstAuth] = useState(true);
-  // const loc = useLocation();
-  // // 라우팅 상태로 전달받은 값 가져오기
-  // const totalDistance = loc.state.totalDistance;
-  // const totalMinutes = loc.state.totalMinutes;
-  const totalDistance = 0;
-  const totalMinutes = 0;
+  const loc = useLocation();
 
   useEffect(() => {
     const fetchQrAuth = async () => {
@@ -52,7 +47,7 @@ function QRAuthPage() {
     }
     // 2회차 QR일 때
     else {
-      navigate('/'); // 완료페이지로 이동
+      navigate('/');
     }
   };
 
@@ -63,6 +58,10 @@ function QRAuthPage() {
     }
     // 2회차 QR일 때 -> /walk/end api -> finish page routing
     else {
+      // 라우팅 상태로 전달받은 값 가져오기
+      const totalDistance = loc.state.totalDistance;
+      const totalMinutes = loc.state.totalMinutes;
+
       try {
         const data = await patchWalkFinish({
           walkId,
@@ -73,7 +72,7 @@ function QRAuthPage() {
         if (data.status === 200) {
           // 완료페이지로 이동
           localStorage.removeItem('walkId');
-          navigate('/', {
+          navigate('/end', {
             state: { ...data.data },
           });
         } else {

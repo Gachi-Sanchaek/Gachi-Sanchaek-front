@@ -15,7 +15,7 @@ export const postPloggingAuth = async ({ walkId, image }: PloggingAuthRequest): 
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      params: walkId,
+      params: { walkId },
     }
   );
 
