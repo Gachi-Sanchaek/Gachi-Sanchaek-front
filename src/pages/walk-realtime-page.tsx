@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import MapRealtime from "../components/WalkRealtime/MapRealtime";
 import Modal from "../components/common/Modal";
 import { useNavigate } from "react-router-dom";
@@ -15,8 +15,6 @@ export default function WalkRealtimePage() {
   const [distanceKm, setDistanceKm] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const pathRef = useRef<{ lat: number; lng: number }[]>([]);
-
   //타이머
   useEffect(() => {
     if (!tracking) return;
@@ -27,11 +25,6 @@ export default function WalkRealtimePage() {
   //거리
   const handleStats = ({ distanceKm }: { distanceKm: number }) =>
     setDistanceKm(distanceKm);
-
-  //누적 좌표
-  const handlePath = (p: { lat: number; lng: number }[]) => {
-    pathRef.current = p;
-  };
 
   //시간 mm:ss
   const fmt = (sec: number) => {
@@ -113,7 +106,6 @@ export default function WalkRealtimePage() {
         <MapRealtime
           tracking={tracking}
           onStatsChange={handleStats}
-          onPathUpdate={handlePath}
           width="100%"
           height="100%"
         />
@@ -168,7 +160,6 @@ export default function WalkRealtimePage() {
         </div>
       </div>
 
-      {/* 종료 확인 모달 수정예정 */}
       {showConfirm && (
         <Modal
           title="산책을 마치겠습니까?"
