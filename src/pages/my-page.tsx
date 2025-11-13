@@ -4,22 +4,12 @@ import coin from "../assets/coin.svg";
 import polygon from "../assets/polygon.svg";
 import lock from "../assets/lock.svg";
 import { useEffect, useState } from "react";
-import { pointHistory } from "../mocks/pointHistory";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
-import { axiosInstance } from "../apis/axios";
 import type { PointLogItem } from "../types/point";
+import { axiosInstance } from "../apis/axios";
 import { getPointLog } from "../apis/point";
-
-interface UserProfile {
-  profileImageUrl: string;
-  nickname: string;
-  email: string;
-  createdAt: string;
-  totalPoints: number;
-  walkingCount: number;
-  role: string;
-}
+import { useUserStore } from "../store/UserStore";
 
 interface Stamp {
   id: number;
@@ -31,16 +21,14 @@ interface Stamp {
 
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState<"points" | "stamps">("points");
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const { profile, error, updateProfile } = useUserStore();
   const [selectedBonggong, setSelectedBonggong] = useState<number | null>(null);
   const [representBonggong, setRepresentBonggong] = useState<string>("");
   const [stamps, setStamps] = useState<Stamp[]>([]);
   const [pointLogs, setPointLogs] = useState<PointLogItem[]>([]);
-
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>("전체");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const sortedPointHistory = [...pointLogs].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -48,7 +36,7 @@ export default function MyPage() {
 
   const months = [
     ...new Set(
-      pointHistory.map((p) => {
+      pointLogs.map((p) => {
         const [year, month] = p.date.split("-");
         return `${year.slice(2)}.${parseInt(month, 10)}`;
       })
@@ -77,33 +65,10 @@ export default function MyPage() {
   }, []);
 
   useEffect(() => {
-    if (userProfile) {
-      setRepresentBonggong(userProfile.profileImageUrl);
+    if (profile) {
+      setRepresentBonggong(profile.profileImageUrl);
     }
-  }, [userProfile]);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axiosInstance.get("/api/v1/users/me");
-        const data = response.data?.data;
-        console.log(response.data);
-
-        if (data) {
-          setUserProfile(data);
-        } else {
-          console.error("사용자 데이터가 없습니다.");
-          setUserProfile(null);
-        }
-      } catch (error) {
-        setError("사용자 정보를 불러오지 못했습니다.");
-        console.error("사용자 정보 불러오기 실패: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserData();
-  }, []);
+  }, [profile]);
 
   useEffect(() => {
     const fetchStamps = async () => {
@@ -125,30 +90,23 @@ export default function MyPage() {
   }, []);
 
   const handleChangeBonggong = async () => {
-    if (selectedBonggong === null || !userProfile) return;
+    if (selectedBonggong === null || !profile) return;
 
     const selected = stamps.find((b) => b.id === selectedBonggong);
     if (!selected) return;
 
-    if (!userProfile) {
+    if (!profile) {
       alert("유저 정보를 불러오지 못했습니다.");
       return;
     }
 
-    const updatedData = {
-      nickname: userProfile.nickname,
-      profileImageUrl: selected.imageUrl,
-    };
-
     try {
-      const response = await axiosInstance.patch(
-        "/api/v1/users/me",
-        updatedData
-      );
+      const response = await updateProfile({
+        profileImageUrl: selected.imageUrl,
+      });
 
-      console.log("프로필 수정 성공:", response.data);
+      console.log("프로필 수정 성공:", response);
       setRepresentBonggong(selected.imageUrl);
-      setUserProfile({ ...userProfile, profileImageUrl: selected.imageUrl });
       setSelectedBonggong(null);
     } catch (error) {
       console.error("대표 봉공 변경 실패: ", error);
@@ -176,7 +134,7 @@ export default function MyPage() {
         {error}
       </div>
     );
-  if (!userProfile) return <p>사용자 정보가 없습니다.</p>;
+  if (!profile) return <p>사용자 정보가 없습니다.</p>;
 
   return (
     <Background
@@ -190,7 +148,7 @@ export default function MyPage() {
               style={{ backgroundColor: "#FFFFFF" }}
             >
               <img
-                src={`${import.meta.env.VITE_API_URL}${userProfile?.profileImageUrl}`}
+                src={`${import.meta.env.VITE_API_URL}${profile?.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
@@ -199,7 +157,7 @@ export default function MyPage() {
               className="ml-2 font-[PretendardVariable]"
               style={{ color: "#FFFFFF", fontSize: "24px" }}
             >
-              {userProfile?.nickname}님
+              {profile?.nickname}님
             </h2>
           </div>
 
@@ -207,7 +165,7 @@ export default function MyPage() {
             <div className="flex items-center rounded-lg bg-black/10 p-2">
               <img src={vector} alt="발바닥 아이콘" className="w-5 h-5" />
               <span className="ml-2 font-[PretendardVariable] text-base">
-                {userProfile?.walkingCount}번
+                {profile?.walkingCount}번
               </span>
             </div>
             <span className="ml-1 font-[PretendardVariable] text-base">
@@ -219,7 +177,7 @@ export default function MyPage() {
             <div className="flex items-center rounded-lg bg-black/10 p-2">
               <img src={coin} alt="동전 아이콘" className="w-4.5 h-4.5" />
               <span className="ml-2 font-[PretendardVariable] text-base">
-                {userProfile?.totalPoints.toLocaleString()}포인트
+                {profile?.totalPoints.toLocaleString()}포인트
               </span>
             </div>
             <span className="ml-1 font-[PretendardVariable] text-base">
