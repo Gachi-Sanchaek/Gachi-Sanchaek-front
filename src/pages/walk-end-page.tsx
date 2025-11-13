@@ -1,13 +1,24 @@
 import BottomButton from "../components/common/BottomButton";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function WalkEndPage() {
-  //교체예정
-  const nickname = "즈에";
-  const walkingCount = 3;
-  const totalDistance = 5.0;
-  const totalMinutes = 30;
-  const pointsEarned = 600;
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  const data = location.state as {
+    nickname: string;
+    walkingCount: number;
+    totalDistance: number;
+    totalMinutes: number;
+    pointsEarned: number;
+  };
+
+  if (!data) {
+    return <div>데이터가 없습니다.</div>;
+  }
+
+  const { nickname, walkingCount, totalDistance, totalMinutes, pointsEarned } =
+    data;
   return (
     <>
       <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-136px)] gap-4">
@@ -58,7 +69,7 @@ export default function WalkEndPage() {
             {
               text: "완료",
               variant: "green",
-              onClick: () => console.log("완료 클릭"),
+              onClick: () => navigate("/"),
               disabled: false,
             },
           ]}

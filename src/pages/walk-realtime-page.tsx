@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import MapRealtime from "../components/WalkRealtime/MapRealtime";
 import Modal from "../components/common/Modal";
 import { useNavigate } from "react-router-dom";
@@ -15,8 +15,6 @@ export default function WalkRealtimePage() {
   const [distanceKm, setDistanceKm] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const pathRef = useRef<{ lat: number; lng: number }[]>([]);
-
   //타이머
   useEffect(() => {
     if (!tracking) return;
@@ -27,11 +25,6 @@ export default function WalkRealtimePage() {
   //거리
   const handleStats = ({ distanceKm }: { distanceKm: number }) =>
     setDistanceKm(distanceKm);
-
-  //누적 좌표
-  const handlePath = (p: { lat: number; lng: number }[]) => {
-    pathRef.current = p;
-  };
 
   //시간 mm:ss
   const fmt = (sec: number) => {
@@ -59,43 +52,45 @@ export default function WalkRealtimePage() {
       return;
     }
 
-    //종료 API
-    const finishBody = {
-      walkId,
-      totalDistance: distanceKm,
+    const walkResult = {
+      totalDistance: Number(distanceKm),
       totalMinutes: Math.floor(elapsed / 60),
     };
 
-    try {
-      //종료API 호출
-      const res = await patchWalkFinish(finishBody);
-      const finishData = res.data; //응답 데이터
+    if (selectedCategory === "산책") {
+      try {
+        const res = await patchWalkFinish({
+          walkId,
+          totalDistance: Number(distanceKm),
+          totalMinutes: Math.floor(elapsed / 60),
+        });
 
-      //카테고리별 이동 처리
-      if (selectedCategory === "산책") {
+        const finishData = res.data;
         navigate("/end", { state: finishData });
-        return;
+      } catch (err) {
+        console.error("산책 종료 API 실패:", err);
       }
-
-      //인증 페이지 경로 매핑
-      const authRoutes: Record<string, string> = {
-        플로깅: "/walk/auth/plogging",
-        "유기견 산책": "/walk/auth/dog",
-        "동행 산책": "/walk/auth/companion",
-      };
-
-      const next = authRoutes[selectedCategory];
-      if (!next) {
-        console.error("해당 카테고리 인증 페이지 없음");
-        return;
-      }
-
-      //인증 페이지로 응답 전달
-      navigate(next, { state: finishData });
-    } catch (err) {
-      console.error("산책 종료 API 실패:", err);
+      return;
     }
+
+    const authRoutes: Record<string, string> = {
+      플로깅: "/plogging-auth",
+      "유기견 산책": "/qr-auth",
+      "동행 산책": "/qr-auth",
+    };
+
+    const next = authRoutes[selectedCategory];
+
+    if (!next) {
+      console.error("해당 카테고리 인증 페이지 없음");
+      return;
+    }
+
+    navigate(next, {
+      state: walkResult, //거리,시간 전달
+    });
   };
+
   const pauseIcon = tracking ? "/src/assets/stop.svg" : "/src/assets/play.svg";
 
   return (
@@ -105,7 +100,6 @@ export default function WalkRealtimePage() {
         <MapRealtime
           tracking={tracking}
           onStatsChange={handleStats}
-          onPathUpdate={handlePath}
           width="100%"
           height="100%"
         />
@@ -160,7 +154,6 @@ export default function WalkRealtimePage() {
         </div>
       </div>
 
-      {/* 종료 확인 모달 수정예정 */}
       {showConfirm && (
         <Modal
           title="산책을 마치겠습니까?"
