@@ -72,8 +72,15 @@ export default function WalkRoutePage() {
           waypoints: current.waypoints,
         },
       });
-      console.log("백엔드 응답 :"); //제거 예정
-      navigate("/walk/realtime");
+
+      if (
+        selectedCategory === "유기견 산책" ||
+        selectedCategory === "동행 산책"
+      ) {
+        navigate("/qr-auth");
+      } else {
+        navigate("/walk/realtime");
+      }
     } catch (error) {
       console.error("산책 시작 실패:", error);
       alert("산책 시작에 실패했습니다. 잠시 후 다시 시도해주세요.");
