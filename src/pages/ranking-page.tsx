@@ -74,23 +74,49 @@ export default function RankingPage() {
     };
   };
 
-  const [weekInfo, setWeekInfo] = useState(getCurrentWeek());
+  const [weekInfo, setWeekInfo] = useState(() => {
+    const saved = localStorage.getItem("rankingWeek");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      parsed.date = dayjs(parsed.date);
+      return parsed;
+    }
+
+    return getCurrentWeek();
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "rankingWeek",
+      JSON.stringify({ ...weekInfo, date: weekInfo.date.toISOString() })
+    );
+  }, [weekInfo]);
+
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("rankingWeek");
+    };
+  }, []);
 
   const handlePrevWeek = () => {
-    setWeekInfo((prev) => {
-      const newDate = prev.date.subtract(7, "day");
-      return getCurrentWeek(newDate);
+    setWeekInfo((prev: typeof weekInfo) => {
+      const prevDate = dayjs(prev.date);
+      const newWeek = getCurrentWeek(prevDate.subtract(7, "day"));
+
+      return newWeek;
     });
   };
 
   const handleNextWeek = () => {
-    setWeekInfo((prev) => {
-      const newDate = prev.date.add(7, "day");
+    setWeekInfo((prev: typeof weekInfo) => {
+      const prevDate = dayjs(prev.date);
+      const newDate = prevDate.add(7, "day");
 
-      if (newDate.isAfter(dayjs(), "week")) {
-        return prev;
-      }
-      return getCurrentWeek(newDate);
+      if (newDate.isAfter(dayjs(), "week")) return prev;
+
+      const newWeek = getCurrentWeek(newDate);
+
+      return newWeek;
     });
   };
 
@@ -146,13 +172,13 @@ export default function RankingPage() {
 
   if (loading)
     return (
-      <div className="w-full h-screen flex justify-center items-center">
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
         로딩중...
       </div>
     );
   if (error)
     return (
-      <div className="w-full h-screen flex justify-center items-center">
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
         {error}
       </div>
     );
