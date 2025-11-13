@@ -6,6 +6,7 @@ import MapRoute from "../components/WalkRoutePage/MapRoute";
 import type { RecommendResponse } from "../apis/routes";
 import { startWalkAndSelect } from "../apis/route-select";
 import { CategoryStore } from "../store/CategoryStore";
+import { postWalkStateChange } from "../apis/walk";
 
 export default function WalkRoutePage() {
   const navigate = useNavigate();
@@ -46,16 +47,14 @@ export default function WalkRoutePage() {
 
   const handleStart = async () => {
     try {
-      //임시값
       const orgId = recommend?.orgId ?? null;
       if (!recommend?.recommendationGroupId) {
         alert("추천 정보가 없습니다. 처음부터 다시 시도해주세요.");
         return;
       }
-
       const groupId = recommend.recommendationGroupId;
 
-      await startWalkAndSelect({
+      const walkId = await startWalkAndSelect({
         category: selectedCategory as
           | "산책"
           | "동행 산책"
@@ -70,6 +69,11 @@ export default function WalkRoutePage() {
           waypoints: current.waypoints,
         },
       });
+
+      if (selectedCategory === "산책" || selectedCategory === "플로깅") {
+        await postWalkStateChange(walkId);
+        console.log("WAITING → ONGOING");
+      }
 
       if (
         selectedCategory === "유기견 산책" ||
