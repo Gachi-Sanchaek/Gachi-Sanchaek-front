@@ -51,12 +51,6 @@ export default function WalkRealtimePage() {
       console.error("walkId가 없습니다");
       return;
     }
-    console.log("walkId:", walkId);
-    console.log("보내는 데이터:", {
-      walkId,
-      totalDistance: Number(distanceKm),
-      totalMinutes: Math.floor(elapsed / 60),
-    });
 
     const walkResult = {
       totalDistance: Number(distanceKm),
