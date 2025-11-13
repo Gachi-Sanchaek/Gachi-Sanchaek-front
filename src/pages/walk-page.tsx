@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BottomButton from "../components/common/BottomButton";
 import MapView from "../components/WalkPage/MapView";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getRecommendedRoutes } from "../apis/routes";
 import Loading from "../components/common/Loading";
 
@@ -9,6 +9,9 @@ export default function WalkPage() {
   const [time, setTime] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const orgId = location.state.orgId;
+  console.log(orgId);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
@@ -43,7 +46,7 @@ export default function WalkPage() {
         minutes,
         currentLat: cur.lat,
         currentLng: cur.lng,
-        //orgId 선택된 기관?
+        orgId,
       });
       console.log("백엔드 응답:", data);
       navigate("/walk/route", { state: { recommend: data } });
