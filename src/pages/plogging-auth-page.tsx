@@ -88,6 +88,7 @@ export default function PloggingAuthPage() {
         });
 
         if (data.status === 200) {
+          alert(data.data.message);
           // 라우팅 상태로 전달받은 값 가져오기
           const totalDistance = loc.state.totalDistance;
           const totalMinutes = loc.state.totalMinutes;
