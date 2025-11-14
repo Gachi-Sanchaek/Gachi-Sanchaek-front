@@ -1,13 +1,33 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import BottomButton from "../components/common/BottomButton";
 import RouteInfoCard from "../components/WalkRoutePage/RouteInfoCard";
-import { walkRoutes } from "../mocks/walkRoutes";
 import MapRoute from "../components/WalkRoutePage/MapRoute";
+import type { RecommendResponse } from "../apis/routes";
+import { startWalkAndSelect } from "../apis/route-select";
+import { CategoryStore } from "../store/CategoryStore";
+import { postWalkStateChange } from "../apis/walk";
 
 export default function WalkRoutePage() {
-  const routes = walkRoutes; //api연결후교체
+  const navigate = useNavigate();
+  const location = useLocation();
+  const recommend = (location.state as { recommend?: RecommendResponse } | null)
+    ?.recommend;
+  //API응답사용
+  const routes = recommend?.routes ?? [];
   const [index, setIndex] = useState(0);
   const touchX = useRef<number | null>(null);
+
+  const { selectedCategory } = CategoryStore();
+
+  useEffect(() => {
+    if (!routes.length) {
+      alert("추천 경로를 찾을 수 없습니다. 처음부터 다시 시도해주세요.");
+      navigate("/walk", { replace: true });
+    }
+  }, [routes.length, navigate]);
+
+  if (!routes.length) return null; //데이터 없으면 렌더 X
 
   const count = routes.length;
   const current = routes[index];
@@ -25,6 +45,50 @@ export default function WalkRoutePage() {
     touchX.current = null;
   };
 
+  const handleStart = async () => {
+    try {
+      const orgId = recommend?.orgId ?? null;
+      if (!recommend?.recommendationGroupId) {
+        alert("추천 정보가 없습니다. 처음부터 다시 시도해주세요.");
+        return;
+      }
+      const groupId = recommend.recommendationGroupId;
+
+      const walkId = await startWalkAndSelect({
+        category: selectedCategory as
+          | "산책"
+          | "동행 산책"
+          | "유기견 산책"
+          | "플로깅",
+        orgId,
+        groupId,
+        selectedRoute: {
+          id: current.id,
+          description: current.description,
+          estimatedTime: current.estimatedTime,
+          waypoints: current.waypoints,
+        },
+      });
+
+      if (selectedCategory === "산책" || selectedCategory === "플로깅") {
+        await postWalkStateChange(walkId);
+        console.log("WAITING → ONGOING");
+      }
+
+      if (
+        selectedCategory === "유기견 산책" ||
+        selectedCategory === "동행 산책"
+      ) {
+        navigate("/qr-auth");
+      } else {
+        navigate("/walk/realtime");
+      }
+    } catch (error) {
+      console.error("산책 시작 실패:", error);
+      alert("산책 시작에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
+  };
+
   return (
     <>
       <MapRoute
@@ -33,9 +97,9 @@ export default function WalkRoutePage() {
       />
 
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40">
-        <div className="w-[393px] h-[238px] relative overflow-hidden rounded-tl-xl rounded-tr-xl bg-white mx-auto">
+        <div className="w-full h-[238px] relative overflow-hidden rounded-tl-xl rounded-t-xl bg-white mx-auto">
           <div
-            className="flex flex-col items-center w-[393px] absolute top-6 gap-3"
+            className="flex flex-col items-center w-full absolute top-6 gap-3"
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
@@ -44,6 +108,7 @@ export default function WalkRoutePage() {
               {routes.map((_, i) => (
                 <div
                   key={i}
+                  onClick={() => setIndex(i)}
                   className={`w-2 h-2 rounded-full ${
                     i === index ? "bg-[#5fd59b]" : "bg-neutral-200"
                   }`}
@@ -67,9 +132,7 @@ export default function WalkRoutePage() {
                 {
                   text: "산책 시작",
                   variant: "green",
-                  onClick: () => {
-                    console.log("산책 시작 버튼 클릭");
-                  },
+                  onClick: handleStart,
                 },
               ]}
             />

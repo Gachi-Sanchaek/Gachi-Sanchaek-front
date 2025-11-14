@@ -14,7 +14,21 @@ export type PlaceMarkerRequest = {
   lat: number;
   lng: number;
   radius: number;
-  keyword: string;
+  type: string;
 };
 
 export type PlaceMarkerResponse = CommonResponse<Place[]>;
+
+export type PlaceStoreRequest = Place;
+
+export type PlaceStoreResponse = CommonResponse<{
+  id: number;
+  kakaoId: number;
+  name: string;
+  phone: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  category: string;
+  createdAt: Date;
+}>;

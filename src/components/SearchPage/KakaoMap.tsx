@@ -122,16 +122,16 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
       const params = {
         lat: myLocation?.lat || initialLat,
         lng: myLocation?.lng || initialLng,
-        radius: 5000,
-        keyword: keywordType(selectedCategory),
+        radius: 10000,
+        type: keywordType(selectedCategory),
       };
 
       if (isValidCategory) {
         try {
           const data = await getNearbyPlaces(params);
           console.log('근처 기관 데이터:', data);
-          setPlaces(data?.result || []);
-          data?.result.forEach(createPlaceMarker);
+          setPlaces(data?.data || []);
+          data?.data.forEach(createPlaceMarker);
         } catch (e) {
           console.error('getNearbyPlaces api error', e);
         }
@@ -151,7 +151,7 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
 
       script.onload = () => window.kakao.maps.load(loadMap);
     }
-  }, [initialLat, initialLng, initialLevel, selectedCategory, myLocation?.lat, myLocation?.lng, setPlaces, setSelectedPlace, setShowBottomSheet, mapRefExternal]);
+  }, [initialLat, initialLng, initialLevel, selectedCategory, myLocation?.lat, myLocation?.lng, setPlaces, setSelectedPlace, setShowBottomSheet, mapRefExternal, markersRefExternal]);
 
   return (
     <div className='relative w-full h-[calc(100dvh-48px)]'>

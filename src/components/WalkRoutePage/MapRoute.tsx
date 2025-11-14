@@ -1,6 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import CurrentMarker from "/src/assets/current-marker.svg";
+
+import {
+  createCurrentMarker,
+  updateCurrentMarker,
+  removeCurrentMarker,
+  type CurrentMarkerHandle,
+} from "../../utils/map/current-marker";
 
 type LatLng = { lat: number; lng: number };
 
@@ -9,92 +15,112 @@ interface MapRouteProps {
   height?: string | number; // 지도 높이
 }
 
+type Road = {
+  vertexes: number[];
+};
+
+type Section = {
+  roads?: Road[];
+};
+
 function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<kakao.maps.Map | null>(null); //지도객체 저장
   const lineRef = useRef<kakao.maps.Polyline | null>(null); //그려진 폴리라인 객체 저장
-  const markerRef = useRef<kakao.maps.Marker | null>(null);
+
+  const currentRef = useRef<CurrentMarkerHandle | null>(null);
+  const watchIdRef = useRef<number | null>(null); //위치만 갱신
+
+  const [mapReady, setMapReady] = useState(false);
+  const restKeyRef = useRef(import.meta.env.VITE_KAKAO_REST_API_KEY);
 
   //현재위치 받아오기
-  const getCurrentLatLng = (): Promise<{ lat: number; lng: number }> =>
+  const getCurrentLatLng = (): Promise<LatLng> =>
     new Promise((resolve) => {
-      if (!navigator?.geolocation) {
-        return resolve({ lat: 37.4863, lng: 126.825 }); //가톨릭대 정문
+      if (!navigator.geolocation) {
+        return resolve({ lat: 37.4863, lng: 126.825 });
       }
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        (pos) =>
           resolve({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
-          });
-        },
-        () => resolve({ lat: 37.4863, lng: 126.825 }) // 권한 거부/오류
+          }),
+        () => resolve({ lat: 37.4863, lng: 126.825 })
       );
     });
 
   //지도 초기화
   useEffect(() => {
-    if (typeof kakao === "undefined" || !mapEl.current) return;
+    if (!mapEl.current) return;
+    if (typeof kakao === "undefined") return;
 
-    const container = mapEl.current as HTMLDivElement;
     kakao.maps.load(async () => {
       const cur = await getCurrentLatLng();
 
-      const center = new kakao.maps.LatLng(
-        waypoints?.[0]?.lat || cur.lat,
-        waypoints?.[0]?.lng || cur.lng
-      );
+      const center = new kakao.maps.LatLng(cur.lat, cur.lng);
 
-      const map = new kakao.maps.Map(container, {
+      const map = new kakao.maps.Map(mapEl.current!, {
         center,
-        level: 5,
+        level: 4,
       });
       mapRef.current = map;
+      setMapReady(true);
 
-      const imageSrc = CurrentMarker;
-      const imageSize = new kakao.maps.Size(54, 54);
-      const imageOption: kakao.maps.MarkerImageOptions = {
-        offset: new kakao.maps.Point(27, 27),
-      };
-      const markerImage = new kakao.maps.MarkerImage(
-        imageSrc,
-        imageSize,
-        imageOption
-      );
-      const markerPosition = new kakao.maps.LatLng(cur.lat, cur.lng);
+      const pos = new kakao.maps.LatLng(cur.lat, cur.lng);
+      currentRef.current = createCurrentMarker(map, pos);
 
-      markerRef.current = new kakao.maps.Marker({
-        position: markerPosition,
-        image: markerImage,
-      });
-      markerRef.current?.setMap(map);
+      if (navigator.geolocation) {
+        watchIdRef.current = navigator.geolocation.watchPosition(
+          (p) => {
+            const latlng = new kakao.maps.LatLng(
+              p.coords.latitude,
+              p.coords.longitude
+            );
+            if (currentRef.current) {
+              updateCurrentMarker(currentRef.current, latlng);
+            }
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+        );
+      }
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    //언마운트 정리
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+      if (currentRef.current) {
+        removeCurrentMarker(currentRef.current);
+      }
+    };
+  }, []);
 
   //경로 그리기
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !waypoints || waypoints.length < 2) return;
+    if (!mapReady) return;
+    if (!waypoints || waypoints.length < 2) return;
 
-    // 기존 선 제거
+    const map = mapRef.current;
+    if (!map) return;
+
+    //기존 polyline 제거
     if (lineRef.current) {
       lineRef.current.setMap(null);
       lineRef.current = null;
     }
 
-    const REST_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY as
-      | string
-      | undefined;
-
     //다중 경유지 길찾기 호출
+    const REST_KEY = restKeyRef.current;
     const fetchRoute = async () => {
-      if (!REST_KEY) throw new Error("NO_REST_KEY");
+      if (!REST_KEY) return null;
 
       const start = waypoints[0];
       const dest = waypoints[waypoints.length - 1];
-      const mids = waypoints.slice(1, -1); //가운데 점들 경유지
+      const mids = waypoints.slice(1, -1);
 
-      //x=lng y=lat
       const body = {
         origin: { x: start.lng, y: start.lat },
         destination: { x: dest.lng, y: dest.lat },
@@ -102,34 +128,35 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
         priority: "TIME",
       };
 
-      const res = await axios.post(
-        "https://apis-navi.kakaomobility.com/v1/waypoints/directions",
-        body,
-        {
-          headers: {
-            Authorization: `KakaoAK ${REST_KEY}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const route = res.data?.routes?.[0];
-      if (!route) throw new Error("NO_ROUTE");
-
-      const path: kakao.maps.LatLng[] = [];
-      route.sections?.forEach((sec: { roads?: { vertexes: number[] }[] }) => {
-        sec.roads?.forEach((r: { vertexes: number[] }) => {
-          const v = r.vertexes;
-          for (let i = 0; i < v.length; i += 2) {
-            const lng = v[i];
-            const lat = v[i + 1];
-            path.push(new kakao.maps.LatLng(lat, lng)); // lat,lng로 뒤집기
+      try {
+        const res = await axios.post(
+          "https://apis-navi.kakaomobility.com/v1/waypoints/directions",
+          body,
+          {
+            headers: {
+              Authorization: `KakaoAK ${REST_KEY}`,
+              "Content-Type": "application/json",
+            },
           }
-        });
-      });
+        );
 
-      if (path.length < 2) throw new Error("PARSE_FAIL");
-      return path;
+        const route = res.data?.routes?.[0];
+        if (!route) return null;
+
+        const path: kakao.maps.LatLng[] = [];
+        route.sections?.forEach((sec: Section) => {
+          sec.roads?.forEach((r: Road) => {
+            const v = r.vertexes;
+            for (let i = 0; i < v.length; i += 2) {
+              path.push(new kakao.maps.LatLng(v[i + 1], v[i]));
+            }
+          });
+        });
+
+        return path.length >= 2 ? path : null;
+      } catch {
+        return null;
+      }
     };
 
     const draw = (path: kakao.maps.LatLng[]) => {
@@ -149,20 +176,17 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
     };
 
     (async () => {
-      try {
-        const roadPath = await fetchRoute();
-        draw(roadPath);
-      } catch (e) {
-        console.warn("KakaoMobility 실패 → 직선 폴백", e);
+      const route = await fetchRoute();
 
-        //연결실패시 단순 웨이포인트 연결(임시)
-        const straight = waypoints.map(
+      if (route) draw(route);
+      else {
+        const fallback = waypoints.map(
           (p) => new kakao.maps.LatLng(p.lat, p.lng)
         );
-        draw(straight);
+        draw(fallback);
       }
     })();
-  }, [waypoints]);
+  }, [mapReady, waypoints]);
 
   return <div ref={mapEl} className="w-full" style={{ height }} />;
 }

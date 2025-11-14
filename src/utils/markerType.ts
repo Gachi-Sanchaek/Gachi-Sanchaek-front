@@ -1,5 +1,5 @@
-import WelfareCenter from '/assets/welfare-center-pin.png';
-import AnimalShelter from '/assets/animal-shelter-pin.png';
+import WelfareCenter from '/assets/welfare-center-pin.svg';
+import AnimalShelter from '/assets/animal-shelter-pin.svg';
 
 // 마커 타입 반환
 export const markerType = (category: string) => {

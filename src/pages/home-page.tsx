@@ -4,27 +4,10 @@ import walkBonggong from "../assets/bonggong_png/4_걷는봉공.png";
 import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { axiosInstance } from "../apis/axios";
 import dayjs, { Dayjs } from "dayjs";
+import { useUserStore } from "../store/UserStore";
 
 const STAMP_POINT = 500;
-
-interface UserProfile {
-  profileImageUrl: string;
-  nickname: string;
-  email: string;
-  createdAt: string;
-  totalPoints: number;
-  walkingCount: number;
-  role: string;
-}
-
-interface UserRanking {
-  nickname: string;
-  point: number;
-  profileImageUrl: string;
-  ranking: number;
-}
 
 function getWeekOfMonth(date: Dayjs): number {
   const startOfMonth = date.startOf("month");
@@ -37,10 +20,9 @@ function getWeekOfMonth(date: Dayjs): number {
 
 const Home = () => {
   const navigate = useNavigate();
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [userRanking, setUserRanking] = useState<UserRanking | null>(null);
+  const { profile, ranking, error, fetchProfile, fetchRanking } =
+    useUserStore();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -49,6 +31,20 @@ const Home = () => {
       document.body.style.overflow = "auto";
     };
   }, []);
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const { year, month, week } = getCurrentWeek();
+        const formattedDate = `${year}${String(month).padStart(2, "0")}${week}`;
+        await fetchProfile();
+        await fetchRanking(formattedDate);
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
+  }, [fetchProfile, fetchRanking]);
 
   const getCurrentWeek = (baseDate: Dayjs = dayjs()) => {
     const date = baseDate;
@@ -101,59 +97,11 @@ const Home = () => {
     };
   };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axiosInstance.get("/api/v1/users/me");
-        const data = response.data?.data;
-        console.log(response.data);
-
-        if (data) {
-          setUserProfile(data);
-        } else {
-          console.error("사용자 데이터가 없습니다.");
-          setUserProfile(null);
-        }
-      } catch (error) {
-        setError("사용자 정보를 불러오지 못했습니다.");
-        console.error("사용자 정보 불러오기 실패: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserData();
-  }, []);
-
-  useEffect(() => {
-    const fetchRanking = async () => {
-      try {
-        const { year, month, week } = getCurrentWeek();
-        console.log(year, month, week);
-        const formattedDate = `${year}${String(month).padStart(2, "0")}${week}`;
-        const response = await axiosInstance.get(
-          `/api/v1/rankings/my-ranking`,
-          {
-            params: { date: formattedDate },
-          }
-        );
-
-        if (response.data.status === 200) {
-          setUserRanking(response.data.data);
-        }
-        console.log(response.data.ranking);
-      } catch (error) {
-        console.error("내 랭킹 조회 실패: ", error);
-      }
-    };
-
-    fetchRanking();
-  }, []);
-
   if (loading) return <p>로딩중...</p>;
   if (error) return <p>{error}</p>;
-  if (!userProfile) return <p>사용자 정보가 없습니다.</p>;
+  if (!profile) return <p>사용자 정보가 없습니다.</p>;
 
-  const currentPoints = userProfile?.totalPoints;
+  const currentPoints = profile?.totalPoints;
 
   const currentStampCount = Math.floor(currentPoints / STAMP_POINT);
   const startPoints = currentStampCount * STAMP_POINT;
@@ -200,13 +148,13 @@ const Home = () => {
           <div className="flex items-center mt-4">
             <div className="bg-[#FFFFFF] w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
               <img
-                src={`${import.meta.env.VITE_API_URL}${userProfile.profileImageUrl}`}
+                src={`${import.meta.env.VITE_API_URL}${profile.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
             </div>
             <h2 className="ml-2 font-[PretendardVariable] text-[24px] text-[#FFFFFF]">
-              {userProfile.nickname}님
+              {profile.nickname}님
             </h2>
             <ChevronRight
               size={30}
@@ -215,7 +163,7 @@ const Home = () => {
             />
           </div>
 
-          <div className="absolute left-0 bottom-[62vh] w-full flex justify-center w-full px-4 mt-25 overflow-visible">
+          <div className="absolute left-0 bottom-[62vh] flex justify-center w-full px-4 mt-25 overflow-visible">
             <div className="bg-[#FFFFFF] w-full h-4 rounded-full">
               <div
                 className="bg-[#FFEC8A] h-full rounded-full transition-all duration-500"
@@ -270,40 +218,43 @@ const Home = () => {
               />
             </div>
 
-            <button className="bg-[#5FD59B] w-full text-white py-2 rounded-lg font-[PretendardVariable] text-sm font-medium">
+            <button
+              className="bg-[#5FD59B] w-full text-white py-2 rounded-lg font-[PretendardVariable] text-sm font-medium"
+              onClick={() => {
+                navigate("/search");
+              }}
+            >
               산책 시작하기
             </button>
           </div>
 
           <div className="flex-[3] flex gap-4">
             <div className="bg-[#FFFFFF] flex-1 flex flex-col justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)] mx-auto">
-              <div className="flex items-center">
+              <div
+                className="flex items-center"
+                onClick={() => navigate("/mypage")}
+              >
                 <p className="font-[PretendardVariable] text-[16px] text-[#BDBDBD]">
                   나의 포인트
                 </p>
-                <ChevronRight
-                  size={20}
-                  color="#BDBDBD"
-                  onClick={() => navigate("/mypage")}
-                />
+                <ChevronRight size={20} color="#BDBDBD" />
               </div>
               <p className="font-[PretendardVariable] text-[18px] font-semibold">
-                {userProfile.totalPoints.toLocaleString()}P
+                {profile.totalPoints.toLocaleString()}P
               </p>
             </div>
             <div className="bg-[#FFFFFF] flex-1 flex flex-col justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)] mx-auto">
               <div className="flex items-center">
-                <p className="font-[PretendardVariable] text-[16px] text-[#BDBDBD]">
+                <p
+                  className="font-[PretendardVariable] text-[16px] text-[#BDBDBD]"
+                  onClick={() => navigate("/ranking")}
+                >
                   나의 순위
                 </p>
-                <ChevronRight
-                  size={20}
-                  color="#BDBDBD"
-                  onClick={() => navigate("/ranking")}
-                />
+                <ChevronRight size={20} color="#BDBDBD" />
               </div>
               <p className="font-[PretendardVariable] text-[18px] font-semibold">
-                {userRanking?.ranking}위
+                {ranking?.ranking}위
               </p>
             </div>
           </div>
