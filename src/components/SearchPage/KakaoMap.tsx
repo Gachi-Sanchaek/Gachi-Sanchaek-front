@@ -122,7 +122,7 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
       const params = {
         lat: myLocation?.lat || initialLat,
         lng: myLocation?.lng || initialLng,
-        radius: 5000,
+        radius: 10000,
         type: keywordType(selectedCategory),
       };
 
