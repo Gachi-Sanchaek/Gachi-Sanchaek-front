@@ -131,7 +131,7 @@ export default function MyPage() {
 
   return (
     <Background
-      whiteBackgroundHeight={54}
+      whiteBackgroundHeight={52}
       whiteBgColor="#FFFFFF"
       greenChildren={
         <div className="p-5 pt-2">
@@ -178,7 +178,7 @@ export default function MyPage() {
             </span>
           </div>
 
-          <div className="absolute bottom-[53.4vh] left-1/2 transform -translate-x-1/2 flex gap-14">
+          <div className="absolute bottom-[51.4vh] left-1/2 transform -translate-x-1/2 flex gap-14">
             <div
               className="flex flex-col items-center cursor-pointer"
               onClick={() => {
