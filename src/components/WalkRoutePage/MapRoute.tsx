@@ -172,6 +172,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
       //전체확인용 지도 영역 맞추기
       const bounds = new kakao.maps.LatLngBounds();
       path.forEach((p) => bounds.extend(p));
+      map.relayout();//지도 크기 다시 계산
       map.setBounds(bounds, 24, 24, 24, 24); //상하좌우 여백
     };
 
