@@ -35,6 +35,7 @@ function MapRealtime({
 
   const watchId = useRef<number | null>(null);
   const pathRef = useRef<kakao.maps.LatLng[]>([]);
+  const alertShownRef = useRef(false);
 
   useEffect(() => {
     if (!el.current || mapRef.current) return;
@@ -45,7 +46,10 @@ function MapRealtime({
     kakao.maps.load(() => {
       if (!el.current || mapRef.current) return;
 
-      const fallback = new kakao.maps.LatLng(37.4863, 126.825); //가톨릭대
+      const fallback = new kakao.maps.LatLng( //위치권한 없을때 가톨릭대 
+        37.485993139336074,
+        126.80448486831264
+      ); 
       const map = new kakao.maps.Map(el.current, {
         center: fallback,
         level: 3,
@@ -105,7 +109,12 @@ function MapRealtime({
             pathRef.current.map((p) => ({ lat: p.getLat(), lng: p.getLng() }))
           );
         },
-        () => console.log("위치 권한이 필요합니다."),
+        () =>  {if (!alertShownRef.current) {
+          alert("현재 위치를 불러올 수 없어 기본 위치로 표시됩니다.");
+          console.log("위치 권한이 필요합니다.");
+          alertShownRef.current = true;
+        }},
+          
         { enableHighAccuracy: true, maximumAge: 1000, timeout: 3000 }
       );
     };

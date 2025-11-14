@@ -1,5 +1,6 @@
 import BottomButton from "../components/common/BottomButton";
 import { useLocation, useNavigate } from "react-router-dom";
+import bonggongFighting from "/src/assets/bonggong_png/54_화이팅봉공.png";
 
 export default function WalkEndPage() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function WalkEndPage() {
 
         <div className="flex flex-col items-center relative">
           <img
-            src="/src/assets/bonggong_png/54_화이팅봉공.png"
+            src={bonggongFighting}
             alt="화이팅봉공"
             className="w-[100px] h-[100px] object-cover -mb-8"
           />
