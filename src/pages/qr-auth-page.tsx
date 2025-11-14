@@ -23,7 +23,7 @@ function QRAuthPage() {
           walkId,
           qrToken: qrResult,
         });
-        if (data.status === 200) {
+        if (data.data.verified) {
           setIsFirstAuth(data.data.message.includes('1'));
           setShowSuccessModal(true);
         } else {
@@ -145,7 +145,7 @@ function QRAuthPage() {
               variant: 'green',
               text: '다시 찍기',
               onClick: () => {
-                location.reload();
+                setShowErrorModal(false);
               },
             },
           ]}
