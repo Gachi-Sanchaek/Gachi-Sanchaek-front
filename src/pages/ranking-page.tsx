@@ -185,7 +185,7 @@ export default function RankingPage() {
 
   return (
     <Background
-      whiteBackgroundHeight={45}
+      whiteBackgroundHeight={40}
       whiteBgColor="#FFFFFF"
       greenChildren={
         <div className="p-5 pt-0 flex flex-col justify-between h-[50%] w-full">
