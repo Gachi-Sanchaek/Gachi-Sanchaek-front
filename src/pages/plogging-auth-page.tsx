@@ -19,6 +19,15 @@ export default function PloggingAuthPage() {
   const walkId = localStorage.getItem('walkId');
   const loc = useLocation();
 
+  useEffect(() => {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   // 카메라 시작
   useEffect(() => {
     // 로컬 변수에 ref 값을 복사하고 startCamera에서 설정되면 업데이트
