@@ -4,6 +4,7 @@ import Modal from '../components/common/Modal';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { postPloggingAuth } from '../apis/walk-auth';
 import { patchWalkFinish } from '../apis/walk';
+import SirenBonggong from '/src/assets/images/siren_bonggong.svg';
 
 export default function PloggingAuthPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -12,6 +13,8 @@ export default function PloggingAuthPage() {
   const [capturedFile, setCapturedFile] = useState<File | null>(null);
   const [showCloseModal, setshowCloseModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isAiDetecting, setIsAiDetecting] = useState(false);
   const navigate = useNavigate();
   const walkId = localStorage.getItem('walkId');
   const loc = useLocation();
@@ -81,6 +84,8 @@ export default function PloggingAuthPage() {
 
   const handleSubmit = async () => {
     if (capturedFile && walkId) {
+      setIsAiDetecting(true);
+
       try {
         const data = await postPloggingAuth({
           walkId,
@@ -88,30 +93,7 @@ export default function PloggingAuthPage() {
         });
 
         if (data.status === 200) {
-          alert(data.data.message);
-          // 라우팅 상태로 전달받은 값 가져오기
-          const totalDistance = loc.state.totalDistance;
-          const totalMinutes = loc.state.totalMinutes;
-
-          try {
-            const data = await patchWalkFinish({
-              walkId: Number(walkId),
-              totalDistance,
-              totalMinutes,
-            });
-
-            if (data.status === 200) {
-              localStorage.removeItem('walkId');
-              navigate('/end', {
-                state: { ...data.data },
-              }); //종료페이지로 이동
-            } else {
-              alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
-            }
-          } catch (e) {
-            alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
-            console.error('plogging auth error', e);
-          }
+          setShowSuccessModal(true);
         } else {
           alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
         }
@@ -120,10 +102,52 @@ export default function PloggingAuthPage() {
         console.error('plogging auth error', e);
       }
     }
+
+    setShowSubmitModal(false);
+    setIsAiDetecting(false);
   };
 
+  const handleSuccess = async () => {
+    // 라우팅 상태로 전달받은 값 가져오기
+    const totalDistance = loc.state.totalDistance;
+    const totalMinutes = loc.state.totalMinutes;
+
+    try {
+      const data = await patchWalkFinish({
+        walkId: Number(walkId),
+        totalDistance,
+        totalMinutes,
+      });
+
+      if (data.status === 200) {
+        localStorage.removeItem('walkId');
+        navigate('/end', {
+          state: { ...data.data },
+        }); //종료페이지로 이동
+      } else {
+        alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+      }
+    } catch (e) {
+      alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+      console.error('plogging auth error', e);
+    }
+  };
+
+  if (isAiDetecting) {
+    return (
+      <Modal
+        title={
+          <div className='flex flex-col justify-center items-center'>
+            <img src={SirenBonggong} alt='ai detecting' />
+            <p className='pt-3'>AI가 검증하고 있어요!</p>
+          </div>
+        }
+      />
+    );
+  }
+
   return (
-    <div className='relative w-full h-screen flex flex-col justify-center items-center gap-6 bg-black'>
+    <div className='relative w-full h-[100dvh] flex flex-col justify-center items-center gap-6 bg-black'>
       <button type='button' className='absolute top-10 right-6 cursor-pointer p-1' onClick={() => setshowCloseModal(true)}>
         <img src={Close} alt='close' />
       </button>
@@ -179,6 +203,22 @@ export default function PloggingAuthPage() {
               variant: 'green',
               text: '제출하기',
               onClick: handleSubmit,
+            },
+          ]}
+        />
+      )}
+      {showSuccessModal && (
+        <Modal
+          title={
+            <>
+              인증이 완료되었습니다! <br /> 산책을 종료합니다.
+            </>
+          }
+          buttons={[
+            {
+              variant: 'green',
+              text: '확인',
+              onClick: () => handleSuccess(),
             },
           ]}
         />
