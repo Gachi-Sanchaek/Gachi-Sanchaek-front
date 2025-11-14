@@ -1,6 +1,6 @@
 import Background from '../components/Background';
 import walkingBonggong from '../assets/images/gachi_sanchaek_bonggong.svg';
-import walkBonggong from '../assets/bonggong_png/4_걷는봉공.png';
+import walkBonggong from '../assets/images/4_걷는봉공.png';
 import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
