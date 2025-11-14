@@ -1,5 +1,5 @@
-import { axiosInstance } from "./axios";
 import type { PointLogItem } from "../types/point";
+import { axiosInstance } from "./axios";
 
 export const getPointLog = async (): Promise<PointLogItem[]> => {
   const response = await axiosInstance.get(`/api/v1/pointLog`);

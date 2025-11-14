@@ -7,24 +7,17 @@ import { useEffect, useState } from "react";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
 import type { PointLogItem } from "../types/point";
-import { axiosInstance } from "../apis/axios";
 import { getPointLog } from "../apis/point";
 import { useUserStore } from "../store/UserStore";
-
-interface Stamp {
-  id: number;
-  name: string;
-  imageUrl: string;
-  price: number;
-  isActive: boolean;
-}
+import type { Bonggong } from "../types/bonggong";
+import { getBonggongs } from "../apis/bonggong";
 
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState<"points" | "stamps">("points");
   const { profile, error, updateProfile } = useUserStore();
   const [selectedBonggong, setSelectedBonggong] = useState<number | null>(null);
   const [representBonggong, setRepresentBonggong] = useState<string>("");
-  const [stamps, setStamps] = useState<Stamp[]>([]);
+  const [bonggongs, setBonggongs] = useState<Bonggong[]>([]);
   const [pointLogs, setPointLogs] = useState<PointLogItem[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>("전체");
@@ -73,13 +66,8 @@ export default function MyPage() {
   useEffect(() => {
     const fetchStamps = async () => {
       try {
-        const response = await axiosInstance.get("/api/v1/stamps");
-
-        if (response.data.status === 200 && Array.isArray(response.data.data)) {
-          setStamps(response.data.data);
-        } else {
-          console.error("스탬프 에러 응답: ", response.data);
-        }
+        const response = await getBonggongs();
+        setBonggongs(response);
       } catch (error) {
         console.error("스탬프 데이터 호출 실패: ", error);
       } finally {
@@ -92,7 +80,7 @@ export default function MyPage() {
   const handleChangeBonggong = async () => {
     if (selectedBonggong === null || !profile) return;
 
-    const selected = stamps.find((b) => b.id === selectedBonggong);
+    const selected = bonggongs.find((b) => b.id === selectedBonggong);
     if (!selected) return;
 
     if (!profile) {
@@ -322,7 +310,7 @@ export default function MyPage() {
           ) : (
             <div className="overflow-y-auto h-[calc(100%-40px)]">
               <div className="grid grid-cols-3 gap-3 p-2">
-                {stamps.map((b) => {
+                {bonggongs.map((b) => {
                   const isSelected = selectedBonggong === b.id;
                   const isRepresentative = representBonggong === b.imageUrl;
                   return (
