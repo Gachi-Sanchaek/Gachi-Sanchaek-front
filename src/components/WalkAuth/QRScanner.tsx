@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
-import QrScanner from "qr-scanner";
-import { QrOptions } from "../../constant/QrOptions";
+import { useEffect, useRef } from 'react';
+import QrScanner from 'qr-scanner';
+import { QrOptions } from '../../constant/QrOptions';
 
 interface QrScannerProps {
   setResult: React.Dispatch<React.SetStateAction<string>>;
@@ -17,25 +17,14 @@ const QrScannner = ({ setResult }: QrScannerProps) => {
     };
 
     if (videoElem) {
-      const qrScanner = new QrScanner(
-        videoElem,
-        (result) => handleScan(result),
-        QrOptions
-      );
+      const qrScanner = new QrScanner(videoElem, (result) => handleScan(result), QrOptions);
       qrScanner.start();
 
       return () => qrScanner.destroy();
     }
   }, [setResult]);
 
-  return (
-    <video
-      ref={videoRef}
-      style={{ width: "300px", height: "300px", objectFit: "cover" }}
-      autoPlay
-      playsInline
-    />
-  );
+  return <video ref={videoRef} style={{ width: '300px', height: '300px', objectFit: 'cover' }} autoPlay playsInline muted controls={false} disablePictureInPicture controlsList='nodownload nofullscreen noremoteplayback' className='pointer-events-none' />;
 };
 
 export default QrScannner;
