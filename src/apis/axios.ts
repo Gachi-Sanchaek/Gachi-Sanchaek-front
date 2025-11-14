@@ -12,7 +12,7 @@ axiosInstance.interceptors.request.use(
 
     if (accessToken) {
       config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc2MjkzNzczOSwiZXhwIjoxNzYzNTQyNTM5fQ._TlPBb-KghJ0J7tZ5zbsoPxSMeqh8LrCUsh0q5t1g-4`; // `Bearer ${accessToken}`;
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
     //수정된 요청 설정을 반환
