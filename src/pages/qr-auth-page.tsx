@@ -24,7 +24,7 @@ function QRAuthPage() {
           qrToken: qrResult,
         });
         if (data.data.verified) {
-          setIsFirstAuth(data.data.message.includes('1'));
+          setIsFirstAuth(data.data.message.includes('첫번'));
           setShowSuccessModal(true);
         } else {
           setShowErrorModal(true);
