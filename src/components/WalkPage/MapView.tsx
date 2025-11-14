@@ -6,11 +6,7 @@ import {
   type CurrentMarkerHandle,
 } from "../../utils/map/current-marker";
 
-type MapViewProps = {
-  onLocationReady?: (pos: { lat: number; lng: number }) => void;
-};
-
-export default function MapView({ onLocationReady }: MapViewProps) {
+export default function MapView() {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const markerRef = useRef<CurrentMarkerHandle | null>(null);
   const watchIdRef = useRef<number | null>(null);
@@ -39,7 +35,6 @@ export default function MapView({ onLocationReady }: MapViewProps) {
           updateCurrentMarker(markerRef.current, pos); //위치만 갱신
         }
         map.setCenter(pos);
-        onLocationReady?.({ lat, lng });
       };
 
       //위치 허용시 현재 위치로 센터 이동 + 추적
@@ -67,7 +62,7 @@ export default function MapView({ onLocationReady }: MapViewProps) {
         navigator.geolocation.clearWatch(watchIdRef.current);
       if (markerRef.current) removeCurrentMarker(markerRef.current);
     };
-  }, [onLocationReady]);
+  }, []);
 
   return <div ref={mapRef} className="w-full h-full" />;
 }
