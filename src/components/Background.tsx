@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface BackgroundProps {
   whiteBackgroundHeight: number;
@@ -13,13 +13,27 @@ const Background: React.FC<BackgroundProps> = ({
   whiteChildren,
   whiteBgColor = "#FFFFFF",
 }) => {
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
   const safeHeight = Math.max(0, Math.min(100, whiteBackgroundHeight));
+
+  useEffect(() => {
+    const updateHeight = () => {
+      setViewportHeight(window.innerHeight);
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+
+    return () => {
+      window.removeEventListener("resize", updateHeight);
+    };
+  }, []);
 
   return (
     <div
       className="relative w-full h-screen overflow-hidden"
       style={{
-        height: "calc(100dvh - 40px)", // 40px = ProtectedLayout의 pt-10
+        height: `${viewportHeight - 40}px`,
       }}
     >
       <div
