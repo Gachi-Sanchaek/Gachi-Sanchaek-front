@@ -168,8 +168,8 @@ export default function PloggingAuthPage() {
       </p>
 
       {/* 캡처 버튼 */}
-      <div className='absolute bottom-10 border-3 border-white rounded-full bg-transparent w-15 h-15 flex justify-center items-center'>
-        <button onClick={handleCapture} className='w-11 h-11 bg-white text-white rounded-full cursor-pointer active:w-8 active:h-8' />
+      <div className='absolute bottom-10 border-3 border-white rounded-full bg-transparent w-18 h-18 flex justify-center items-center'>
+        <button onClick={handleCapture} className='w-15 h-15 bg-white text-white rounded-full cursor-pointer active:w-13 active:h-13' />
       </div>
 
       {showCloseModal && (
