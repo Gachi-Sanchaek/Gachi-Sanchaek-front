@@ -144,19 +144,19 @@ export default function PloggingAuthPage() {
   };
 
   return (
-    <div className='relative w-full h-[100dvh] flex flex-col justify-center items-center gap-6 bg-black'>
+    <div className='relative w-full h-[100dvh] flex flex-col justify-center items-center gap-1 bg-black'>
       <button type='button' className='absolute top-10 right-6 cursor-pointer p-1' onClick={() => setshowCloseModal(true)}>
         <img src={Close} alt='close' />
       </button>
       {/* 카메라 미러링 */}
-      <video ref={videoRef} autoPlay playsInline className='w-full max-w-[400px] object-cover aspect-square px-5' />
+      <video ref={videoRef} autoPlay playsInline muted controls={false} disablePictureInPicture controlsList='nodownload nofullscreen noremoteplayback' className='w-full max-w-[400px] object-cover aspect-square px-5 pointer-events-none' />
       <canvas ref={canvasRef} style={{ display: 'none' }} />
       <p className='text-white font-[pretendardVariable] text-base font-normal text-center'>
         쓰레기를 담은 봉투가 잘 보이게, <br /> 사각형 안에 맞춰주세요.
       </p>
 
       {/* 캡처 버튼 */}
-      <div className='absolute bottom-10 border-3 border-white rounded-full bg-transparent w-18 h-18 flex justify-center items-center'>
+      <div className='absolute bottom-7 border-3 border-white rounded-full bg-transparent w-18 h-18 flex justify-center items-center'>
         <button onClick={handleCapture} className='w-15 h-15 bg-white text-white rounded-full cursor-pointer active:w-13 active:h-13' />
       </div>
 
