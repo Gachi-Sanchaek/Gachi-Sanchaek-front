@@ -26,12 +26,9 @@ export const updateUserProfile = async (data: Partial<UserProfileRequest>) => {
     profileImageUrl: data.profileImageUrl ?? store.profile?.profileImageUrl,
   };
 
-  const { data: response } = await axiosInstance.patch<UserProfileResponse>(
-    "/api/v1/users/me",
-    payload
-  );
+  const response = await axiosInstance.patch("/api/v1/users/me", payload);
 
-  return response;
+  return response.data.data;
 };
 
 export const getUserRanking = async (

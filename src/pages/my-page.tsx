@@ -4,48 +4,32 @@ import coin from "../assets/coin.svg";
 import polygon from "../assets/polygon.svg";
 import lock from "../assets/lock.svg";
 import { useEffect, useState } from "react";
-import { pointHistory } from "../mocks/pointHistory";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
-import { axiosInstance } from "../apis/axios";
-
-interface UserProfile {
-  profileImageUrl: string;
-  nickname: string;
-  email: string;
-  createdAt: string;
-  totalPoints: number;
-  walkingCount: number;
-  role: string;
-}
-
-interface Stamp {
-  id: number;
-  name: string;
-  imageUrl: string;
-  price: number;
-  isActive: boolean;
-}
+import type { PointLogItem } from "../types/point";
+import { getPointLog } from "../apis/point";
+import { useUserStore } from "../store/UserStore";
+import type { Bonggong } from "../types/bonggong";
+import { getBonggongs } from "../apis/bonggong";
 
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState<"points" | "stamps">("points");
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const { profile, error, updateProfile } = useUserStore();
   const [selectedBonggong, setSelectedBonggong] = useState<number | null>(null);
   const [representBonggong, setRepresentBonggong] = useState<string>("");
-  const [stamps, setStamps] = useState<Stamp[]>([]);
-
+  const [bonggongs, setBonggongs] = useState<Bonggong[]>([]);
+  const [pointLogs, setPointLogs] = useState<PointLogItem[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>("전체");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const sortedPointHistory = [...pointHistory].sort(
+  const sortedPointHistory = [...pointLogs].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
   const months = [
     ...new Set(
-      pointHistory.map((p) => {
+      pointLogs.map((p) => {
         const [year, month] = p.date.split("-");
         return `${year.slice(2)}.${parseInt(month, 10)}`;
       })
@@ -62,44 +46,28 @@ export default function MyPage() {
         });
 
   useEffect(() => {
-    if (userProfile) {
-      setRepresentBonggong(userProfile.profileImageUrl);
-    }
-  }, [userProfile]);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchLogs = async () => {
       try {
-        const response = await axiosInstance.get("/api/v1/users/me");
-        const data = response.data?.data;
-        console.log(response.data);
-
-        if (data) {
-          setUserProfile(data);
-        } else {
-          console.error("사용자 데이터가 없습니다.");
-          setUserProfile(null);
-        }
-      } catch (error) {
-        setError("사용자 정보를 불러오지 못했습니다.");
-        console.error("사용자 정보 불러오기 실패: ", error);
-      } finally {
-        setLoading(false);
+        const logs = await getPointLog();
+        setPointLogs(logs);
+      } catch (err) {
+        console.error("포인트 로그 불러오기 실패", err);
       }
     };
-    fetchUserData();
+    fetchLogs();
   }, []);
+
+  useEffect(() => {
+    if (profile) {
+      setRepresentBonggong(profile.profileImageUrl);
+    }
+  }, [profile]);
 
   useEffect(() => {
     const fetchStamps = async () => {
       try {
-        const response = await axiosInstance.get("/api/v1/stamps");
-
-        if (response.data.status === 200 && Array.isArray(response.data.data)) {
-          setStamps(response.data.data);
-        } else {
-          console.error("스탬프 에러 응답: ", response.data);
-        }
+        const response = await getBonggongs();
+        setBonggongs(response);
       } catch (error) {
         console.error("스탬프 데이터 호출 실패: ", error);
       } finally {
@@ -110,30 +78,23 @@ export default function MyPage() {
   }, []);
 
   const handleChangeBonggong = async () => {
-    if (selectedBonggong === null || !userProfile) return;
+    if (selectedBonggong === null || !profile) return;
 
-    const selected = stamps.find((b) => b.id === selectedBonggong);
+    const selected = bonggongs.find((b) => b.id === selectedBonggong);
     if (!selected) return;
 
-    if (!userProfile) {
+    if (!profile) {
       alert("유저 정보를 불러오지 못했습니다.");
       return;
     }
 
-    const updatedData = {
-      nickname: userProfile.nickname,
-      profileImageUrl: selected.imageUrl,
-    };
-
     try {
-      const response = await axiosInstance.patch(
-        "/api/v1/users/me",
-        updatedData
-      );
+      const response = await updateProfile({
+        profileImageUrl: selected.imageUrl,
+      });
 
-      console.log("프로필 수정 성공:", response.data);
+      console.log("프로필 수정 성공:", response);
       setRepresentBonggong(selected.imageUrl);
-      setUserProfile({ ...userProfile, profileImageUrl: selected.imageUrl });
       setSelectedBonggong(null);
     } catch (error) {
       console.error("대표 봉공 변경 실패: ", error);
@@ -149,9 +110,24 @@ export default function MyPage() {
     };
   }, []);
 
-  if (loading) return <p>로딩중...</p>;
-  if (error) return <p>{error}</p>;
-  if (!userProfile) return <p>사용자 정보가 없습니다.</p>;
+  if (loading)
+    return (
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
+        로딩중...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
+        {error}
+      </div>
+    );
+  if (!profile)
+    return (
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
+        사용자 정보가 없습니다.
+      </div>
+    );
 
   return (
     <Background
@@ -165,7 +141,7 @@ export default function MyPage() {
               style={{ backgroundColor: "#FFFFFF" }}
             >
               <img
-                src={`${import.meta.env.VITE_API_URL}${userProfile?.profileImageUrl}`}
+                src={`${import.meta.env.VITE_API_URL}${profile?.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
@@ -174,7 +150,7 @@ export default function MyPage() {
               className="ml-2 font-[PretendardVariable]"
               style={{ color: "#FFFFFF", fontSize: "24px" }}
             >
-              {userProfile?.nickname}님
+              {profile?.nickname}님
             </h2>
           </div>
 
@@ -182,7 +158,7 @@ export default function MyPage() {
             <div className="flex items-center rounded-lg bg-black/10 p-2">
               <img src={vector} alt="발바닥 아이콘" className="w-5 h-5" />
               <span className="ml-2 font-[PretendardVariable] text-base">
-                {userProfile?.walkingCount}번
+                {profile?.walkingCount}번
               </span>
             </div>
             <span className="ml-1 font-[PretendardVariable] text-base">
@@ -194,7 +170,7 @@ export default function MyPage() {
             <div className="flex items-center rounded-lg bg-black/10 p-2">
               <img src={coin} alt="동전 아이콘" className="w-4.5 h-4.5" />
               <span className="ml-2 font-[PretendardVariable] text-base">
-                {userProfile?.totalPoints.toLocaleString()}포인트
+                {profile?.totalPoints.toLocaleString()}포인트
               </span>
             </div>
             <span className="ml-1 font-[PretendardVariable] text-base">
@@ -311,7 +287,7 @@ export default function MyPage() {
 
                     return (
                       <div
-                        key={p.id}
+                        key={p.date}
                         className="flex justify-between h-16 items-center font-[PretendardVariable]"
                       >
                         <span className="text-[#BDBDBD] text-[16px] w-15">
@@ -328,7 +304,7 @@ export default function MyPage() {
                           </span>
                         </div>
                         <span className="text-[#5FD59B] text-[16px] font-medium">
-                          {p.point}P
+                          {p.amount}P
                         </span>
                       </div>
                     );
@@ -339,7 +315,7 @@ export default function MyPage() {
           ) : (
             <div className="overflow-y-auto h-[calc(100%-40px)]">
               <div className="grid grid-cols-3 gap-3 p-2">
-                {stamps.map((b) => {
+                {bonggongs.map((b) => {
                   const isSelected = selectedBonggong === b.id;
                   const isRepresentative = representBonggong === b.imageUrl;
                   return (
