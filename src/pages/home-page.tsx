@@ -1,6 +1,6 @@
 import Background from "../components/Background";
 //import walkingBonggong from "../assets/images/gachi_sanchaek_bonggong.svg";
-import walkingBonggong2 from "../assets/images/gachi_sanchaek_bonggong2.png";
+//import walkingBonggong2 from "../assets/images/gachi_sanchaek_bonggong2.png";
 import walkBonggong from "../assets/bonggong_png/4_걷는봉공.png";
 import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -228,7 +228,7 @@ const Home = () => {
           <div className="bg-[#FFFFFF] flex-[4] flex flex-col items-center justify-center rounded-xl p-5 shadow-[0_0_10px_0_rgba(0,0,0,0.08)]">
             <div className="flex-1 flex items-center justify-center w-full mb-2">
               <img
-                src={walkingBonggong2}
+                src="../../assets/gachi-sanchaek-bonggong.png"
                 alt="산책 봉공"
                 className="w-[207px]"
               />
