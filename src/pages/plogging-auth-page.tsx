@@ -101,10 +101,11 @@ export default function PloggingAuthPage() {
           image: capturedFile,
         });
 
-        if (data.status === 200) {
+        if (data.data.verified) {
           setShowSuccessModal(true);
         } else {
-          alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+          alert(data.data.message);
+          location.reload();
         }
       } catch (e) {
         alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
