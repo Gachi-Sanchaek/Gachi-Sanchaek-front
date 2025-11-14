@@ -33,7 +33,11 @@ const SignUp = () => {
 
   // 닉네임 변경 시 초기화
   const handleNicknameChange = (value: string) => {
-    setNickname(value);
+    const filteredValue = value.replace(
+      /[^a-zA-Z0-9\u3131-\u318E\uAC00-\uD7A3]/g,
+      ""
+    );
+    setNickname(filteredValue);
     setNicknameChecked(false);
     setIsNicknameValid(null);
   };
@@ -103,7 +107,7 @@ const SignUp = () => {
             placeholder="닉네임을 입력하세요"
             value={nickname}
             onChange={(e) => handleNicknameChange(e.target.value)}
-            className={`flex-1 px-3 py-3 rounded-lg font-[PretendardVariable] font-medium text-[16px] border ${
+            className={`flex-1 min-w-0 px-3 py-3 rounded-lg font-[PretendardVariable] font-medium text-[16px] border ${
               nicknameChecked && isNicknameValid
                 ? "border-[#5FD59B]"
                 : "border-[#F5F5F5]"
@@ -113,7 +117,7 @@ const SignUp = () => {
             type="button"
             onClick={handleCheckNickname}
             disabled={!nickname.trim() || nicknameChecked}
-            className={`w-24 bg-[#5FD59B] text-white rounded-lg active:brightness-98 transition-colors
+            className={`w-[72px] flex-shrink-0 bg-[#5FD59B] text-white text-[16px] rounded-lg active:brightness-98 transition-colors
             }`}
           >
             중복확인
