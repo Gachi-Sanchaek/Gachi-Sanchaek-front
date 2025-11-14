@@ -29,10 +29,10 @@ export default function WalkPage() {
   const getCurrent = (): Promise<{ lat: number; lng: number }> =>
     new Promise((resolve) => {
       if (!navigator?.geolocation)
-        return resolve({ lat: 37.4863, lng: 126.825 });
+        return resolve({ lat: 37.485993139336074, lng: 126.80448486831264 });
       navigator.geolocation.getCurrentPosition(
         (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
-        () => resolve({ lat: 37.4863, lng: 126.825 }) //기본값
+        () => resolve({ lat: 37.485993139336074, lng: 126.80448486831264 }) //기본값
       );
     });
 

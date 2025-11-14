@@ -38,7 +38,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
   const getCurrentLatLng = (): Promise<LatLng> =>
     new Promise((resolve) => {
       if (!navigator.geolocation) {
-        return resolve({ lat: 37.4863, lng: 126.825 });
+        return resolve({ lat: 37.485993139336074, lng: 126.80448486831264 });
       }
       navigator.geolocation.getCurrentPosition(
         (pos) =>
@@ -46,7 +46,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           }),
-        () => resolve({ lat: 37.4863, lng: 126.825 })
+        () => resolve({ lat: 37.485993139336074, lng: 126.80448486831264 })
       );
     });
 
@@ -172,6 +172,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
       //전체확인용 지도 영역 맞추기
       const bounds = new kakao.maps.LatLngBounds();
       path.forEach((p) => bounds.extend(p));
+      map.relayout();//지도 크기 다시 계산
       map.setBounds(bounds, 24, 24, 24, 24); //상하좌우 여백
     };
 
