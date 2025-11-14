@@ -1,13 +1,10 @@
-import WelfareCenter from '/assets/welfare-center-pin.svg';
-import AnimalShelter from '/assets/animal-shelter-pin.svg';
-
 // 마커 타입 반환
 export const markerType = (category: string) => {
   switch (category) {
     case '동행 산책':
-      return WelfareCenter;
+      return '/assets/welfare-center-pin.png';
     case '유기견 산책':
-      return AnimalShelter;
+      return '/assets/animal-shelter-pin.png';
     default:
       return undefined;
   }
