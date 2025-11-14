@@ -122,7 +122,12 @@ export default function MyPage() {
         {error}
       </div>
     );
-  if (!profile) return <p>사용자 정보가 없습니다.</p>;
+  if (!profile)
+    return (
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
+        사용자 정보가 없습니다.
+      </div>
+    );
 
   return (
     <Background

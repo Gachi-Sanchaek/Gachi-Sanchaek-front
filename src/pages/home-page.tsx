@@ -97,9 +97,24 @@ const Home = () => {
     };
   };
 
-  if (loading) return <p>로딩중...</p>;
-  if (error) return <p>{error}</p>;
-  if (!profile) return <p>사용자 정보가 없습니다.</p>;
+  if (loading)
+    return (
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
+        로딩중...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
+        {error}
+      </div>
+    );
+  if (!profile)
+    return (
+      <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
+        사용자 정보가 없습니다.
+      </div>
+    );
 
   const currentPoints = profile?.totalPoints;
 
