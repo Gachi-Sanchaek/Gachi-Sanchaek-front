@@ -1,5 +1,6 @@
 import BottomButton from '../components/common/BottomButton';
 import { useLocation, useNavigate } from 'react-router-dom';
+import bonggongFighting from '/src/assets/images/54_화이팅봉공.png';
 
 export default function WalkEndPage() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export default function WalkEndPage() {
         </p>
 
         <div className='flex flex-col items-center relative'>
-          <img src='/src/assets/images/54_화이팅봉공.png' alt='화이팅봉공' className='w-[100px] h-[100px] object-cover -mb-8' />
+          <img src={bonggongFighting} alt='화이팅봉공' className='w-[100px] h-[100px] object-cover -mb-8' />
           <div className='flex justify-center items-center gap-10 px-9 py-3 rounded-2xl bg-white shadow-[0_0_4px_rgba(0,0,0,0.1)]'>
             <div className='flex flex-col items-center'>
               <p className='text-2xl font-semibold text-[#bdbdbd] font-[PretendardVariable]'>{totalDistance.toFixed(1)}</p>

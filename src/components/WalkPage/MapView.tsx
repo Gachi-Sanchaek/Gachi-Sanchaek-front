@@ -10,14 +10,18 @@ export default function MapView() {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const markerRef = useRef<CurrentMarkerHandle | null>(null);
   const watchIdRef = useRef<number | null>(null);
+  const alertShownRef = useRef(false); //위치권한 없음 알림
 
   useEffect(() => {
     const { kakao } = window;
     if (!mapRef.current || !kakao) return;
 
     kakao.maps.load(() => {
-      // 기본 중심으로맵 생성
-      const defaultCenter = new kakao.maps.LatLng(37.4863, 126.825);
+      //기본 중심으로맵 생성
+      const defaultCenter = new kakao.maps.LatLng(
+        37.485993139336074,
+        126.80448486831264
+      );
       const map = new kakao.maps.Map(mapRef.current!, {
         center: defaultCenter,
         level: 3,
@@ -33,11 +37,17 @@ export default function MapView() {
         map.setCenter(pos);
       };
 
-      // 위치 허용시 현재 위치로 센터 이동 + 추적
+      //위치 허용시 현재 위치로 센터 이동 + 추적
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (p) => setAt(p.coords.latitude, p.coords.longitude),
-          () => setAt(defaultCenter.getLat(), defaultCenter.getLng())
+          () => {
+            if (!alertShownRef.current) {
+              alert("현재 위치를 불러올 수 없어 기본 위치로 표시됩니다.");
+              alertShownRef.current = true;
+            }
+            setAt(defaultCenter.getLat(), defaultCenter.getLng());
+          }
         );
         watchIdRef.current = navigator.geolocation.watchPosition((p) =>
           setAt(p.coords.latitude, p.coords.longitude)
