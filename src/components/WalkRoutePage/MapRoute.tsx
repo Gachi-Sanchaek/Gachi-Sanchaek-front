@@ -38,7 +38,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
   const getCurrentLatLng = (): Promise<LatLng> =>
     new Promise((resolve) => {
       if (!navigator.geolocation) {
-        return resolve({ lat: 37.4863, lng: 126.825 });
+        return resolve({ lat: 37.485993139336074, lng: 126.80448486831264 });
       }
       navigator.geolocation.getCurrentPosition(
         (pos) =>
@@ -46,7 +46,7 @@ function MapRoute({ waypoints, height = 400 }: MapRouteProps) {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           }),
-        () => resolve({ lat: 37.4863, lng: 126.825 })
+        () => resolve({ lat: 37.485993139336074, lng: 126.80448486831264 })
       );
     });
 
