@@ -17,6 +17,15 @@ function QRAuthPage() {
   const loc = useLocation();
 
   useEffect(() => {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchQrAuth = async () => {
       try {
         const data = await postQrAuth({
