@@ -101,10 +101,10 @@ export default function PloggingAuthPage() {
           image: capturedFile,
         });
 
-        if (data.status === 200) {
+        if (data.data.verified) {
           setShowSuccessModal(true);
         } else {
-          alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+          alert(data.data.message);
         }
       } catch (e) {
         alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
@@ -141,19 +141,6 @@ export default function PloggingAuthPage() {
       console.error('plogging auth error', e);
     }
   };
-
-  if (isAiDetecting) {
-    return (
-      <Modal
-        title={
-          <div className='flex flex-col justify-center items-center'>
-            <img src={SirenBonggong} alt='ai detecting' />
-            <p className='pt-3'>AI가 검증하고 있어요!</p>
-          </div>
-        }
-      />
-    );
-  }
 
   return (
     <div className='relative w-full h-[100dvh] flex flex-col justify-center items-center gap-6 bg-black'>
@@ -198,7 +185,7 @@ export default function PloggingAuthPage() {
         />
       )}
 
-      {showSubmitModal && capturedImage && (
+      {showSubmitModal && capturedImage && !isAiDetecting && (
         <Modal
           title={
             <>
@@ -230,6 +217,16 @@ export default function PloggingAuthPage() {
               onClick: () => handleSuccess(),
             },
           ]}
+        />
+      )}
+      {isAiDetecting && (
+        <Modal
+          title={
+            <div className='flex flex-col justify-center items-center'>
+              <img src={SirenBonggong} alt='ai detecting' />
+              <p className='pt-3'>AI가 검증하고 있어요!</p>
+            </div>
+          }
         />
       )}
     </div>
