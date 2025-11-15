@@ -59,7 +59,7 @@ export default function WalkRealtimePage() {
 
     const walkResult = {
       totalDistance: Number(distanceKm),
-      totalMinutes: Math.floor(elapsed / 60),
+      totalSeconds: elapsed,
     };
 
     if (selectedCategory === '산책') {
@@ -67,7 +67,7 @@ export default function WalkRealtimePage() {
         const res = await patchWalkFinish({
           walkId,
           totalDistance: Number(distanceKm),
-          totalMinutes: Math.floor(elapsed / 60),
+          totalSeconds: elapsed,
         });
 
         const finishData = res.data;
