@@ -1,7 +1,7 @@
 export interface PointLogItem {
   amount: number;
   date: string;
-  title: string;
+  type: string;
   location: string;
 }
 
