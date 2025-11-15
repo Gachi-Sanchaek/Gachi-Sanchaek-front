@@ -198,7 +198,7 @@ const Home = () => {
                 />
               ))}
             </div>
-            <div className="absolute top-full w-full flex justify-between font-[PretendardVariavle] font-semibold text-[14px] mt-2 px-4">
+            <div className="absolute top-full w-full flex justify-between font-[PretendardVariable] font-semibold text-[14px] mt-2 px-4">
               <span></span>
               <span className="text-right text-[#FFFFFF]">
                 {nextPoints.toLocaleString()}P
