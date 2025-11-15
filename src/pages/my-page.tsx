@@ -227,22 +227,20 @@ export default function MyPage() {
                 />
               </button>
             </div>
-            <div className="ml-2 flex items-center w-[calc(100%-60px)]">
+            <div className="ml-2 flex items-center">
               {isEditing ? (
                 <input
                   ref={inputRef}
                   value={newNickname}
                   onChange={(e) => handleNicknameChange(e.target.value)}
-                  className={`text-white font-[PretendardVariable] font-medium text-[22px] bg-transparent border-none outline-none caret-white w-full ${
-                    shake ? "shake" : ""
-                  }`}
+                  className={`text-white font-[PretendardVariable] font-medium text-[22px] bg-transparent border-none outline-none caret-white w-full ${shake ? "shake" : ""}`}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleCheckNickname();
                     if (e.key === "Escape") setIsEditing(false);
                   }}
                 />
               ) : (
-                <h2 className="text-white font-[PretendardVariable] font-medium text-[22px] w-full">
+                <h2 className="text-white font-[PretendardVariable] font-medium text-[22px]">
                   {profile?.nickname}님
                 </h2>
               )}
@@ -282,11 +280,7 @@ export default function MyPage() {
               }}
             >
               <span
-                className={`text-base font-[PretendardVariable] ${
-                  activeTab === "points"
-                    ? "text-white font-semibold"
-                    : "text-white/70"
-                }`}
+                className={`text-base font-[PretendardVariable] ${activeTab === "points" ? "text-white font-semibold" : "text-white/70"}`}
               >
                 포인트
               </span>
@@ -304,11 +298,7 @@ export default function MyPage() {
               onClick={() => setActiveTab("stamps")}
             >
               <span
-                className={`text-base font-[PretendardVariable] ${
-                  activeTab === "stamps"
-                    ? "text-white font-semibold"
-                    : "text-white/70"
-                }`}
+                className={`text-base font-[PretendardVariable] ${activeTab === "stamps" ? "text-white font-semibold" : "text-white/70"}`}
               >
                 스탬프
               </span>
@@ -344,9 +334,7 @@ export default function MyPage() {
                 {dropdownOpen && (
                   <div className="absolute mt-2 bg-white border-none rounded-lg shadow-md w-32 z-20">
                     <div
-                      className={`px-3 py-2 cursor-pointer ${
-                        selectedMonth === "전체" ? "text-[#5FD59B]" : ""
-                      }`}
+                      className={`px-3 py-2 cursor-pointer ${selectedMonth === "전체" ? "text-[#5FD59B]" : ""}`}
                       onClick={() => {
                         setSelectedMonth("전체");
                         setDropdownOpen(false);
@@ -357,11 +345,7 @@ export default function MyPage() {
                     {months.map((m) => (
                       <div
                         key={m}
-                        className={`px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 ${
-                          selectedMonth === m
-                            ? "text-[#5FD59B] font-semibold"
-                            : ""
-                        }`}
+                        className={`px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 ${selectedMonth === m ? "text-[#5FD59B] font-semibold" : ""}`}
                         onClick={() => {
                           setSelectedMonth(m);
                           setDropdownOpen(false);
@@ -426,11 +410,7 @@ export default function MyPage() {
                   return (
                     <div
                       key={b.id}
-                      className={`relative flex flex-col items-center cursor-pointer rounded-lg transition-transform duration-100 ${
-                        isSelected
-                          ? "outline outline-[2px] outline-[#5FD59B] shadow-[0_0_10px_#5FD59B]"
-                          : ""
-                      }`}
+                      className={`relative flex flex-col items-center cursor-pointer rounded-lg transition-transform duration-100 ${isSelected ? "outline-[2px] outline-[#5FD59B] shadow-[0_0_10px_#5FD59B]" : ""}`}
                       onClick={() => {
                         if (!b.isActive) return;
                         if (isRepresentative) return;
@@ -440,9 +420,7 @@ export default function MyPage() {
                       <img
                         src={`${import.meta.env.VITE_API_URL}${b.imageUrl}`}
                         alt={b.name}
-                        className={`w-28 h-28 object-contain rounded-lg ${
-                          b.isActive ? "" : "filter grayscale"
-                        }`}
+                        className={`w-28 h-28 object-contain rounded-lg ${b.isActive ? "" : "filter grayscale"}`}
                       />
                       {isSelected && (
                         <div className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center bg-[#5FD59B]">
