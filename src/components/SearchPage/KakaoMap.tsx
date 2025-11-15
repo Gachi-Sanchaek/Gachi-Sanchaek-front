@@ -18,8 +18,12 @@ interface KakaoMapProps {
 
 const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.80448486831264, initialLevel = 3, selectedCategory, setShowBottomSheet, setPlaces, setSelectedPlace, mapRefExternal, markersRefExternal }: KakaoMapProps) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+
   const myLocationMarkerRef = useRef<kakao.maps.CustomOverlay | null>(null);
+
+  // 지도에 표시 중인 마커 배열
   const markersRef = useRef<kakao.maps.Marker[]>([]);
+
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   /* -------------------------------------------------------------
@@ -31,7 +35,7 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
 
       if (!mapContainerRef.current) return;
 
-      // 이미 생성된 지도 있으면 재생성하지 않음
+      // 지도 최초 생성
       if (!mapRefExternal.current) {
         const map = new kakao.maps.Map(mapContainerRef.current, {
           center: new kakao.maps.LatLng(initialLat, initialLng),
@@ -56,16 +60,21 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
   }, [initialLat, initialLng, initialLevel]);
 
   /* -------------------------------------------------------------
-    2) 위치 권한 요청 (지도와 별도)
+    2) 위치 권한 요청
   -------------------------------------------------------------- */
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setMyLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setMyLocation({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
       },
       () => {
-        // 권한 거부 → 초기 좌표 사용
-        setMyLocation({ lat: initialLat, lng: initialLng });
+        setMyLocation({
+          lat: initialLat,
+          lng: initialLng,
+        });
       }
     );
   }, []);
@@ -75,7 +84,8 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
   -------------------------------------------------------------- */
   const createMyLocationMarker = (lat: number, lng: number) => {
     const { kakao } = window;
-    if (!mapRefExternal.current) return;
+    const map = mapRefExternal.current;
+    if (!map) return;
 
     const position = new kakao.maps.LatLng(lat, lng);
 
@@ -96,12 +106,12 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
       yAnchor: 0.5,
     });
 
-    overlay.setMap(mapRefExternal.current);
+    overlay.setMap(map);
     myLocationMarkerRef.current = overlay;
   };
 
   /* -------------------------------------------------------------
-    4) myLocation이 준비되면 지도 center 이동 + 내 위치 마커 표시
+    4) 내 위치가 준비되면 지도 이동 + 내 위치 마커 표시
   -------------------------------------------------------------- */
   useEffect(() => {
     if (!myLocation || !mapRefExternal.current) return;
@@ -118,13 +128,16 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
   -------------------------------------------------------------- */
   const createPlaceMarker = (place: Place) => {
     const { kakao } = window;
-    if (!mapRefExternal.current) return;
-
     const map = mapRefExternal.current;
-    const type = markerType(selectedCategory);
+    if (!map) return;
 
-    const normalMarkerImg = type ? new kakao.maps.MarkerImage(type, new kakao.maps.Size(40, 40)) : undefined;
-    const selectedMarkerImg = type ? new kakao.maps.MarkerImage(type, new kakao.maps.Size(50, 50)) : undefined;
+    const typeImgUrl = markerType(selectedCategory);
+
+    // normal marker image
+    const normalMarkerImg = typeImgUrl ? new kakao.maps.MarkerImage(typeImgUrl, new kakao.maps.Size(40, 40)) : undefined;
+
+    // selected marker image
+    const selectedMarkerImg = typeImgUrl ? new kakao.maps.MarkerImage(typeImgUrl, new kakao.maps.Size(50, 50)) : undefined;
 
     const marker = new kakao.maps.Marker({
       position: new kakao.maps.LatLng(place.latitude, place.longitude),
@@ -135,9 +148,16 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
     markersRef.current.push(marker);
     markersRefExternal.current = markersRef.current;
 
+    // 클릭 이벤트
     kakao.maps.event.addListener(marker, 'click', () => {
-      markersRef.current.forEach((m) => m.setImage(normalMarkerImg || ''));
+      // 기존 모든 마커를 normal 이미지로
+      markersRef.current.forEach((m) => {
+        m.setImage(normalMarkerImg || '');
+      });
+
+      // 현재 클릭된 마커만 selected 이미지로
       marker.setImage(selectedMarkerImg || '');
+
       map.panTo(marker.getPosition());
 
       setSelectedPlace(place);
@@ -146,13 +166,21 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
   };
 
   /* -------------------------------------------------------------
-    6) myLocation + category 변경 시 기관 데이터 로드
+    6) category + myLocation 변경 시 API 호출 + 마커 재생성
   -------------------------------------------------------------- */
   useEffect(() => {
     if (!myLocation) return;
 
     const isValidCategory = selectedCategory === '동행 산책' || selectedCategory === '유기견 산책';
-    if (!isValidCategory) return;
+
+    if (!isValidCategory) {
+      // ❗ 카테고리가 다른 값이면 마커 삭제만 하고 종료
+      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current = [];
+      markersRefExternal.current = [];
+      setPlaces([]);
+      return;
+    }
 
     const params = {
       lat: myLocation.lat,
@@ -165,12 +193,16 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
       try {
         const res = await getNearbyPlaces(params);
         const data = res?.data || [];
+
+        // 리스트 저장
         setPlaces(data);
 
         // 기존 마커 제거
         markersRef.current.forEach((m) => m.setMap(null));
         markersRef.current = [];
+        markersRefExternal.current = [];
 
+        // 새 마커 생성
         data.forEach((place) => createPlaceMarker(place));
       } catch (err) {
         console.error('기관 데이터 로드 오류:', err);
@@ -180,6 +212,9 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
     fetchPlaces();
   }, [myLocation, selectedCategory]);
 
+  /* -------------------------------------------------------------
+    7) UI
+  -------------------------------------------------------------- */
   return (
     <div className='relative w-full h-[calc(100dvh-48px)]'>
       <div ref={mapContainerRef} className='w-full h-full' />
