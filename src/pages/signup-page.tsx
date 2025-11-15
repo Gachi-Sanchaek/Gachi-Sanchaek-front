@@ -38,7 +38,7 @@ const SignUp = () => {
       ""
     );
 
-    if (filteredValue.length > 8) {
+    if (filteredValue.length > 7) {
       setShake(true);
       setTimeout(() => setShake(false), 300);
       return;
