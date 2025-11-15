@@ -1,3 +1,7 @@
+export interface ResponseRefreshTokenResponse {
+  accessToken: string;
+}
+
 export interface UserProfile {
   profileImageUrl: string;
   nickname: string;
