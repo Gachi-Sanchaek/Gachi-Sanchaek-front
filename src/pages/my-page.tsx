@@ -17,6 +17,7 @@ import { checkNickname, updateUserProfile } from "../apis/user";
 import Modal from "../components/common/Modal";
 import WarningModal from "../components/common/Modal";
 import type { CheckNicknameResponse } from "../types/user";
+import { walkAuthType } from "../utils/walkType";
 
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState<"points" | "stamps">("points");
@@ -72,7 +73,7 @@ export default function MyPage() {
     try {
       const response: CheckNicknameResponse = await checkNickname(newNickname);
       if (response.isAvailable) {
-        setIsModalOpen(true); // 가능하면 바로 모달 띄움
+        setIsModalOpen(true);
       } else {
         setIsWarningOpen(true);
       }
@@ -399,7 +400,7 @@ export default function MyPage() {
                           </span>
                           <div className="flex flex-col flex-1 ml-2 justify-center">
                             <span className="font-medium text-[16px]">
-                              {p.title}
+                              {walkAuthType(p.title)}
                             </span>
                             <span className="text-[#BDBDBD] text-[14px]">
                               {p.location.length > 15
