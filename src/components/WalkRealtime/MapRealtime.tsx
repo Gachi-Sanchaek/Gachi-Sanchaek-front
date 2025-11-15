@@ -17,6 +17,7 @@ type MapRealtimeProps = {
   onPathUpdate?: (path: { lat: number; lng: number }[]) => void;
   width?: string | number;
   height?: string | number;
+  aiRoute?: { lat: number; lng: number }[] | null;//루트 표시용
 };
 
 function MapRealtime({
@@ -25,6 +26,7 @@ function MapRealtime({
   onPathUpdate,
   width = "100%",
   height = 400,
+  aiRoute,
 }: MapRealtimeProps) {
   const el = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<kakao.maps.Map | null>(null);
@@ -46,10 +48,10 @@ function MapRealtime({
     kakao.maps.load(() => {
       if (!el.current || mapRef.current) return;
 
-      const fallback = new kakao.maps.LatLng( //위치권한 없을때 가톨릭대 
+      const fallback = new kakao.maps.LatLng( //위치권한 없을때 가톨릭대
         37.485993139336074,
         126.80448486831264
-      ); 
+      );
       const map = new kakao.maps.Map(el.current, {
         center: fallback,
         level: 3,
@@ -77,6 +79,30 @@ function MapRealtime({
       }
     };
   }, []);
+
+  //AI 경로 표시
+  useEffect(() => {
+    if (!aiRoute || !aiRoute.length) return;
+    if (!mapRef.current) return;
+
+    const { kakao } = window;
+
+    const path = aiRoute.map(
+      (p: { lat: number; lng: number }) => new kakao.maps.LatLng(p.lat, p.lng)
+    );
+
+    const aiLine = new kakao.maps.Polyline({
+      path,
+      strokeWeight: 6,
+      strokeColor: "#BEF4D6", // 연한 연두색
+      strokeOpacity: 0.6,
+      strokeStyle: "solid",
+    });
+
+    aiLine.setMap(mapRef.current);
+
+    return () => aiLine.setMap(null);
+  }, [aiRoute]);
 
   //실시간 위치추적
   useEffect(() => {
@@ -109,12 +135,14 @@ function MapRealtime({
             pathRef.current.map((p) => ({ lat: p.getLat(), lng: p.getLng() }))
           );
         },
-        () =>  {if (!alertShownRef.current) {
-          alert("현재 위치를 불러올 수 없어 기본 위치로 표시됩니다.");
-          console.log("위치 권한이 필요합니다.");
-          alertShownRef.current = true;
-        }},
-          
+        () => {
+          if (!alertShownRef.current) {
+            alert("현재 위치를 불러올 수 없어 기본 위치로 표시됩니다.");
+            console.log("위치 권한이 필요합니다.");
+            alertShownRef.current = true;
+          }
+        },
+
         { enableHighAccuracy: true, maximumAge: 1000, timeout: 3000 }
       );
     };
