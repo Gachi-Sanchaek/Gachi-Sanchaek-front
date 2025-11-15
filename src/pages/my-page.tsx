@@ -55,13 +55,15 @@ export default function MyPage() {
       ""
     );
 
-    if (filteredValue.length > 8) {
+    if (filteredValue.length > 7) {
       setShake(true);
       setTimeout(() => setShake(false), 300);
       return;
     }
 
     setNewNickname(filteredValue);
+    setIsModalOpen(false);
+    setIsWarningOpen(false);
   };
 
   const handleCheckNickname = async () => {
@@ -225,22 +227,22 @@ export default function MyPage() {
                 />
               </button>
             </div>
-            <div className="ml-2 flex items-center">
+            <div className="ml-2 flex items-center w-[calc(100%-60px)]">
               {isEditing ? (
                 <input
                   ref={inputRef}
                   value={newNickname}
                   onChange={(e) => handleNicknameChange(e.target.value)}
-                  className={`text-white font-[PretendardVariable] font-medium text-[22px] bg-transparent border-none outline-none caret-white ${
+                  className={`text-white font-[PretendardVariable] font-medium text-[22px] bg-transparent border-none outline-none caret-white w-full ${
                     shake ? "shake" : ""
                   }`}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") setIsModalOpen(true);
+                    if (e.key === "Enter") handleCheckNickname();
                     if (e.key === "Escape") setIsEditing(false);
                   }}
                 />
               ) : (
-                <h2 className="text-white font-[PretendardVariable] font-medium text-[22px]">
+                <h2 className="text-white font-[PretendardVariable] font-medium text-[22px] w-full">
                   {profile?.nickname}님
                 </h2>
               )}
