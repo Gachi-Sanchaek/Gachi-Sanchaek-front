@@ -212,9 +212,6 @@ const KakaoMap = ({ initialLat = 37.485993139336074, initialLng = 126.8044848683
     fetchPlaces();
   }, [myLocation, selectedCategory]);
 
-  /* -------------------------------------------------------------
-    7) UI
-  -------------------------------------------------------------- */
   return (
     <div className='relative w-full h-[calc(100dvh-48px)]'>
       <div ref={mapContainerRef} className='w-full h-full' />
