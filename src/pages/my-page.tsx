@@ -13,15 +13,19 @@ import { getPointLog } from "../apis/point";
 import { useUserStore } from "../store/UserStore";
 import type { Bonggong } from "../types/bonggong";
 import { getBonggongs } from "../apis/bonggong";
-import { updateUserProfile } from "../apis/user";
+import { checkNickname, updateUserProfile } from "../apis/user";
 import Modal from "../components/common/Modal";
+import WarningModal from "../components/common/Modal";
+import type { CheckNicknameResponse } from "../types/user";
 
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState<"points" | "stamps">("points");
   const { profile, error, updateProfile } = useUserStore();
   const [isEditing, setIsEditing] = useState(false);
+  const [shake, setShake] = useState(false);
   const [newNickname, setNewNickname] = useState(profile?.nickname || "");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [selectedBonggong, setSelectedBonggong] = useState<number | null>(null);
   const [representBonggong, setRepresentBonggong] = useState<string>("");
   const [bonggongs, setBonggongs] = useState<Bonggong[]>([]);
@@ -39,9 +43,40 @@ export default function MyPage() {
 
   const handleEditClick = () => {
     if (isEditing) {
-      setIsModalOpen(true);
+      handleCheckNickname();
     } else {
       setIsEditing(true);
+    }
+  };
+
+  const handleNicknameChange = (value: string) => {
+    const filteredValue = value.replace(
+      /[^a-zA-Z0-9\u3131-\u318E\uAC00-\uD7A3]/g,
+      ""
+    );
+
+    if (filteredValue.length > 8) {
+      setShake(true);
+      setTimeout(() => setShake(false), 300);
+      return;
+    }
+
+    setNewNickname(filteredValue);
+  };
+
+  const handleCheckNickname = async () => {
+    if (!newNickname.trim()) return;
+
+    try {
+      const response: CheckNicknameResponse = await checkNickname(newNickname);
+      if (response.isAvailable) {
+        setIsModalOpen(true); // 가능하면 바로 모달 띄움
+      } else {
+        setIsWarningOpen(true);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("닉네임 중복 검사 중 오류가 발생했습니다.");
     }
   };
 
@@ -195,8 +230,10 @@ export default function MyPage() {
                 <input
                   ref={inputRef}
                   value={newNickname}
-                  onChange={(e) => setNewNickname(e.target.value)}
-                  className="text-white font-[PretendardVariable] font-medium text-[22px] bg-transparent border-none outline-none caret-white"
+                  onChange={(e) => handleNicknameChange(e.target.value)}
+                  className={`text-white font-[PretendardVariable] font-medium text-[22px] bg-transparent border-none outline-none caret-white ${
+                    shake ? "shake" : ""
+                  }`}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") setIsModalOpen(true);
                     if (e.key === "Escape") setIsEditing(false);
@@ -428,7 +465,7 @@ export default function MyPage() {
           )}
           {isModalOpen && (
             <Modal
-              title={`닉네임을 "${newNickname}"로 바꾸시겠습니까?`}
+              title={`닉네임을 "${newNickname}"(으)로 바꾸시겠습니까?`}
               buttons={[
                 {
                   text: "취소",
@@ -439,6 +476,18 @@ export default function MyPage() {
                   text: "확인",
                   onClick: handleConfirmChange,
                   variant: "green",
+                },
+              ]}
+            />
+          )}
+          {isWarningOpen && (
+            <WarningModal
+              title={`이미 사용중인 닉네임입니다.`}
+              buttons={[
+                {
+                  text: "확인",
+                  onClick: () => setIsWarningOpen(false),
+                  variant: "gray",
                 },
               ]}
             />
