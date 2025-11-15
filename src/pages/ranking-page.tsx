@@ -256,14 +256,14 @@ export default function RankingPage() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center flex-1 font-[PretendardVariable] font-medium">
+            <div className="flex flex-col justify-center flex-1 font-[PretendardVariable] font-semibold">
               <span className="text-[13px]">{profile?.nickname}</span>
               <span className="text-[13px] text-[#BDBDBD]">
                 {myRanking?.ranking ?? "- "}위
               </span>
             </div>
             <div className="flex justify-end">
-              <span className="bg-[#5FD59B] text-[#FFFFFF] text-[12px] px-3.5 py-0.5 rounded-full font-[PretendardVariable] font-light">
+              <span className="bg-[#5FD59B] text-[#FFFFFF] text-[12px] px-3.5 py-0.5 rounded-full font-[PretendardVariable] font-normal">
                 {myRanking?.point.toLocaleString() ?? 0}P
               </span>
             </div>
@@ -312,16 +312,16 @@ export default function RankingPage() {
                         style={{ width: size, height: size }}
                       />
                       <div
-                        className={`absolute top-0 left-0 w-6 h-6 rounded-full text-[#FFFFFF] font-[PretendardVariable] flex items-center justify-center ${rankColor[rankNum]}`}
+                        className={`absolute top-0 left-0 w-6 h-6 rounded-full text-[#FFFFFF] font-[PretendardVariable] font-semibold flex items-center justify-center ${rankColor[rankNum]}`}
                       >
                         {rankNum}
                       </div>
                     </div>
 
-                    <span className="font-[PretendardVariable] font-medium text-[15px] text-[#FFFFFF] mt-1 ">
+                    <span className="font-[PretendardVariable] font-semibold text-[15px] text-[#FFFFFF] mt-1 ">
                       {user.nickname}
                     </span>
-                    <span className="bg-[#FFFFFF]/30 text-[#FFFFFF] text-[12px] px-3.5 py-0.5 rounded-full font-[PretendardVariable] font-light">
+                    <span className="bg-[#FFFFFF]/30 text-[#FFFFFF] text-[12px] px-3.5 py-0.5 rounded-full font-[PretendardVariable] font-normal">
                       {user.point.toLocaleString()}P
                     </span>
                   </div>
@@ -344,7 +344,7 @@ export default function RankingPage() {
                 key={`${user.ranking}-${idx}`}
                 className="flex items-center justify-between py-2"
               >
-                <span className="w-6 text-[16px] font-[PretendardVariable] font-medium text-[#BDBDBD] ml-4">
+                <span className="w-6 text-[16px] font-[PretendardVariable] font-semibold text-[#BDBDBD] ml-4">
                   {user.ranking}
                 </span>
 
@@ -356,12 +356,12 @@ export default function RankingPage() {
                       className="w-13 h-13 rounded-full"
                     />
                   </div>
-                  <span className="font-[PretendardVariable] font-medium text-[16px]">
+                  <span className="font-[PretendardVariable] font-semibold text-[16px]">
                     {user.nickname}
                   </span>
                 </div>
 
-                <span className="bg-[#5FD59B] text-white text-[12px] px-3 py-0.5 rounded-full font-[PretendardVariable] font-light">
+                <span className="bg-[#5FD59B] text-white text-[12px] px-3 py-0.5 rounded-full font-[PretendardVariable] font-normal">
                   {user.point.toLocaleString()}P
                 </span>
               </div>

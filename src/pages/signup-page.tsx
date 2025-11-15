@@ -3,10 +3,13 @@ import { Check } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../apis/axios";
+import close from "../assets/close.svg";
+import { checkNickname } from "../apis/user";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
+  const [shake, setShake] = useState(false);
   const [isNicknameValid, setIsNicknameValid] = useState<boolean | null>(null);
   const [nicknameChecked, setNicknameChecked] = useState(false);
 
@@ -17,11 +20,8 @@ const SignUp = () => {
     if (!nickname.trim()) return;
 
     try {
-      const response = await axiosInstance.get("/api/v1/users/check-nickname", {
-        params: { nickname },
-      });
-      console.log("닉네임 중복 응답:", response.data);
-      const available = response.data?.data?.isAvailable ?? false;
+      const response = await checkNickname(nickname);
+      const available = response.isAvailable ?? false;
       setIsNicknameValid(available);
     } catch (error) {
       console.error("닉네임 중복 검사 실패:", error);
@@ -37,6 +37,13 @@ const SignUp = () => {
       /[^a-zA-Z0-9\u3131-\u318E\uAC00-\uD7A3]/g,
       ""
     );
+
+    if (filteredValue.length > 8) {
+      setShake(true);
+      setTimeout(() => setShake(false), 300);
+      return;
+    }
+
     setNickname(filteredValue);
     setNicknameChecked(false);
     setIsNicknameValid(null);
@@ -102,37 +109,46 @@ const SignUp = () => {
           </div>
         </label>
         <div className="flex gap-2 mt-1 mb-1">
-          <input
-            type="text"
-            placeholder="닉네임을 입력하세요"
-            value={nickname}
-            onChange={(e) => handleNicknameChange(e.target.value)}
-            className={`flex-1 min-w-0 px-3 py-3 rounded-lg font-[PretendardVariable] font-medium text-[16px] border ${
-              nicknameChecked && isNicknameValid
-                ? "border-[#5FD59B]"
-                : "border-[#F5F5F5]"
-            } focus:outline-none focus:ring-2 focus:ring-green-400`}
-          />
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="닉네임을 입력하세요"
+              value={nickname}
+              onChange={(e) => handleNicknameChange(e.target.value)}
+              className={`flex-1 min-w-0 w-full pr-8 px-3 py-3 rounded-lg font-[PretendardVariable] font-medium text-[16px] border ${
+                nicknameChecked && isNicknameValid
+                  ? "border-[#5FD59B]"
+                  : "border-[#F5F5F5]"
+              } focus:outline-none focus:ring-2 focus:ring-green-400 ${shake ? "shake" : ""}`}
+            />
+            {nickname.length > 0 && (
+              <button
+                onClick={() => setNickname("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                <img src={close} alt="초기화" />
+              </button>
+            )}
+          </div>
+
           <button
             type="button"
             onClick={handleCheckNickname}
-            disabled={!nickname.trim() || nicknameChecked}
+            disabled={nickname.length < 1 || nicknameChecked}
             className={`w-[72px] flex-shrink-0 bg-[#5FD59B] text-white text-[16px] rounded-lg active:brightness-98 transition-colors
             }`}
           >
             중복확인
           </button>
         </div>
-        {nicknameChecked && isNicknameValid && (
-          <p className="text-[#5FD59B] text-[13px]">
-            사용 가능한 닉네임입니다.
-          </p>
-        )}
-        {nicknameChecked && !isNicknameValid && (
-          <p className="text-red-500 text-[13px]">
-            사용 불가능한 닉네임입니다.
-          </p>
-        )}
+        <div className="h-[18px] mb-1 text-[13px]">
+          {nicknameChecked && isNicknameValid && (
+            <p className="text-[#5FD59B]">사용 가능한 닉네임입니다.</p>
+          )}
+          {nicknameChecked && !isNicknameValid && (
+            <p className="text-red-500">사용 불가능한 닉네임입니다.</p>
+          )}
+        </div>
 
         <label className="flex items-center gap-2 pt-10 font-[PretendardVariable] font-medium text-[16px] pt-8">
           성별

@@ -4,6 +4,7 @@ import type {
   UserProfileResponse,
   UserRankingResponse,
   UserRankingItem,
+  CheckNicknameResponse,
 } from "../types/user";
 import { useUserStore } from "../store/UserStore";
 
@@ -51,4 +52,15 @@ export const getTopRanking = async (
   console.log(response);
 
   return response.data.data || [];
+};
+
+export const checkNickname = async (
+  nickname: string
+): Promise<CheckNicknameResponse> => {
+  const response = await axiosInstance.get("/api/v1/users/check-nickname", {
+    params: { nickname },
+  });
+  console.log(response);
+
+  return response.data?.data;
 };
