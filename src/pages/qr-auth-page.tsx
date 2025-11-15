@@ -69,13 +69,13 @@ function QRAuthPage() {
     else {
       // 라우팅 상태로 전달받은 값 가져오기
       const totalDistance = loc.state.totalDistance;
-      const totalMinutes = loc.state.totalMinutes;
+      const totalSeconds = loc.state.totalSeconds;
 
       try {
         const data = await patchWalkFinish({
           walkId,
           totalDistance,
-          totalMinutes,
+          totalSeconds,
         });
 
         if (data.status === 200) {
