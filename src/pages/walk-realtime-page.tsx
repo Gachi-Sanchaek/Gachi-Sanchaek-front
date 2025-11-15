@@ -7,16 +7,19 @@ import { patchWalkFinish } from '../apis/walk';
 import pauseIcon from '/src/assets/stop.svg';
 import playIcon from "/src/assets/play.svg";
 import finishIcon from "/src/assets/finish.svg";
+import { useLocation } from "react-router-dom";
 
 export default function WalkRealtimePage() {
   const navigate = useNavigate();
   const { selectedCategory } = CategoryStore();
-  //const isPlogging = selectedCategory === "플로깅";
 
   const [tracking, setTracking] = useState(true);
   const [elapsed, setElapsed] = useState(0);
   const [distanceKm, setDistanceKm] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const location = useLocation();
+  const aiRoute = location.state?.aiRoute ?? null;
 
   //타이머
   useEffect(() => {
@@ -56,7 +59,7 @@ export default function WalkRealtimePage() {
 
     const walkResult = {
       totalDistance: Number(distanceKm),
-      totalMinutes: Math.floor(elapsed / 60),
+      totalSeconds: elapsed,
     };
 
     if (selectedCategory === '산책') {
@@ -64,7 +67,7 @@ export default function WalkRealtimePage() {
         const res = await patchWalkFinish({
           walkId,
           totalDistance: Number(distanceKm),
-          totalMinutes: Math.floor(elapsed / 60),
+          totalSeconds: elapsed,
         });
 
         const finishData = res.data;
@@ -106,6 +109,7 @@ export default function WalkRealtimePage() {
           onStatsChange={handleStats}
           width="100%"
           height="100%"
+          aiRoute={aiRoute}
         />
       </div>
 

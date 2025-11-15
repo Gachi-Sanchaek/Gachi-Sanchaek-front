@@ -79,9 +79,12 @@ export default function WalkRoutePage() {
         selectedCategory === "유기견 산책" ||
         selectedCategory === "동행 산책"
       ) {
-        navigate("/qr-auth");
+        navigate("/qr-auth", { state: { aiRoute: current.waypoints } }); //qr로 경로보냄
+        /* state: {
+          aiRoute: current.waypoints;
+        } */
       } else {
-        navigate("/walk/realtime");
+        navigate("/walk/realtime", { state: { aiRoute: current.waypoints } });
       }
     } catch (error) {
       console.error("산책 시작 실패:", error);
