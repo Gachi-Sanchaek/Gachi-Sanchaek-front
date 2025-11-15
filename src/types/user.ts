@@ -35,3 +35,8 @@ export type UserRankingItem = {
 };
 
 export type UserRankingResponse = UserRankingItem | null;
+
+export interface CheckNicknameResponse {
+  nickname: string;
+  isAvailable: boolean;
+}
