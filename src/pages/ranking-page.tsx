@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Background from "../components/Background";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
+import infoIcon from "../assets/inform.svg";
+import closeIcon from "../assets/close-white.svg";
 import dayjs, { Dayjs } from "dayjs";
 import { getTopRanking, getUserRanking } from "../apis/user";
 import type { UserRankingItem } from "../types/user";
@@ -20,6 +21,7 @@ export default function RankingPage() {
   const { profile } = useUserStore();
   const [myRanking, setMyRanking] = useState<UserRankingItem | null>(null);
   const [topRankings, setTopRankings] = useState<UserRankingItem[]>([]);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -189,28 +191,58 @@ export default function RankingPage() {
       whiteBgColor="#FFFFFF"
       greenChildren={
         <div className="p-5 pt-0 flex flex-col justify-between h-[50%] w-full">
-          <div className="flex justify-center items-center">
-            <button onClick={handlePrevWeek} className="p-2">
-              <ChevronLeft className="text-white" size={24} />
-            </button>
-            <span className="text-white text-[16px] mx-6">
-              {formattedWeek()}
-            </span>
+          <div className="flex items-center w-full px-4 relative">
+            <div className="flex justify-center items-center flex-1">
+              <button onClick={handlePrevWeek} className="p-2">
+                <ChevronLeft className="text-white" size={24} />
+              </button>
+              <span className="text-white text-[16px] mx-6">
+                {formattedWeek()}
+              </span>
+              <button
+                onClick={!isNextDisabled ? handleNextWeek : undefined}
+                className="p-2"
+                disabled={isNextDisabled}
+              >
+                <ChevronRight
+                  className={
+                    isNextDisabled
+                      ? "text-white/50 cursor-not-allowed"
+                      : "text-white"
+                  }
+                  size={24}
+                />
+              </button>
+            </div>
             <button
-              onClick={!isNextDisabled ? handleNextWeek : undefined}
-              className="p-2"
-              disabled={isNextDisabled}
+              onClick={() => setIsInfoOpen(true)}
+              className="absolute right-0"
             >
-              <ChevronRight
-                className={
-                  isNextDisabled
-                    ? "text-white/50 cursor-not-allowed"
-                    : "text-white"
-                }
-                size={24}
+              <img
+                src={infoIcon}
+                alt="정보 아이콘"
+                className="w-5 h-5 mt-0.5"
               />
             </button>
           </div>
+
+          {isInfoOpen && (
+            <div className="absolute top-9 right-5 bg-[#000000]/80 rounded-md pl-3 pr-4 py-2 text-center shadow-lg z-50">
+              <button
+                onClick={() => setIsInfoOpen(false)}
+                className="absolute top-3 right-3"
+              >
+                <img src={closeIcon} alt="닫기 버튼" className="w-2 h-2" />
+              </button>
+              <p className="font-[PretendardVariable] font-light text-[12px] text-[#FFFFFF]">
+                이번 주에 모은 포인트로 순위가 정해져요. 🌿
+                <br />
+                매주 일요일 0시에 새로운 랭킹이 시작됩니다.
+                <br />
+                같은 점수라면, 더 빨리 포인트를 얻은 사람이 앞에 표시돼요.
+              </p>
+            </div>
+          )}
 
           <div className="mt-2 w-full h-[70px] flex-shrink-0 bg-[#FFFFFF]/80 rounded-2xl flex items-center shadow-[0_0_5px_0_rgba(0,0,0,0.2)] px-4">
             <div className="relative w-[50px] h-[50px] bg-[#FFFFFF] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_3px_0_rgba(0,0,0,0.1)] mr-3">
@@ -232,7 +264,7 @@ export default function RankingPage() {
             </div>
             <div className="flex justify-end">
               <span className="bg-[#5FD59B] text-[#FFFFFF] text-[12px] px-3.5 py-0.5 rounded-full font-[PretendardVariable] font-light">
-                {myRanking?.point ?? 0}P
+                {myRanking?.point.toLocaleString() ?? 0}P
               </span>
             </div>
           </div>
