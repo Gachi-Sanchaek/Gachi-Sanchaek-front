@@ -19,7 +19,7 @@ export type WalkStartResponse = CommonWalkResponse<WalkStartData>;
 export type WalkFinishRequest = {
   walkId: number;
   totalDistance: number;
-  totalMinutes: number;
+  totalSeconds: number;
 };
 
 export type WalkFinishData = {
@@ -27,7 +27,7 @@ export type WalkFinishData = {
   status: string;
   nickname: string;
   totalDistance: number;
-  totalMinutes: number;
+  totalTime: string;
   pointsEarned: number;
   walkingCount: number;
   message: string;
