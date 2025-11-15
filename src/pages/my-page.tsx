@@ -137,20 +137,14 @@ export default function MyPage() {
       greenChildren={
         <div className="p-5 pt-2">
           <div className="flex items-center mt-4">
-            <div
-              className="w-[50px] h-[50px] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]"
-              style={{ backgroundColor: "#FFFFFF" }}
-            >
+            <div className="w-[50px] h-[50px] bg-[#FFFFFF] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
               <img
                 src={`${import.meta.env.VITE_API_URL}${profile?.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
             </div>
-            <h2
-              className="ml-2 font-[PretendardVariable]"
-              style={{ color: "#FFFFFF", fontSize: "24px" }}
-            >
+            <h2 className="ml-2 font-[PretendardVariable] font-medium text-[22px] text-[#FFFFFF]">
               {profile?.nickname}님
             </h2>
           </div>
@@ -300,7 +294,7 @@ export default function MyPage() {
                           key={p.date}
                           className="flex justify-between h-16 items-center font-[PretendardVariable]"
                         >
-                          <span className="text-[#BDBDBD] text-[16px] w-15">
+                          <span className="text-[#BDBDBD] font-semibold text-[16px] w-15">
                             {formattedDate}
                           </span>
                           <div className="flex flex-col flex-1 ml-2 justify-center">
@@ -313,8 +307,8 @@ export default function MyPage() {
                                 : p.location}
                             </span>
                           </div>
-                          <span className="text-[#5FD59B] text-[16px] font-medium">
-                            {p.amount}P
+                          <span className="text-[#5FD59B] text-[16px] font-semibold">
+                            {p.amount.toLocaleString()}P
                           </span>
                         </div>
                       );

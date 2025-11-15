@@ -1,5 +1,7 @@
 import Background from "../components/Background";
 import walkBonggong from "../assets/images/4_걷는봉공.png";
+import polygon from "../assets/reverse-polygon.svg";
+import rightArrow from "../assets/right-arrow.svg";
 import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -167,17 +169,18 @@ const Home = () => {
                 className="w-[50px] h-[50px] rounded-full"
               />
             </div>
-            <h2 className="ml-2 font-[PretendardVariable] text-[24px] text-[#FFFFFF]">
-              {profile.nickname}님
-            </h2>
-            <ChevronRight
-              size={30}
-              color="#FFFFFF"
+            <div
+              className="flex items-center justify-center"
               onClick={() => navigate("/mypage")}
-            />
+            >
+              <h2 className="ml-2 font-[PretendardVariable] font-medium text-[22px] text-[#FFFFFF]">
+                {profile.nickname}님
+              </h2>
+              <img src={rightArrow} className="w-5.5 ml-0.5" />
+            </div>
           </div>
 
-          <div className="absolute left-0 bottom-[58.5vh] flex justify-center w-full px-4 mt-25 overflow-visible">
+          <div className="absolute left-0 bottom-[58vh] flex justify-center w-full px-4 mt-25 overflow-visible">
             <div className="bg-[#FFFFFF] w-full h-4 rounded-full">
               <div
                 className="bg-[#FFEC8A] h-full rounded-full transition-all duration-500"
@@ -195,7 +198,7 @@ const Home = () => {
                 />
               ))}
             </div>
-            <div className="absolute top-full w-full flex justify-between text-sm mt-2 px-4">
+            <div className="absolute top-full w-full flex justify-between font-[PretendardVariavle] font-semibold text-[14px] mt-2 px-4">
               <span></span>
               <span className="text-right text-[#FFFFFF]">
                 {nextPoints.toLocaleString()}P
@@ -214,9 +217,14 @@ const Home = () => {
                 className="w-[80px] h-[80px]"
               />
 
-              <div className="absolute top-[-10px] left-1/2 transform -translate-x-1/2 text-xs px-2 py-0.5 rounded-md font-medium bg-[#FFFFFF] text-[#5FD59B]">
+              <div className="absolute top-[-25px] left-1/2 transform -translate-x-1/2 text-xs px-2 py-1 rounded-md font-[PretendardVariable] font-normal bg-[#FFFFFF] text-[#5FD59B] text-[13px]">
                 {currentPoints.toLocaleString()}
               </div>
+              <img
+                src={polygon}
+                alt="말풍선"
+                className="absolute top-[0px] left-1/2 transform -translate-x-1/2 w-2"
+              />
             </div>
           </div>
         </div>
@@ -233,7 +241,7 @@ const Home = () => {
             </div>
 
             <button
-              className="bg-[#5FD59B] w-full text-white py-2 rounded-lg font-[PretendardVariable] text-sm font-medium"
+              className="bg-[#5FD59B] w-full text-white py-2 rounded-lg font-[PretendardVariable] text-[14px] font-semibold"
               onClick={() => {
                 navigate("/search");
               }}
