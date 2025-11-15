@@ -3,8 +3,9 @@ import vector from "../assets/vector.svg";
 import coin from "../assets/coin.svg";
 import polygon from "../assets/polygon.svg";
 import lock from "../assets/lock.svg";
+import pen from "../assets/pen.svg";
 import sadBonggong from "../assets/images/not_found_bonggong.png";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
 import type { PointLogItem } from "../types/point";
@@ -12,17 +13,52 @@ import { getPointLog } from "../apis/point";
 import { useUserStore } from "../store/UserStore";
 import type { Bonggong } from "../types/bonggong";
 import { getBonggongs } from "../apis/bonggong";
+import { updateUserProfile } from "../apis/user";
+import Modal from "../components/common/Modal";
 
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState<"points" | "stamps">("points");
   const { profile, error, updateProfile } = useUserStore();
+  const [isEditing, setIsEditing] = useState(false);
+  const [newNickname, setNewNickname] = useState(profile?.nickname || "");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBonggong, setSelectedBonggong] = useState<number | null>(null);
   const [representBonggong, setRepresentBonggong] = useState<string>("");
   const [bonggongs, setBonggongs] = useState<Bonggong[]>([]);
   const [pointLogs, setPointLogs] = useState<PointLogItem[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>("전체");
+  const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing]);
+
+  const handleEditClick = () => {
+    if (isEditing) {
+      setIsModalOpen(true);
+    } else {
+      setIsEditing(true);
+    }
+  };
+
+  const handleConfirmChange = async () => {
+    setIsModalOpen(false);
+    try {
+      const updated = await updateUserProfile({
+        nickname: newNickname,
+        profileImageUrl: profile?.profileImageUrl,
+      });
+      updateProfile(updated);
+      setIsEditing(false);
+    } catch (err) {
+      console.error("닉네임 변경 실패:", err);
+      alert("닉네임 변경 중 오류가 발생했습니다.");
+    }
+  };
 
   const sortedPointHistory = [...pointLogs].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -137,16 +173,41 @@ export default function MyPage() {
       greenChildren={
         <div className="p-5 pt-2">
           <div className="flex items-center mt-4">
-            <div className="w-[50px] h-[50px] bg-[#FFFFFF] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
+            <div className="relative w-[50px] h-[50px] bg-[#FFFFFF] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
               <img
                 src={`${import.meta.env.VITE_API_URL}${profile?.profileImageUrl}`}
                 alt="프로필 봉공"
                 className="w-[50px] h-[50px] rounded-full"
               />
+              <button
+                onClick={handleEditClick}
+                className="absolute bottom-0 right-0 w-4 h-4 flex items-center justify-center"
+              >
+                <img
+                  src={pen}
+                  alt="수정펜"
+                  className={isEditing ? "grayscale" : "opacity-100"}
+                />
+              </button>
             </div>
-            <h2 className="ml-2 font-[PretendardVariable] font-medium text-[22px] text-[#FFFFFF]">
-              {profile?.nickname}님
-            </h2>
+            <div className="ml-2 flex items-center">
+              {isEditing ? (
+                <input
+                  ref={inputRef}
+                  value={newNickname}
+                  onChange={(e) => setNewNickname(e.target.value)}
+                  className="text-white font-[PretendardVariable] font-medium text-[22px] bg-transparent border-none outline-none caret-white"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") setIsModalOpen(true);
+                    if (e.key === "Escape") setIsEditing(false);
+                  }}
+                />
+              ) : (
+                <h2 className="text-white font-[PretendardVariable] font-medium text-[22px]">
+                  {profile?.nickname}님
+                </h2>
+              )}
+            </div>
           </div>
 
           <div className="mt-4 flex items-center text-white font-medium">
@@ -173,7 +234,7 @@ export default function MyPage() {
             </span>
           </div>
 
-          <div className="absolute bottom-[51.4vh] left-1/2 transform -translate-x-1/2 flex gap-14">
+          <div className="absolute bottom-[51vh] left-1/2 transform -translate-x-1/2 flex gap-14">
             <div
               className="flex flex-col items-center cursor-pointer"
               onClick={() => {
@@ -364,6 +425,23 @@ export default function MyPage() {
                 })}
               </div>
             </div>
+          )}
+          {isModalOpen && (
+            <Modal
+              title={`닉네임을 "${newNickname}"로 바꾸시겠습니까?`}
+              buttons={[
+                {
+                  text: "취소",
+                  onClick: () => setIsModalOpen(false),
+                  variant: "gray",
+                },
+                {
+                  text: "확인",
+                  onClick: handleConfirmChange,
+                  variant: "green",
+                },
+              ]}
+            />
           )}
 
           {selectedBonggong && (
