@@ -63,7 +63,13 @@ function QRAuthPage() {
   const handleNavigateSuccess = async () => {
     // 1회차 QR일 때 -> /walk/realtime
     if (isFirstAuth) {
-      navigate('/walk/realtime');
+      const aiRoute = loc.state?.aiRoute;
+
+      navigate('/walk/realtime', {
+        state: {
+          aiRoute,
+        },
+      });
     }
     // 2회차 QR일 때 -> /walk/end api -> finish page routing
     else {
