@@ -3,6 +3,7 @@ import vector from "../assets/vector.svg";
 import coin from "../assets/coin.svg";
 import polygon from "../assets/polygon.svg";
 import lock from "../assets/lock.svg";
+import sadBonggong from "../assets/images/not_found_bonggong.png";
 import { useEffect, useState } from "react";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import BottomButton from "../components/common/BottomButton";
@@ -280,40 +281,50 @@ export default function MyPage() {
               </div>
 
               <div className="overflow-y-auto h-[calc(100%-40px)] pb-5">
-                <div className="flex flex-col gap-3">
-                  {filteredPointHistory.map((p) => {
-                    const [, month, day] = p.date.split("-");
-                    const formattedDate = `${parseInt(month, 10)}.${parseInt(day, 10)}`;
+                {filteredPointHistory.length === 0 ? (
+                  <div className="w-full h-full flex flex-col justify-center items-center text-center text-[#BDBDBD] font-[PretendardVariable]">
+                    <img src={sadBonggong} alt="우는 봉공" className="w-20" />
+                    <p className="text-[14px]">포인트 내역이 아직 없어요.</p>
+                    <p className="text-[14px] mt-1">
+                      산책하고 포인트를 모아보세요!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {filteredPointHistory.map((p) => {
+                      const [, month, day] = p.date.split("-");
+                      const formattedDate = `${parseInt(month, 10)}.${parseInt(day, 10)}`;
 
-                    return (
-                      <div
-                        key={p.date}
-                        className="flex justify-between h-16 items-center font-[PretendardVariable]"
-                      >
-                        <span className="text-[#BDBDBD] text-[16px] w-15">
-                          {formattedDate}
-                        </span>
-                        <div className="flex flex-col flex-1 ml-2 justify-center">
-                          <span className="font-medium text-[16px]">
-                            {p.title}
+                      return (
+                        <div
+                          key={p.date}
+                          className="flex justify-between h-16 items-center font-[PretendardVariable]"
+                        >
+                          <span className="text-[#BDBDBD] text-[16px] w-15">
+                            {formattedDate}
                           </span>
-                          <span className="text-[#BDBDBD] text-[14px]">
-                            {p.location.length > 15
-                              ? `${p.location.slice(0, 15)}...`
-                              : p.location}
+                          <div className="flex flex-col flex-1 ml-2 justify-center">
+                            <span className="font-medium text-[16px]">
+                              {p.title}
+                            </span>
+                            <span className="text-[#BDBDBD] text-[14px]">
+                              {p.location.length > 15
+                                ? `${p.location.slice(0, 15)}...`
+                                : p.location}
+                            </span>
+                          </div>
+                          <span className="text-[#5FD59B] text-[16px] font-medium">
+                            {p.amount}P
                           </span>
                         </div>
-                        <span className="text-[#5FD59B] text-[16px] font-medium">
-                          {p.amount}P
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           ) : (
-            <div className="overflow-y-auto h-[calc(100%-40px)]">
+            <div className="overflow-y-auto h-[calc(100%-10px)]">
               <div className="grid grid-cols-3 gap-3 p-2">
                 {bonggongs.map((b) => {
                   const isSelected = selectedBonggong === b.id;
