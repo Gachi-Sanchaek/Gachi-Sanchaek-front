@@ -1,4 +1,4 @@
-import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -8,11 +8,11 @@ export const axiosInstance = axios.create({
 // 요청 인터셉터: 요청 전에 accessToken을 Auhorization 헤더에 추가
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = localStorage.getItem("accessToken");
 
     if (accessToken) {
       config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${accessToken}`;
+      config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc2MjkzNzczOSwiZXhwIjoxNzYzNTQyNTM5fQ._TlPBb-KghJ0J7tZ5zbsoPxSMeqh8LrCUsh0q5t1g-4`;
     }
 
     //수정된 요청 설정을 반환
@@ -27,8 +27,8 @@ axiosInstance.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       // 토큰 만료 시 로그아웃 처리 또는 로그인 페이지로 이동
-      localStorage.removeItem('accessToken');
-      window.location.href = '/login';
+      localStorage.removeItem("accessToken");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
