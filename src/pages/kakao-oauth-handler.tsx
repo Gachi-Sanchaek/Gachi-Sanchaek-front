@@ -49,7 +49,7 @@ const KakaoOAuthHandler = () => {
         navigate("/login", { replace: true });
       }
     },
-    [navigate, setAccessToken, [K_API_URL], [code]]
+    [navigate, setAccessToken, K_API_URL]
   );
 
   useEffect(() => {
@@ -62,7 +62,7 @@ const KakaoOAuthHandler = () => {
     }
 
     processedRef.current = true;
-  }, [navigate, sendAuthCodeToServer]);
+  }, [navigate, code, sendAuthCodeToServer]);
 
   return null;
 };
