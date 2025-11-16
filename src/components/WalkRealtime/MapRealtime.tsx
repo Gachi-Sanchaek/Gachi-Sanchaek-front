@@ -170,6 +170,7 @@ function MapRealtime({
           strokeStyle: "solid",
         });
         aiLineRef.current.setMap(mapRef.current);
+        lineRef.current?.setMap(mapRef.current);
       } catch (e) {
         console.warn("AI 경로 가져오기 실패", e);
       }
