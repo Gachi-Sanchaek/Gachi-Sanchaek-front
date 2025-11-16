@@ -13,9 +13,10 @@ export default function WalkPage() {
   const orgId = location.state?.orgId ?? null;
   console.log(orgId);
 
+  //5분이상 300이하만 산책 시간 입력가능
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
-    //토스트로 수정하기
+
     if (Number(value) > 300) {
       alert("최대 300분까지만 가능합니다!");
       return;
@@ -23,9 +24,9 @@ export default function WalkPage() {
     setTime(value);
   };
 
-  const isDisabled = !time || Number(time) === 0;
+  const isDisabled = Number(time) < 5 || Number(time) > 300;
 
-  //mapview에서 현재위치 받아오는것으로 수정 예정
+//현재위치 받아옴
   const getCurrent = (): Promise<{ lat: number; lng: number }> =>
     new Promise((resolve) => {
       if (!navigator?.geolocation)
