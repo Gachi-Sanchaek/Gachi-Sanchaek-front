@@ -123,7 +123,11 @@ const SignUp = () => {
             />
             {nickname.length > 0 && (
               <button
-                onClick={() => setNickname("")}
+                onClick={() => {
+                  setNickname("");
+                  setNicknameChecked(false);
+                  setIsNicknameValid(null);
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
                 <img src={close} alt="초기화" />
