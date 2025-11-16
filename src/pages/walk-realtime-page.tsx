@@ -51,12 +51,20 @@ export default function WalkRealtimePage() {
 
   //산책중 화면 꺼짐 방지
   useEffect(() => {
-    let wakeLock: any = null;
+    type ScreenWakeLock = { release: () => Promise<void> };
+
+    let wakeLock: ScreenWakeLock | null = null;
 
     async function requestWakeLock() {
-      if ("wakeLock" in navigator) {
+      const nav = navigator as Navigator & {
+        wakeLock?: {
+          request: (type: "screen") => Promise<ScreenWakeLock>;
+        };
+      };
+
+      if (nav.wakeLock) {
         try {
-          wakeLock = await (navigator as any).wakeLock.request("screen");
+          wakeLock = await nav.wakeLock.request("screen");
           console.log("Screen Wake Lock 활성화");
         } catch (err) {
           console.error("Wake Lock 요청 실패:", err);
@@ -67,7 +75,7 @@ export default function WalkRealtimePage() {
     requestWakeLock();
 
     return () => {
-      if (wakeLock !== null) {
+      if (wakeLock) {
         wakeLock.release().then(() => {
           console.log("Screen Wake Lock 해제");
           wakeLock = null;
