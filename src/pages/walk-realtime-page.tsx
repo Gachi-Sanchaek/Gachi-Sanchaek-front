@@ -39,6 +39,33 @@ export default function WalkRealtimePage() {
     }
   }, [distanceKm, navigate]);
 
+  //산책중 화면 꺼짐 방지
+  useEffect(() => {
+    let wakeLock: any = null;
+
+    async function requestWakeLock() {
+      if ("wakeLock" in navigator) {
+        try {
+          wakeLock = await (navigator as any).wakeLock.request("screen");
+          console.log("Screen Wake Lock 활성화");
+        } catch (err) {
+          console.error("Wake Lock 요청 실패:", err);
+        }
+      }
+    }
+
+    requestWakeLock();
+
+    return () => {
+      if (wakeLock !== null) {
+        wakeLock.release().then(() => {
+          console.log("Screen Wake Lock 해제");
+          wakeLock = null;
+        });
+      }
+    };
+  }, []);
+
   //시간 mm:ss
   const fmt = (sec: number) => {
     const m = Math.floor(sec / 60);
