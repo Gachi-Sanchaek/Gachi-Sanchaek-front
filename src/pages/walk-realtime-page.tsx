@@ -31,6 +31,14 @@ export default function WalkRealtimePage() {
   //거리
   const handleStats = ({ distanceKm }: { distanceKm: number }) => setDistanceKm(distanceKm);
 
+  //비정상적 거리 감지 
+  useEffect(() => {
+    if (distanceKm >= 30) {
+      alert("비정상적인 움직임이 감지되어 산책이 자동 종료되었습니다.");
+      navigate("/", { replace: true });
+    }
+  }, [distanceKm, navigate]);
+
   //시간 mm:ss
   const fmt = (sec: number) => {
     const m = Math.floor(sec / 60);
