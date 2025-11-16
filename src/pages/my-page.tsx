@@ -11,16 +11,15 @@ import BottomButton from "../components/common/BottomButton";
 import type { PointLogItem } from "../types/point";
 import { getPointLog } from "../apis/point";
 import { useUserStore } from "../store/UserStore";
-import type { Bonggong } from "../types/bonggong";
-import { getBonggongs } from "../apis/bonggong";
 import { checkNickname, updateUserProfile } from "../apis/user";
 import Modal from "../components/common/Modal";
 import WarningModal from "../components/common/Modal";
 import type { CheckNicknameResponse } from "../types/user";
+import { useBonggongs } from "../hooks/useBonggong";
 
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState<"points" | "stamps">("points");
-  const { profile, error, updateProfile } = useUserStore();
+  const { profile, error: profileError, updateProfile } = useUserStore();
   const [isEditing, setIsEditing] = useState(false);
   const [shake, setShake] = useState(false);
   const [newNickname, setNewNickname] = useState(profile?.nickname || "");
@@ -28,12 +27,17 @@ export default function MyPage() {
   const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [selectedBonggong, setSelectedBonggong] = useState<number | null>(null);
   const [representBonggong, setRepresentBonggong] = useState<string>("");
-  const [bonggongs, setBonggongs] = useState<Bonggong[]>([]);
+  const {
+    data: bonggongs,
+    isLoading: bonggongsLoading,
+    error: bonggongsError,
+  } = useBonggongs();
   const [pointLogs, setPointLogs] = useState<PointLogItem[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>("전체");
   const inputRef = useRef<HTMLInputElement>(null);
-  const [loading, setLoading] = useState(true);
+  const [pointsLoading, setPointsLoading] = useState(true);
+  const [pointsError, setPointsError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -121,11 +125,16 @@ export default function MyPage() {
 
   useEffect(() => {
     const fetchLogs = async () => {
+      setPointsLoading(true);
       try {
         const logs = await getPointLog();
         setPointLogs(logs);
+        setPointsError(null);
       } catch (err) {
         console.error("포인트 로그 불러오기 실패", err);
+        setPointsError("포인트 로그 불러오기 실패");
+      } finally {
+        setPointsLoading(false);
       }
     };
     fetchLogs();
@@ -137,24 +146,10 @@ export default function MyPage() {
     }
   }, [profile]);
 
-  useEffect(() => {
-    const fetchStamps = async () => {
-      try {
-        const response = await getBonggongs();
-        setBonggongs(response);
-      } catch (error) {
-        console.error("스탬프 데이터 호출 실패: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStamps();
-  }, []);
-
   const handleChangeBonggong = async () => {
     if (selectedBonggong === null || !profile) return;
 
-    const selected = bonggongs.find((b) => b.id === selectedBonggong);
+    const selected = bonggongs?.find((b) => b.id === selectedBonggong);
     if (!selected) return;
 
     if (!profile) {
@@ -184,16 +179,16 @@ export default function MyPage() {
     };
   }, []);
 
-  if (loading)
+  if (bonggongsLoading || pointsLoading)
     return (
       <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
         로딩중...
       </div>
     );
-  if (error)
+  if (bonggongsError || pointsError || profileError)
     return (
       <div className="w-full h-screen flex justify-center items-center font-[PretendardVariable] text-[#FFFFFF]">
-        {error}
+        {(bonggongsError || pointsError || profileError) as string}
       </div>
     );
   if (!profile)
@@ -404,7 +399,7 @@ export default function MyPage() {
           ) : (
             <div className="overflow-y-auto h-[calc(100%-10px)]">
               <div className="grid grid-cols-3 gap-3 p-2">
-                {bonggongs.map((b) => {
+                {bonggongs?.map((b) => {
                   const isSelected = selectedBonggong === b.id;
                   const isRepresentative = representBonggong === b.imageUrl;
                   return (
