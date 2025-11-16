@@ -244,7 +244,11 @@ export default function PloggingAuthPage() {
         <Modal
           title={
             <div className="flex flex-col justify-center items-center">
-              <img src="../../assets/siren_bonggong.png" alt="ai detecting" />
+              <img
+                src="../../assets/siren_bonggong.png"
+                alt="ai detecting"
+                className="w-24"
+              />
               <p className="pt-3">AI가 검증하고 있어요!</p>
             </div>
           }
