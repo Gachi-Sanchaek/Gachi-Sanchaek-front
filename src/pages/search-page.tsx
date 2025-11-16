@@ -65,7 +65,24 @@ export default function SearchPage() {
             console.error('walk connect error', e);
           }
         } else if (selectedCategory === '동행 산책' || selectedCategory === '유기견 산책') {
-          navigate('/qr-auth');
+          if (selectedPlace) {
+            try {
+              const data = await postPlaceStore(selectedPlace, keywordType(selectedCategory));
+
+              console.log(data.data);
+
+              if (data.data) {
+                navigate(`/qr-auth`);
+              } else {
+                alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+              }
+            } catch (e) {
+              alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
+              console.error('place store error', e);
+            }
+          } else {
+            console.error('기관 선택 필수');
+          }
         }
       } else {
         alert('접속이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.');
