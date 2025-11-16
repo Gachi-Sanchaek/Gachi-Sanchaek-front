@@ -41,7 +41,7 @@ axiosInstance.interceptors.response.use(
       originalRequest &&
       !originalRequest._retry
     ) {
-      if (originalRequest.url === "/reissue") {
+      if (originalRequest.url === "/api/v1/auth/refresh") {
         localStorage.removeItem("accessToken");
         window.location.href = "/login";
         return Promise.reject(error);

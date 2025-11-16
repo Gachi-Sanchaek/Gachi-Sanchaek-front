@@ -19,6 +19,9 @@ import QRAuthPage from "./pages/qr-auth-page";
 import WalkRealtimePage from "./pages/walk-realtime-page";
 import PloggingAuthPage from "./pages/plogging-auth-page";
 import WalkEndPage from "./pages/walk-end-page";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const publicRoutes: RouteObject[] = [
   {
@@ -54,7 +57,11 @@ const protectedRoutes: RouteObject[] = [
 const router = createBrowserRouter([...publicRoutes, ...protectedRoutes]);
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 };
 
 export default App;
