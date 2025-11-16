@@ -1,10 +1,18 @@
 import BottomButton from '../components/common/BottomButton';
 import { useLocation, useNavigate } from 'react-router-dom';
 import bonggongFighting from '/src/assets/images/54_화이팅봉공.png';
+import { useEffect } from "react";
 
 export default function WalkEndPage() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   const data = location.state as {
     nickname: string;
@@ -22,7 +30,7 @@ export default function WalkEndPage() {
     data;
   return (
     <>
-      <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-136px)] gap-4">
+      <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-100px)] gap-4">
         <p className="text-2xl font-semibold text-center text-[#5fd59b] font-[PretendardVariable]">
           {nickname}님의 {walkingCount}번째 산책
         </p>
