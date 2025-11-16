@@ -74,6 +74,7 @@ function MapRealtime({
         strokeColor: "#4ACF9A",
         strokeOpacity: 0.85,
         strokeStyle: "solid",
+        zIndex: 20,
       });
       line.setMap(map);
       lineRef.current = line;
@@ -168,9 +169,9 @@ function MapRealtime({
           strokeColor: "#BEF4D6",
           strokeOpacity: 0.8,
           strokeStyle: "solid",
+          zIndex: 5,
         });
         aiLineRef.current.setMap(mapRef.current);
-        lineRef.current?.setMap(mapRef.current);
       } catch (e) {
         console.warn("AI 경로 가져오기 실패", e);
       }
