@@ -21,6 +21,15 @@ export default function WalkRealtimePage() {
   const location = useLocation();
   const aiRoute = location.state?.aiRoute ?? null;
 
+  //인증이 필요한 카테고리인지 판별
+  const isAuthCategory =
+    selectedCategory === "플로깅" ||
+    selectedCategory === "유기견 산책" ||
+    selectedCategory === "동행 산책";
+
+  //인증 허용 최소시간 10분
+  const MIN_AUTH_SECONDS = 10 * 60;
+
   //타이머
   useEffect(() => {
     if (!tracking) return;
@@ -29,9 +38,10 @@ export default function WalkRealtimePage() {
   }, [tracking]);
 
   //거리
-  const handleStats = ({ distanceKm }: { distanceKm: number }) => setDistanceKm(distanceKm);
+  const handleStats = ({ distanceKm }: { distanceKm: number }) =>
+    setDistanceKm(distanceKm);
 
-  //비정상적 거리 감지 
+  //비정상적 거리 감지
   useEffect(() => {
     if (distanceKm >= 30) {
       alert("비정상적인 움직임이 감지되어 산책이 자동 종료되었습니다.");
@@ -70,7 +80,7 @@ export default function WalkRealtimePage() {
   const fmt = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
-    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   };
 
   //정지/재시작
@@ -86,9 +96,9 @@ export default function WalkRealtimePage() {
     setShowConfirm(false);
     setTracking(false);
 
-    const walkId = Number(localStorage.getItem('walkId'));
+    const walkId = Number(localStorage.getItem("walkId"));
     if (!walkId) {
-      console.error('walkId가 없습니다');
+      console.error("walkId가 없습니다");
       return;
     }
 
@@ -97,7 +107,19 @@ export default function WalkRealtimePage() {
       totalSeconds: elapsed,
     };
 
-    if (selectedCategory === '산책') {
+    //10분 미만 포인트 없이 종료
+    if (isAuthCategory && elapsed < MIN_AUTH_SECONDS) {
+      navigate("/", { replace: true });
+      return;
+    }
+
+    if (selectedCategory === "산책") {
+      const walkId = Number(localStorage.getItem("walkId"));
+      if (!walkId) {
+        console.error("walkId가 없습니다");
+        return;
+      }
+
       try {
         const res = await patchWalkFinish({
           walkId,
@@ -106,23 +128,23 @@ export default function WalkRealtimePage() {
         });
 
         const finishData = res.data;
-        navigate('/end', { state: finishData });
+        navigate("/end", { state: finishData });
       } catch (err) {
-        console.error('산책 종료 API 실패:', err);
+        console.error("산책 종료 API 실패:", err);
       }
       return;
     }
 
     const authRoutes: Record<string, string> = {
-      플로깅: '/plogging-auth',
-      '유기견 산책': '/qr-auth',
-      '동행 산책': '/qr-auth',
+      플로깅: "/plogging-auth",
+      "유기견 산책": "/qr-auth",
+      "동행 산책": "/qr-auth",
     };
 
     const next = authRoutes[selectedCategory];
 
     if (!next) {
-      console.error('해당 카테고리 인증 페이지 없음');
+      console.error("해당 카테고리 인증 페이지 없음");
       return;
     }
 
@@ -195,7 +217,18 @@ export default function WalkRealtimePage() {
 
       {showConfirm && (
         <Modal
-          title="산책을 마치겠습니까?"
+          //10분 미만, 인증 카테고리일경우 내용 변경
+          title={
+            isAuthCategory && elapsed < MIN_AUTH_SECONDS ? (
+              <>
+                10분 이상 산책해야 인증 후 포인트를 받을 수 있어요.
+                <br />
+                그래도 종료하시겠어요?
+              </>
+            ) : (
+              "산책을 마치겠습니까?"
+            )
+          }
           buttons={[
             {
               text: "아니오",
