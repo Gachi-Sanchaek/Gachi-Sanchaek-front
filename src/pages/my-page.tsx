@@ -210,7 +210,7 @@ export default function MyPage() {
       greenChildren={
         <div className="p-5 pt-2">
           <div className="flex items-center mt-4">
-            <div className="relative w-[50px] h-[50px] bg-[#FFFFFF] rounded-full flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
+            <div className="relative w-[50px] h-[50px] bg-[#FFFFFF] rounded-full flex-shrink-0 flex items-center justify-center overflow-visible shadow-[0_0_8px_0_rgba(0,0,0,0.3)]">
               <img
                 src={`${import.meta.env.VITE_API_URL}${profile?.profileImageUrl}`}
                 alt="프로필 봉공"
