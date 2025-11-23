@@ -28,7 +28,7 @@ export default function WalkRealtimePage() {
     selectedCategory === "동행 산책";
 
   //인증 허용 최소시간 10분
-  const MIN_AUTH_SECONDS = 10 * 60;
+  const MIN_AUTH_SECONDS = 1;
 
   //타이머
   useEffect(() => {
