@@ -250,7 +250,7 @@ export default function MyPage() {
             </div>
             <button
               onClick={() => setIsDeleteModalOpen(true)}
-              className="w-[48px] flex-shrink-0 text-white border border-white rounded-md px-3 py-2 font-[PretendardVariable] font-medium text-[16px] hover: bg-white/10"
+              className="w-[72px] flex-shrink-0 text-white border border-white rounded-md px-3 py-2 font-[PretendardVariable] font-medium text-[16px] hover: bg-white/10"
             >
               탈퇴
             </button>
@@ -498,7 +498,7 @@ export default function MyPage() {
           {isDeleteModalOpen && (
             <Modal
               title={
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col items-center gap-2">
                   <img
                     src={sadBonggong}
                     alt="우는 봉공"
