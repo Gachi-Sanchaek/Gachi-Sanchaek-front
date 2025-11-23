@@ -64,3 +64,17 @@ export const checkNickname = async (
 
   return response.data?.data;
 };
+
+export const deleteUser = async () => {
+  try {
+    await axiosInstance.delete("/api/v1/users/me");
+
+    useUserStore.setState({ profile: null });
+    localStorage.removeItem("accessToken");
+
+    window.location.assign("/goodbye");
+  } catch (error) {
+    console.error("회원 탈퇴 실패:", error);
+    alert("탈퇴 중 오류가 발생했습니다.");
+  }
+};
