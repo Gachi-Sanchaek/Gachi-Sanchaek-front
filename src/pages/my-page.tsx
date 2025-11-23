@@ -250,38 +250,10 @@ export default function MyPage() {
             </div>
             <button
               onClick={() => setIsDeleteModalOpen(true)}
-              className="text-white border border-white rounded-md px-3 py-1 font-[PretendardVariable] font-medium text-[16px] hover: bg-white/10"
+              className="w-[48px] flex-shrink-0 text-white border border-white rounded-md px-3 py-2 font-[PretendardVariable] font-medium text-[16px] hover: bg-white/10"
             >
               탈퇴
             </button>
-            {isDeleteModalOpen && (
-              <Modal
-                title={
-                  <div className="flex flex-col items-center gap-3">
-                    <img
-                      src={sadBonggong}
-                      alt="우는 봉공"
-                      className="w-20 h-20"
-                    />
-                    <span className="font-[PretendardVariable font-medium text-[18px]">
-                      정말 탈퇴하시겠습니까?
-                    </span>
-                  </div>
-                }
-                buttons={[
-                  {
-                    text: "아니오",
-                    variant: "gray",
-                    onClick: () => setIsDeleteModalOpen(false),
-                  },
-                  {
-                    text: "예",
-                    variant: "green",
-                    onClick: handleDeleteUser,
-                  },
-                ]}
-              />
-            )}
           </div>
 
           <div className="mt-4 flex items-center text-white font-medium">
@@ -522,6 +494,34 @@ export default function MyPage() {
                 ]}
               />
             </div>
+          )}
+          {isDeleteModalOpen && (
+            <Modal
+              title={
+                <div className="flex flex-col items-center gap-3">
+                  <img
+                    src={sadBonggong}
+                    alt="우는 봉공"
+                    className="w-20 h-20"
+                  />
+                  <span className="font-[PretendardVariable] font-medium text-[18px]">
+                    정말 탈퇴하시겠습니까?
+                  </span>
+                </div>
+              }
+              buttons={[
+                {
+                  text: "아니오",
+                  variant: "gray",
+                  onClick: () => setIsDeleteModalOpen(false),
+                },
+                {
+                  text: "예",
+                  variant: "green",
+                  onClick: handleDeleteUser,
+                },
+              ]}
+            />
           )}
         </div>
       }
