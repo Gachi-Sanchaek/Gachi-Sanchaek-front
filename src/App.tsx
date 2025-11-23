@@ -20,6 +20,7 @@ import WalkRealtimePage from "./pages/walk-realtime-page";
 import PloggingAuthPage from "./pages/plogging-auth-page";
 import WalkEndPage from "./pages/walk-end-page";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import GoodbyePage from "./pages/goodbye-page";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const publicRoutes: RouteObject[] = [
       { path: "login", element: <LogIn /> },
       { path: "signup", element: <SignUp /> },
       { path: KAKAO_OAUTH, element: <KakaoOAuthHandler /> },
+      { path: "goodbye", element: <GoodbyePage /> },
     ],
   },
 ];
